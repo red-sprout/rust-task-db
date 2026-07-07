@@ -2,7 +2,7 @@
 
 ## 포함된 파일 목록
 
-현재 Step 11에는 공통 에러 파일 `src/error.rs`가 있다. 유틸, 설정 모듈 파일은 없다.
+현재 Step 12에는 공통 에러 파일 `src/error.rs`가 있다. 유틸, 설정 모듈 파일은 없다.
 
 `src/error.rs`는 여러 계층에서 함께 쓰는 공통 에러 파일이다. repository 설명은 `02-domain-or-feature-files.md`에서 다룬다.
 

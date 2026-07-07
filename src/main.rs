@@ -26,7 +26,7 @@ fn main() {
         return;
     }
 
-    let repository = match GlueSqlTaskRepository::new() {
+    let repository = match GlueSqlTaskRepository::persistent("data/rust-task-db") {
         Ok(repository) => repository,
         Err(message) => {
             eprintln!("{message}");
@@ -127,7 +127,7 @@ fn print_sql_results(results: &[SqlResult]) {
 }
 
 fn print_help() {
-    println!("rust-task Step 11: Tested GlueSQL-backed Todo CLI");
+    println!("rust-task Step 12: Persistent GlueSQL Todo CLI");
     println!();
     println!("Usage:");
     println!("  rust-task add \"Rust 공부\"");
@@ -139,7 +139,7 @@ fn print_help() {
     println!("  rust-task sql \"SELECT * FROM tasks\"");
     println!("  rust-task repl");
     println!();
-    println!("Note: Step 11 reinforces the GlueSQL CLI and REPL with tests.");
+    println!("Note: Step 12 stores GlueSQL data under data/rust-task-db.");
 }
 
 #[cfg(test)]

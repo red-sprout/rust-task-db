@@ -28,6 +28,7 @@
 | `count` | Rust iterator 메서드 | iterator의 항목 개수를 센다. | `.count()` | `src/repository/mod.rs` | 통계 계산에 사용한다. |
 | borrowing | Rust 문법 | 소유권을 가져오지 않고 값을 빌려 사용한다. | `print_task(task: &Task)` | `src/main.rs` | 수정하려면 `&mut`가 필요하다. |
 | `matches!` | Rust macro | 값이 특정 패턴과 맞는지 확인한다. | `matches!(result, Err(AppError::GlueSql(_)))` | `src/repository/gluesql_repository.rs` | `_`는 안쪽 값은 검사하지 않는다는 뜻이다. |
+| `impl AsRef<Path>` | Rust 문법 | path처럼 볼 수 있는 여러 타입을 함수 인자로 받는다. | `persistent(path: impl AsRef<Path>)` | `src/repository/gluesql_repository.rs` | `&str`과 `PathBuf`를 모두 받을 수 있다. |
 
 ## 프레임워크
 
@@ -39,10 +40,10 @@
 
 | 용어 | 분류 | 한 줄 설명 | 프로젝트 코드 예시 | 관련 파일 | 주의할 점 |
 | --- | --- | --- | --- | --- | --- |
-| 외부 crate | 라이브러리 | Cargo dependency로 추가하는 Rust 패키지 | `serde`, `serde_json`, `gluesql`, `futures` | `Cargo.toml` | 현재 Step 11 테스트 보강도 새 crate를 추가하지 않는다. |
+| 외부 crate | 라이브러리 | Cargo dependency로 추가하는 Rust 패키지 | `serde`, `serde_json`, `gluesql`, `futures` | `Cargo.toml` | Step 12는 새 crate 이름 대신 `gluesql_sled_storage` feature를 추가한다. |
 | serde | 라이브러리 | Rust 값을 다른 형식으로 바꾸는 기반 crate | `Serialize`, `Deserialize` | `src/task.rs` | derive feature가 필요하다. |
 | serde_json | 라이브러리 | Rust 값과 JSON 문자열을 서로 변환한다. | `serde_json::from_str` | `src/repository/mod.rs` | JSON 문법 오류는 parsing 실패가 된다. |
-| gluesql | 라이브러리 | Rust 코드 안에서 SQL 엔진과 storage를 제공한다. | `Glue::new` | `src/repository/gluesql_repository.rs` | 현재 Step 11에서는 repository 내부 구현, `sql` 명령, REPL SQL 실행에 사용한다. |
+| gluesql | 라이브러리 | Rust 코드 안에서 SQL 엔진과 storage를 제공한다. | `Glue::new` | `src/repository/gluesql_repository.rs` | 현재 Step 12에서는 repository 내부 구현, `sql` 명령, REPL SQL 실행에 사용한다. |
 | futures | 라이브러리 | async Future를 실행하거나 조합하는 도구를 제공한다. | `block_on` | `src/repository/gluesql_repository.rs` | `main.rs`를 async로 바꾸지 않기 위해 repository 내부에서만 사용한다. |
 
 ## 빌드 도구
@@ -59,9 +60,10 @@
 | JSON 파일 저장 | 저장 방식 | 데이터를 JSON 파일에 저장한다. | `tasks.json` | `tasks.json`, `src/repository/mod.rs` | 프로그램 종료 후에도 데이터가 남는다. |
 | Repository | 저장소 패턴 | 데이터를 어디에 저장하는지 감싸는 역할이다. | `TaskRepository` | `src/repository/mod.rs` | 현재는 JSON 구현체와 GlueSQL 구현체가 함께 있다. |
 | Service layer | 애플리케이션 계층 | 명령 실행 흐름과 저장소 사이에 있는 계층이다. | `TaskService` | `src/service.rs` | 현재는 repository에 위임하는 역할이 중심이다. |
-| JsonTaskRepository | 저장소 구현체 | `tasks.json`을 사용하는 Todo 저장소다. | `JsonTaskRepository::new` | `src/repository/mod.rs` | 현재 Step 11에서는 삭제하지 않고 보존된 구현체다. |
-| GlueSqlTaskRepository | 저장소 구현체 | GlueSQL `MemoryStorage`를 사용하는 Todo 저장소다. | `GlueSqlTaskRepository::new` | `src/repository/gluesql_repository.rs` | 현재 Step 11에서 `main.rs`가 사용하는 활성 구현체다. |
-| MemoryStorage | GlueSQL 저장 방식 | 프로그램 실행 중 메모리에만 SQL table을 둔다. | `MemoryStorage::default()` | `src/repository/gluesql_repository.rs` | 프로그램이 끝나면 데이터가 사라진다. |
+| JsonTaskRepository | 저장소 구현체 | `tasks.json`을 사용하는 Todo 저장소다. | `JsonTaskRepository::new` | `src/repository/mod.rs` | 현재 Step 12에서는 삭제하지 않고 보존된 구현체다. |
+| GlueSqlTaskRepository | 저장소 구현체 | GlueSQL storage를 사용하는 Todo 저장소다. | `GlueSqlTaskRepository::persistent` | `src/repository/gluesql_repository.rs` | 현재 Step 12에서 `main.rs`가 사용하는 활성 구현체다. |
+| MemoryStorage | GlueSQL 저장 방식 | 프로그램 실행 중 메모리에만 SQL table을 둔다. | `MemoryStorage::default()` | `src/repository/gluesql_repository.rs` | 현재는 테스트에서 주로 사용한다. |
+| SledStorage | GlueSQL 저장 방식 | 디렉터리에 SQL table 데이터를 저장한다. | `SledStorage::new(path)` | `src/repository/gluesql_repository.rs` | Step 12 기본 실행 저장소다. |
 | SqlResult | 프로젝트 결과 타입 | SQL 실행 결과를 CLI 출력용으로 표현한다. | `SqlResult::Select` | `src/repository/mod.rs` | GlueSQL `Payload`를 그대로 main에 노출하지 않기 위해 사용한다. |
 | REPL | 실행 모드 | 프로그램을 종료하지 않고 입력을 반복해서 받는 모드다. | `run_repl` | `src/repl.rs` | `.exit` 또는 `.quit`으로 종료한다. |
 
@@ -78,6 +80,7 @@
 | Step 9 | 프로젝트 학습 단계 | SQL 실행 모드를 추가한 단계 | `Command::Sql`, `SqlResult` | `src/command.rs`, `src/repository/mod.rs` | 완료된 단계다. |
 | Step 10 | 프로젝트 학습 단계 | REPL 모드를 추가한 단계 | `Command::Repl`, `run_repl` | `src/command.rs`, `src/repl.rs` | `.schema`, `.exit`, `.quit`을 지원한다. |
 | Step 11 | 프로젝트 학습 단계 | 테스트를 보강한 단계 | `missing_add_title_returns_error`, `invalid_sql_returns_gluesql_error` | `src/cli.rs`, `src/repository/gluesql_repository.rs` | 새 기능을 추가하지 않고 총 57개 테스트로 기존 흐름을 확인한다. |
+| Step 12 | 프로젝트 학습 단계 | GlueSQL 저장소를 영속 저장소로 전환한 단계 | `GlueSqlTaskRepository::persistent` | `src/main.rs`, `src/repository/gluesql_repository.rs` | 데이터가 `data/rust-task-db`에 유지된다. |
 
 ## 테스트
 

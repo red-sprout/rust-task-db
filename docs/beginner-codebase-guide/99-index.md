@@ -2,9 +2,9 @@
 
 ## 이 문서 세트의 목적
 
-이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 11 코드만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, 테스트, 수정 포인트를 이해하게 만드는 것이다.
+이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 12 코드만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL SledStorage 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, 테스트, 수정 포인트를 이해하게 만드는 것이다.
 
-현재 구현은 `docs/prompt.md`의 `Step 11. 테스트 추가`까지다.
+현재 구현은 `Step 12. GlueSQL SledStorage 영속 저장소 전환`까지다.
 
 ## 문서를 읽는 추천 순서
 
@@ -27,7 +27,7 @@
 
 ## 각 문서의 역할
 
-- `00-overview.md`: 현재 Step 11 프로젝트 큰 그림
+- `00-overview.md`: 현재 Step 12 프로젝트 큰 그림
 - `01-project-map.md`: 실제 파일 지도
 - `02-reading-order.md`: 초심자가 읽을 순서
 - `03-runtime-flow.md`: `main()`부터 service, GlueSQL repository 호출까지 흐름
@@ -43,7 +43,7 @@
 - `13-common-mistakes.md`: 초심자 실수
 - `14-glossary.md`: 용어 사전
 - `15-beginner-faq.md`: 지금까지 나온 질문과 답변 모음
-- `16-run-guide.md`: 프로젝트 실행 방법, SQL/REPL 실행 방법, GlueSQL `MemoryStorage` 주의점
+- `16-run-guide.md`: 프로젝트 실행 방법, SQL/REPL 실행 방법, GlueSQL `SledStorage` 저장 위치
 - `README.md`: GitHub 첫 화면용 요약, 실행 방법, 테스트 방법
 
 ## 이 문서만 보고 할 수 있어야 하는 것
@@ -58,7 +58,8 @@
 - `rust-task repl` 실행 흐름 설명
 - `src/task.rs`의 serde derive 설명
 - Step 11에서 보강된 테스트가 무엇을 지키는지 설명
-- Step 10에서 `GlueSqlTaskRepository`가 GlueSQL `MemoryStorage`에 SQL을 직접 실행하는 방식 설명
+- Step 12에서 `SledStorage`로 데이터가 유지되는 이유 설명
+- Step 12에서 `GlueSqlTaskRepository`가 GlueSQL `SledStorage`에 SQL을 직접 실행하는 방식 설명
 - Step 10에서 REPL 안에서는 같은 저장소 인스턴스가 유지되는 이유 설명
 - `mod`, `derive`, `impl`, `match`, `Result`, `?`, `std::fs`, `Serialize`, `Deserialize`, `block_on`이 무엇인지 설명
 - `cargo run`, `cargo test`, `cargo check`로 현재 프로젝트 실행/검증
@@ -73,7 +74,7 @@
 -> src/service.rs TaskService
 -> TaskRepository trait
 -> GlueSqlTaskRepository
--> GlueSQL MemoryStorage
+-> GlueSQL SledStorage
 -> SQL 직접 실행, REPL SQL 실행, 또는 Todo 명령 실행
 -> src/main.rs match command
 -> 터미널 출력
@@ -89,4 +90,4 @@
 
 ## 다음 단계 안내
 
-현재 `docs/prompt.md` 기준 단계 구현은 Step 11까지 완료되어 있다.
+현재 단계 구현은 Step 12까지 완료되어 있다.

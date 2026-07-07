@@ -2,7 +2,7 @@
 
 ## 프로젝트 한 줄 요약
 
-`rust-task`는 Rust 문법을 단계별로 배우기 위한 CLI Todo 앱이며, 현재는 Step 11로 GlueSQL SQL 실행 모드, REPL 모드, 테스트 보강까지 구현되어 있다.
+`rust-task`는 Rust 문법을 단계별로 배우기 위한 CLI Todo 앱이며, 현재는 Step 12로 GlueSQL SQL 실행 모드, REPL 모드, 테스트 보강, SledStorage 영속 저장까지 구현되어 있다.
 
 ## 이 프로젝트가 해결하는 문제
 
@@ -12,7 +12,7 @@ Rust 초심자가 `struct`, `enum`, `trait`, generic, `impl`, `Vec`, ownership, 
 
 현재 구현:
 
-- `cargo run -- add "Rust 공부"`: `TaskService`를 통해 Todo를 GlueSQL `MemoryStorage`에 추가
+- `cargo run -- add "Rust 공부"`: `TaskService`를 통해 Todo를 GlueSQL `SledStorage`에 추가
 - `cargo run -- list`: `TaskService`를 통해 현재 프로세스의 Todo 목록 출력
 - `cargo run -- done 1`: `TaskService`를 통해 Todo를 완료 처리
 - `cargo run -- delete 1`: `TaskService`를 통해 Todo를 삭제
@@ -39,7 +39,7 @@ cargo run -- add "Rust 공부"
 -> src/main.rs main()
 -> std::env::args().collect()
 -> src/cli.rs parse_args(args)
--> GlueSqlTaskRepository::new()
+-> GlueSqlTaskRepository::persistent("data/rust-task-db")
 -> CREATE TABLE tasks (...)
 -> TaskService::new(repository)
 -> src/command.rs Command::Add { title }
@@ -53,13 +53,14 @@ cargo run -- add "Rust 공부"
 
 Step 10의 핵심 변화는 `sql` 명령을 한 번 실행하는 것에서 나아가, `repl` 안에서 여러 SQL을 순서대로 실행할 수 있게 된 것이다.
 Step 11의 핵심 변화는 새 기능 추가가 아니라 기존 구조를 테스트로 더 단단하게 묶은 것이다.
+Step 12의 핵심 변화는 `MemoryStorage` 대신 `SledStorage`를 사용해서 CLI 실행 간 Todo가 유지되게 한 것이다.
 
 ```text
 src/main.rs
 -> TaskService
 -> TaskRepository trait
 -> GlueSqlTaskRepository
--> GlueSQL MemoryStorage
+-> GlueSQL SledStorage
 ```
 
 Step 7까지는 JSON 파일과 iterator 검색/통계가 중심이었다. Step 8에서는 `Glue::new`, `MemoryStorage`, `execute(...).await`, `block_on`, `Payload`, `Value`가 새로 중요해진다.
@@ -67,7 +68,7 @@ Step 7까지는 JSON 파일과 iterator 검색/통계가 중심이었다. Step 8
 Step 9에서는 `Command::Sql`, `TaskRepository::execute_sql`, `SqlResult`, SQL 결과 출력이 새로 중요해졌다.
 Step 10에서는 `Command::Repl`, `src/repl.rs`, `BufRead`, `Write`, `.schema`, `.exit`, `.quit`이 새로 중요해진다.
 
-주의: Step 10의 GlueSQL 저장소도 `MemoryStorage`라서 프로그램이 끝나면 데이터가 사라진다. 다만 REPL 안에서는 같은 실행이 유지되므로 `INSERT` 다음 `SELECT`로 바로 확인할 수 있다.
+주의: Step 12의 GlueSQL 저장소는 `SledStorage`라서 프로그램이 끝나도 `data/rust-task-db`에 데이터가 남는다. REPL 안에서는 같은 실행도 유지된다.
 
 ## 대표 요청 흐름 요약
 
@@ -88,7 +89,8 @@ Step 10에서는 `Command::Repl`, `src/repl.rs`, `BufRead`, `Write`, `.schema`, 
 
 - Todo: `Task` 값 한 개
 - 목록: `Vec<Task>`
-- 현재 활성 저장소: GlueSQL `MemoryStorage`
+- 현재 활성 저장소: GlueSQL `SledStorage`
+- 현재 저장 위치: `data/rust-task-db`
 - 보존된 저장 파일: `tasks.json`
 - SQL 결과 모델: `SqlResult`
 - REPL 모듈: `src/repl.rs`

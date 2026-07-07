@@ -21,7 +21,7 @@ Custom error, Service layer, Repository trait, SQL 결과 타입, GlueSQL reposi
 ```text
 src/main.rs -> AppError
 src/main.rs -> TaskService -> TaskRepository -> GlueSqlTaskRepository
-GlueSqlTaskRepository -> GlueSQL MemoryStorage
+GlueSqlTaskRepository -> GlueSQL SledStorage
 GlueSqlTaskRepository -> SqlResult
 JsonTaskRepository -> tasks.json 보존
 src/cli.rs -> Command
@@ -100,7 +100,7 @@ impl<R: TaskRepository> TaskService<R> {
 }
 ```
 
-현재 Step 11에서는 service가 add/list/done/delete/search/stats/sql/repl 요청을 repository에 위임한다. REPL도 내부적으로 `TaskService::execute_sql`을 사용한다. 실패 타입은 `AppError`다.
+현재 Step 12에서는 service가 add/list/done/delete/search/stats/sql/repl 요청을 repository에 위임한다. REPL도 내부적으로 `TaskService::execute_sql`을 사용한다. 실패 타입은 `AppError`다.
 
 ## 파일 경로
 
@@ -167,13 +167,58 @@ impl TaskRepository for JsonTaskRepository {
 
 ### 이 파일의 역할
 
-`GlueSqlTaskRepository`를 정의한다. 현재 Step 11에서 `main.rs`가 사용하는 활성 저장소이며, `sql` 명령과 `repl` 안의 SQL도 여기서 실행한다.
+`GlueSqlTaskRepository<S>`를 정의한다. 현재 Step 12에서 `main.rs`가 사용하는 활성 저장소는 `GlueSqlTaskRepository<SledStorage>`이며, `sql` 명령과 `repl` 안의 SQL도 여기서 실행한다. 테스트에서는 `GlueSqlTaskRepository<MemoryStorage>`도 사용한다.
+
+핵심 코드:
+
+```rust
+pub struct GlueSqlTaskRepository<S = MemoryStorage>
+where
+    S: GStore + GStoreMut + Planner,
+{
+    glue: Glue<S>,
+}
+```
+
+코드 해석:
+
+- `S`: GlueSQL storage 타입이 들어가는 자리다.
+- `MemoryStorage`: 테스트에서 빠르게 쓰는 메모리 저장소다.
+- `SledStorage`: Step 12 CLI 기본 실행에서 쓰는 파일 기반 저장소다.
+- `GStore + GStoreMut + Planner`: GlueSQL의 `Glue<S>`가 SQL 실행을 위해 요구하는 storage 조건이다.
+
+영속 저장소 생성 코드:
+
+```rust
+pub fn persistent(path: impl AsRef<Path>) -> Result<Self, AppError> {
+    let storage =
+        SledStorage::new(path).map_err(|error| AppError::GlueSql(error.to_string()))?;
+    let glue = Glue::new(storage);
+    let mut repository = Self { glue };
+
+    repository.create_tasks_table()?;
+
+    Ok(repository)
+}
+```
+
+읽는 법:
+
+```text
+path로 SledStorage를 연다.
+-> Glue::new(storage)로 SQL 실행 엔진을 만든다.
+-> tasks table이 없으면 만든다.
+-> repository를 반환한다.
+```
 
 ### 핵심 코드 블록
 
 ```rust
-pub struct GlueSqlTaskRepository {
-    glue: Glue<MemoryStorage>,
+pub struct GlueSqlTaskRepository<S = MemoryStorage>
+where
+    S: GStore + GStoreMut + Planner,
+{
+    glue: Glue<S>,
 }
 ```
 
@@ -194,7 +239,7 @@ fn execute_sql(&mut self, sql: String) -> Result<Vec<SqlResult>, AppError> {
 
 ### 코드 블록별 해설
 
-- `Glue<MemoryStorage>`: GlueSQL 엔진과 메모리 저장소를 함께 들고 있는 값이다.
+- `Glue<S>`: GlueSQL 엔진과 storage 구현체를 함께 들고 있는 값이다. 현재 CLI의 `S`는 `SledStorage`다.
 - `block_on`: GlueSQL의 async 실행을 동기 CLI 흐름 안에서 기다린다.
 - `Payload`: GlueSQL 실행 결과다. `SELECT` 결과는 row 목록으로 들어온다.
 - `Value`: SQL row 안의 개별 값이다. `Value::I64`, `Value::Str`, `Value::Bool`을 `Task` 필드로 바꾼다.
@@ -240,7 +285,7 @@ pub enum Command {
 
 ### 초심자가 수정할 수 있는 부분
 
-새 명령을 추가하려면 먼저 여기에 variant를 추가한다. 현재 Step 11에서는 `Repl`까지 있다.
+새 명령을 추가하려면 먼저 여기에 variant를 추가한다. 현재 Step 12에서는 `Repl`까지 있다.
 
 ## 파일 경로
 

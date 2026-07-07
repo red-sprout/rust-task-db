@@ -9,6 +9,7 @@ rust-task-db/
 ├── Cargo.lock
 ├── AGENTS.md
 ├── tasks.json
+├── data/                  # git 추적 안 함
 ├── src/
 │   ├── main.rs
 │   ├── repl.rs
@@ -47,7 +48,7 @@ rust-task-db/
 | 역할 | GitHub 첫 화면용 프로젝트 소개 문서 |
 | 이 파일이 필요한 이유 | 프로젝트 목적, 실행 방법, 테스트 방법, MemoryStorage 주의점을 빠르게 보여주기 위해 필요하다. |
 | 연결된 파일 | `docs/beginner-codebase-guide/99-index.md`, `docs/beginner-codebase-guide/16-run-guide.md`, `src/main.rs` |
-| 초심자가 봐야 할 핵심 | 현재 Step 11 상태, 지원 명령, `MemoryStorage` 주의점 |
+| 초심자가 봐야 할 핵심 | 현재 Step 12 상태, 지원 명령, `SledStorage` 저장 위치 |
 | 설명 깊이 | 짧은 설명으로 충분 |
 
 | 항목 | 내용 |
@@ -63,10 +64,19 @@ rust-task-db/
 | --- | --- |
 | 파일 경로 | `tasks.json` |
 | 역할 | Step 7까지 사용한 Todo 데이터 저장 파일 |
-| 이 파일이 필요한 이유 | JSON 저장소 구현을 보존하기 위해 남겨둔다. Step 11 기본 실행 경로에서는 사용하지 않는다. |
+| 이 파일이 필요한 이유 | JSON 저장소 구현을 보존하기 위해 남겨둔다. Step 12 기본 실행 경로에서는 사용하지 않는다. |
 | 연결된 파일 | `src/repository/mod.rs`, `src/task.rs` |
 | 초심자가 봐야 할 핵심 | 기존 파일을 삭제하지 않고 저장소를 갈아끼우는 구조 |
 | 설명 깊이 | 상세 설명 필요 |
+
+| 항목 | 내용 |
+| --- | --- |
+| 파일 경로 | `data/rust-task-db` |
+| 역할 | Step 12 기본 실행 데이터가 저장되는 SledStorage 디렉터리 |
+| 이 파일이 필요한 이유 | CLI 명령을 여러 번 나눠 실행해도 Todo가 유지되게 한다. |
+| 연결된 파일 | `src/main.rs`, `src/repository/gluesql_repository.rs`, `.gitignore` |
+| 초심자가 봐야 할 핵심 | 이 디렉터리는 실행 중 생성되며 git에 커밋하지 않는다. |
+| 설명 깊이 | 중간 설명 필요 |
 
 | 항목 | 내용 |
 | --- | --- |
@@ -82,10 +92,10 @@ rust-task-db/
 | 항목 | 내용 |
 | --- | --- |
 | 파일 경로 | `src/main.rs` |
-| 역할 | 프로그램 시작점, `Command` 실행, GlueSQL repository 생성, service 메서드 호출, Todo/SQL 결과 출력 |
+| 역할 | 프로그램 시작점, `Command` 실행, SledStorage 기반 GlueSQL repository 생성, service 메서드 호출, Todo/SQL 결과 출력 |
 | 이 파일이 필요한 이유 | CLI 명령이 service 호출로 이어지는 곳이다. |
 | 연결된 파일 | `src/cli.rs`, `src/command.rs`, `src/service.rs`, `src/repository/mod.rs`, `src/task.rs` |
-| 초심자가 봐야 할 핵심 | `main`, `GlueSqlTaskRepository::new`, `TaskService::new`, `service.add`, `service.execute_sql`, `repl::run_repl` |
+| 초심자가 봐야 할 핵심 | `main`, `GlueSqlTaskRepository::persistent`, `TaskService::new`, `service.add`, `service.execute_sql`, `repl::run_repl` |
 | 설명 깊이 | 상세 설명 필요 |
 
 | 항목 | 내용 |
@@ -127,10 +137,10 @@ rust-task-db/
 | 항목 | 내용 |
 | --- | --- |
 | 파일 경로 | `src/repository/gluesql_repository.rs` |
-| 역할 | `GlueSqlTaskRepository` 구현과 SQL 실행 결과 변환 |
-| 이 파일이 필요한 이유 | GlueSQL `MemoryStorage`로 Todo를 저장하고, Step 9의 `sql` 명령을 실행하는 repository 구현체다. |
+| 역할 | `GlueSqlTaskRepository<S>` 구현과 SQL 실행 결과 변환 |
+| 이 파일이 필요한 이유 | GlueSQL `SledStorage`로 Todo를 저장하고, Step 9의 `sql` 명령을 실행하는 repository 구현체다. 테스트에서는 `MemoryStorage`도 사용한다. |
 | 연결된 파일 | `src/repository/mod.rs`, `src/main.rs`, `src/task.rs`, `src/error.rs` |
-| 초심자가 봐야 할 핵심 | `Glue::new`, `MemoryStorage`, `execute`, `execute_sql`, `payload_to_sql_result`, `Payload`, `Value`, `block_on` |
+| 초심자가 봐야 할 핵심 | `Glue::new`, `SledStorage`, `MemoryStorage`, `persistent`, `execute`, `execute_sql`, `payload_to_sql_result`, `Payload`, `Value`, `block_on` |
 | 설명 깊이 | 상세 설명 필요 |
 
 | 항목 | 내용 |
@@ -162,7 +172,7 @@ rust-task-db/
 
 ## 설정 파일 설명
 
-별도 런타임 설정 파일은 코드에서 확인되지 않음. Step 11 기본 저장소는 GlueSQL `MemoryStorage`라서 파일 경로 상수를 사용하지 않는다.
+별도 런타임 설정 파일은 코드에서 확인되지 않음. Step 12 기본 저장소는 GlueSQL `SledStorage`이며 `src/main.rs`에서 `"data/rust-task-db"` 경로를 직접 넘긴다.
 
 ## 테스트 디렉터리 설명
 
@@ -182,7 +192,7 @@ Docker, CI/CD, 배포 설정은 코드에서 확인되지 않음.
 ```text
 src/main.rs
 -> cli::parse_args(...)
--> GlueSqlTaskRepository::new()
+-> GlueSqlTaskRepository::persistent("data/rust-task-db")
 -> TaskService::new(repository)
 -> match Command
 -> service.add/list/done/delete/search/stats/execute_sql 또는 repl::run_repl
@@ -196,7 +206,7 @@ src/repository/mod.rs
 -> GlueSqlTaskRepository re-export
 
 src/repository/gluesql_repository.rs
--> GlueSQL MemoryStorage
+-> GlueSQL SledStorage
 -> CREATE TABLE tasks
 -> INSERT/SELECT/UPDATE/DELETE/COUNT/user SQL
 -> Payload를 SqlResult로 변환

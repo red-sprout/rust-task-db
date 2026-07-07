@@ -2,7 +2,7 @@
 
 ## 테스트 구조
 
-테스트는 `src/task.rs`, `src/cli.rs`, `src/error.rs`, `src/service.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs` 하단의 `#[cfg(test)] mod tests` 안에 있다.
+테스트는 `src/task.rs`, `src/cli.rs`, `src/error.rs`, `src/service.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs` 하단의 `#[cfg(test)] mod tests` 안에 있다. Step 12에서는 SledStorage 영속 저장 테스트가 추가되었다.
 
 ```rust
 #[cfg(test)]
@@ -41,8 +41,20 @@ cargo test
 - REPL 단위 테스트
 - help 흐름 보조 테스트
 - Task 생성과 TaskStats 계산 테스트
+- SledStorage 영속 저장 테스트
 
 CLI end-to-end 테스트는 코드에서 확인되지 않음.
+
+## Step 12에서 달라진 점
+
+Step 12는 새 CLI 명령을 추가하지 않고 저장소를 영속 저장소로 전환한다.
+
+| 구분 | Step 11 | Step 12 |
+| --- | --- | --- |
+| 기본 CLI 저장소 | `MemoryStorage` | `SledStorage` |
+| 테스트 개수 | 57개 | 58개 |
+| 새 테스트 | 없음 | `persists_tasks_with_sled_storage` |
+| 검증하는 것 | 기존 흐름 보강 | repository를 다시 열어도 Todo가 남는지 |
 
 ## Step 11에서 달라진 점
 
@@ -224,7 +236,7 @@ result 값이
 - `parse_args`가 `Ok(Command)`와 `Err(AppError)` 중 무엇을 반환하는가
 - `TaskService`가 `TaskRepository` trait bound를 사용하는가
 - `JsonTaskRepository::new`가 파일 없음과 JSON parsing 실패를 다르게 처리하는가
-- `GlueSqlTaskRepository::new`가 `tasks` table을 만드는가
+- `GlueSqlTaskRepository::new`가 테스트용 `MemoryStorage` table을 만들고, `GlueSqlTaskRepository::persistent`가 SledStorage table을 준비하는가
 - GlueSQL `Payload::Select`의 row가 `Task`로 변환되는가
 - GlueSQL `Payload`가 `SqlResult`로 변환되는가
 - REPL 테스트가 `Cursor` 입력과 `Vec<u8>` 출력을 사용하는가
@@ -266,7 +278,7 @@ fn missing_add_title_returns_error() {
 
 ## 현재 테스트 개수
 
-현재 Step 11은 총 57개 테스트가 있다.
+현재 Step 12는 총 58개 테스트가 있다.
 
 - `src/task.rs`: domain 테스트 2개
 - `src/cli.rs`: CLI parser 테스트 16개
@@ -274,7 +286,7 @@ fn missing_add_title_returns_error() {
 - `src/service.rs`: service 테스트 7개
 - `src/repl.rs`: REPL 테스트 5개
 - `src/repository/mod.rs`: repository 테스트 9개
-- `src/repository/gluesql_repository.rs`: GlueSQL repository 테스트 12개
+- `src/repository/gluesql_repository.rs`: GlueSQL repository 테스트 13개
 - `src/main.rs`: help 흐름 보조 테스트 1개
 
 ## 테스트 추가 실습
@@ -285,8 +297,8 @@ fn missing_add_title_returns_error() {
 | 항목 | 내용 |
 | --- | --- |
 | 테스트 파일 | `src/repository/gluesql_repository.rs` |
-| 테스트 대상 | `GlueSqlTaskRepository::new`, `add`, `find_all`, `mark_done`, `delete`, `search`, `stats`, `execute_sql` |
-| 테스트가 검증하는 것 | GlueSQL `MemoryStorage`에서 SQL로 Todo 기능과 직접 SQL 실행이 동작하는지 |
+| 테스트 대상 | `GlueSqlTaskRepository::new`, `GlueSqlTaskRepository::persistent`, `add`, `find_all`, `mark_done`, `delete`, `search`, `stats`, `execute_sql` |
+| 테스트가 검증하는 것 | GlueSQL `MemoryStorage`에서 SQL Todo 기능이 동작하고, `SledStorage`에서 데이터가 유지되는지 |
 | 실패하면 의심해야 할 코드 | `execute`, `execute_sql`, `payload_to_sql_result`, `select_tasks`, `row_to_task`, `select_count`, SQL 문자열 |
 | 초심자가 추가할 수 있는 테스트 | 제목에 작은따옴표가 들어간 경우, 없는 id 처리 |
 

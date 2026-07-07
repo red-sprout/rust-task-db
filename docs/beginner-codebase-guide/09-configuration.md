@@ -29,14 +29,13 @@
 
 ## 데이터베이스 설정
 
-별도 데이터베이스 설정 파일은 코드에서 확인되지 않음. 현재 Step 11은 `GlueSqlTaskRepository`가 GlueSQL `MemoryStorage`를 코드 안에서 직접 만든다.
+별도 데이터베이스 설정 파일은 코드에서 확인되지 않음. 현재 Step 12는 `src/main.rs`가 `GlueSqlTaskRepository::persistent("data/rust-task-db")`를 호출한다.
 
 ```rust
-let storage = MemoryStorage::default();
-let glue = Glue::new(storage);
+let repository = GlueSqlTaskRepository::persistent("data/rust-task-db");
 ```
 
-`MemoryStorage`는 파일 경로, 계정, 포트 같은 설정이 없다. 프로그램이 끝나면 데이터도 사라진다.
+`SledStorage`는 별도 설정 파일 없이 코드에서 넘긴 경로를 사용한다. 현재 저장 위치는 `data/rust-task-db`다.
 
 ## 외부 서비스 설정
 
@@ -60,7 +59,7 @@ let glue = Glue::new(storage);
 
 ## 수정하면 위험한 값
 
-현재 Step 11에서는 `[dependencies]`에 `serde`, `serde_json`, `gluesql`, `futures`를 둔다. Step 11 테스트 보강도 새 dependency 없이 Rust 내장 test harness로 처리한다.
+현재 Step 12에서는 `[dependencies]`에 `serde`, `serde_json`, `gluesql`, `futures`를 둔다. `gluesql` feature에는 `gluesql_memory_storage`와 `gluesql_sled_storage`가 포함된다.
 
 ## 설정 오류 해결 가이드
 

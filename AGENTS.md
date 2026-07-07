@@ -4,12 +4,12 @@
 
 ## 현재 단계
 
-- 현재 단계: Step 11. 테스트 추가
-- 현재 저장 방식: `GlueSqlTaskRepository`가 관리하는 GlueSQL `MemoryStorage`
+- 현재 단계: Step 12. GlueSQL SledStorage 영속 저장소 전환
+- 현재 저장 방식: `GlueSqlTaskRepository`가 관리하는 GlueSQL `SledStorage`
 - 현재 지원 명령: `add`, `list`, `done`, `delete`, `search`, `stats`, `sql`, `repl`
 - 현재 CLI 구조: `std::env::args()`를 `src/cli.rs`의 `parse_args`가 `Command` enum으로 변환하고, `src/main.rs`가 `TaskService<GlueSqlTaskRepository>`를 통해 명령을 실행하며 실패는 `AppError`로 표현한다.
-- 보존된 이전 저장소: `JsonTaskRepository`와 `tasks.json`은 삭제하지 않고 교체 가능한 구현체로 남긴다.
-- 아직 도입하지 않는 것: GlueSQL 파일 기반 영속 저장소, 새 기능 명령
+- 보존된 이전 저장소: `JsonTaskRepository`, `tasks.json`, MemoryStorage 기반 테스트 흐름은 삭제하지 않고 남긴다.
+- 아직 도입하지 않는 것: 새 기능 명령, 웹 서버, async 앱 구조
 
 ## 핵심 원칙
 
@@ -18,13 +18,14 @@
 - 구현을 변경할 때마다 `README.md`도 함께 확인하고, 실행 방법/지원 기능/현재 단계/주의점이 바뀌었으면 갱신한다.
 - 다음 단계 기능을 미리 구현하지 않는다.
 - 현재 단계에서 설명해야 할 Rust 문법만 코드에 남긴다.
-- Step 11에서는 `serde`, `serde_json`, `gluesql`, `futures`만 외부 crate로 사용한다.
+- Step 12에서는 `serde`, `serde_json`, `gluesql`, `futures`만 외부 crate로 사용한다.
 - GlueSQL API가 async이므로 `GlueSqlTaskRepository` 내부에서만 `futures::executor::block_on`을 사용한다. `main.rs`를 async 앱으로 바꾸지 않는다.
-- 현재 활성 저장소는 `GlueSqlTaskRepository`의 GlueSQL `MemoryStorage`다.
+- 현재 활성 저장소는 `GlueSqlTaskRepository`의 GlueSQL `SledStorage`다.
 - `JsonTaskRepository`와 `tasks.json`을 삭제하지 않는다.
 - Step 9에서 SQL 직접 실행 명령을 도입했다.
 - Step 10에서는 `repl` 명령과 `.schema`, `.exit`, `.quit`을 지원한다.
 - Step 11에서는 새 기능보다 테스트 보강을 우선한다.
+- Step 12에서는 `GlueSqlTaskRepository::persistent("data/rust-task-db")`를 사용해 CLI 실행 간 Todo가 유지되게 한다.
 - 구현을 변경할 때마다 `docs/beginner-codebase-guide/`의 초심자 가이드를 함께 업데이트한다.
 - 초심자 가이드는 실제 코드 경로, 함수명, 타입명, 실행 흐름, 수정 포인트를 코드와 연결해서 설명해야 한다.
 - Markdown view 모드에서 줄이 붙지 않도록 `파일 경로: ...`, `역할: ...` 같은 key-value 설명은 표 또는 bullet list로 작성한다.
@@ -39,13 +40,14 @@
 - `src/error.rs`: `AppError`, `Display`, `Error`, `From` 구현
 - `src/service.rs`: `TaskService<R: TaskRepository>`, service 테스트
 - `src/repository/mod.rs`: `TaskRepository` trait, `SqlResult`, `JsonTaskRepository`, `tasks.json` 읽기/쓰기, search/stats, SQL unsupported 처리, repository 테스트
-- `src/repository/gluesql_repository.rs`: `GlueSqlTaskRepository`, GlueSQL `MemoryStorage`, `tasks` table 생성, SQL 기반 CRUD/search/stats/sql, repository 테스트
+- `src/repository/gluesql_repository.rs`: `GlueSqlTaskRepository<S>`, GlueSQL `MemoryStorage` 테스트 흐름, GlueSQL `SledStorage` 영속 저장소, `tasks` table 생성, SQL 기반 CRUD/search/stats/sql, repository 테스트
 - `src/command.rs`: CLI 명령을 표현하는 `Command` enum. `Search`, `Stats`, `Sql`, `Repl` 포함
 - `src/cli.rs`: `std::env::args()` 결과를 `Command`로 바꾸는 parser와 parser 테스트
 - `src/task.rs`: `Task` struct, `TaskStats` struct, `Task::new`, serde derive, task 테스트
 - `README.md`: GitHub 첫 화면용 프로젝트 소개, 실행 방법, 테스트 방법, 현재 저장소 주의점
 - `Cargo.toml`: Rust package 설정. `serde`, `serde_json`, `gluesql`, `futures` dependency 포함
-- `tasks.json`: Step 7까지 사용한 JSON 저장 파일. Step 11 현재 기본 실행 저장소는 아니지만 삭제하지 않는다.
+- `tasks.json`: Step 7까지 사용한 JSON 저장 파일. Step 12 현재 기본 실행 저장소는 아니지만 삭제하지 않는다.
+- `data/rust-task-db`: Step 12부터 CLI 실행 데이터가 저장되는 SledStorage 디렉터리. `.gitignore`로 추적하지 않는다.
 - `docs/todo/step-1-progress.md`: Step 1 진행 상태
 - `docs/todo/step-2-progress.md`: Step 2 진행 상태
 - `docs/todo/step-3-progress.md`: Step 3 진행 상태
@@ -110,10 +112,11 @@ docs/beginner-codebase-guide/16-run-guide.md
 - 초심자가 수정할 수 있는 지점
 - 현재 코드에 없는 내용은 "코드에서 확인되지 않음" 또는 "이후 단계 예정"으로 표시
 
-## Step 11 검증 명령
+## Step 12 검증 명령
 
 ```bash
 cargo fmt --check
+cargo check
 cargo test
 cargo run -- add "Rust 공부"
 cargo run -- list
@@ -124,7 +127,7 @@ cargo run -- sql "INSERT INTO tasks VALUES (1, 'Rust 공부', FALSE); SELECT id,
 cargo run -- repl
 ```
 
-주의: Step 11도 GlueSQL `MemoryStorage`를 사용하므로 `cargo run`을 여러 번 나눠 실행하면 이전 명령의 데이터가 유지되지 않는다. 다만 `repl` 안에서는 같은 `GlueSqlTaskRepository` 인스턴스를 계속 쓰므로 `INSERT` 후 `SELECT`로 바로 확인할 수 있다.
+주의: Step 12는 GlueSQL `SledStorage`를 사용하므로 `cargo run`을 여러 번 나눠 실행해도 `data/rust-task-db`에 데이터가 유지된다. 테스트에서는 빠른 단위 검증을 위해 `MemoryStorage`도 계속 사용한다.
 
 ## 앞으로 작업 요청을 받았을 때
 
@@ -174,5 +177,6 @@ cargo run -- repl
 - Step 9에서만 `sql` 명령을 추가한다. 이미 추가되어 있으므로 이후 단계에서는 이 구조를 유지한다.
 - Step 10에서만 `repl` 명령과 `.schema`, `.exit`, `.quit`을 추가한다. 이미 추가되어 있으므로 이후 단계에서는 이 구조를 유지한다.
 - Step 11에서는 테스트를 보강한다. 새 명령이나 저장소 기능을 추가하지 않는다.
+- Step 12에서는 GlueSQL `SledStorage`를 도입해 CLI 기본 저장소를 영속 저장소로 전환한다. 새 CLI 명령은 추가하지 않는다.
 
 단계를 전환할 때는 초심자 가이드도 같은 단계 기준으로 재구성한다. 예를 들어 Step 2로 넘어가면 `Command` enum과 CLI parser를 현재 구현으로 설명하고, Step 3 이후 기능은 계속 예정으로 남긴다.

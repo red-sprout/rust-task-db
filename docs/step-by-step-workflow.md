@@ -9,7 +9,7 @@
 ```text
 AGENTS.md
 docs/todo/roadmap.md
-docs/todo/step-11-progress.md
+docs/todo/step-12-progress.md
 docs/prompt.md
 docs/review_docs.md
 docs/beginner-codebase-guide/99-index.md
@@ -22,9 +22,9 @@ docs/beginner-codebase-guide/99-index.md
 - 단계가 바뀌면 코드와 문서를 같이 갱신한다.
 - 구현을 바꾸면 `docs/beginner-codebase-guide/`도 현재 코드 기준으로 갱신한다.
 
-## 현재 Step 11 작업 절차
+## 현재 Step 12 작업 절차
 
-Step 11에서는 새 기능을 추가하지 않고 테스트를 보강한다. 아래 파일이 현재 구현 범위다.
+Step 12에서는 새 CLI 명령을 추가하지 않고 GlueSQL 기본 저장소를 SledStorage로 전환한다. 아래 파일이 현재 구현 범위다.
 
 ```text
 src/command.rs
@@ -39,6 +39,7 @@ src/repository/gluesql_repository.rs
 tasks.json
 docs/todo/step-10-progress.md
 docs/todo/step-11-progress.md
+docs/todo/step-12-progress.md
 docs/todo/roadmap.md
 docs/beginner-codebase-guide/
 ```
@@ -47,6 +48,7 @@ docs/beginner-codebase-guide/
 
 ```bash
 cargo fmt --check
+cargo check
 cargo test
 cargo run -- add "Rust 공부"
 cargo run -- list
@@ -56,7 +58,7 @@ cargo run -- sql "SELECT * FROM tasks"
 cargo run -- repl
 ```
 
-주의: Step 11도 GlueSQL `MemoryStorage`라서 `cargo run`을 여러 번 나눠 실행하면 데이터가 유지되지 않을 수 있다. `repl` 안에서는 같은 저장소 인스턴스를 계속 쓰므로 `INSERT` 후 `SELECT`가 이어진다.
+주의: Step 12는 GlueSQL `SledStorage`라서 `cargo run`을 여러 번 나눠 실행해도 `data/rust-task-db`에 데이터가 유지된다. `data/`는 `.gitignore`로 추적하지 않는다.
 
 ## Step 2 구현 완료 상태
 
@@ -162,6 +164,16 @@ src/cli.rs
 - `src/repl.rs` REPL 빈 줄/SQL 실패 지속 테스트
 - `src/repository/gluesql_repository.rs` next id/GlueSQL 에러 타입 테스트
 - 총 57개 테스트
+
+## Step 12 구현 완료 상태
+
+추가된 것:
+
+- `gluesql_sled_storage` feature
+- `GlueSqlTaskRepository<S>` generic 저장소 구조
+- `GlueSqlTaskRepository::persistent(path)`
+- CLI 기본 저장 위치 `data/rust-task-db`
+- SledStorage 영속 저장 테스트
 
 ## 문서 작성 절차
 

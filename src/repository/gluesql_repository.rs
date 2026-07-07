@@ -2,27 +2,57 @@ use crate::error::AppError;
 use crate::repository::{SqlResult, TaskRepository};
 use crate::task::{Task, TaskStats};
 use futures::executor::block_on;
-use gluesql::prelude::{Glue, MemoryStorage, Payload, Value};
+use gluesql::core::store::{GStore, GStoreMut, Planner};
+use gluesql::prelude::{Glue, MemoryStorage, Payload, SledStorage, Value};
+use std::path::Path;
 
-pub struct GlueSqlTaskRepository {
-    glue: Glue<MemoryStorage>,
+pub struct GlueSqlTaskRepository<S = MemoryStorage>
+where
+    S: GStore + GStoreMut + Planner,
+{
+    glue: Glue<S>,
 }
 
-impl GlueSqlTaskRepository {
+#[cfg(test)]
+impl GlueSqlTaskRepository<MemoryStorage> {
     pub fn new() -> Result<Self, AppError> {
         let storage = MemoryStorage::default();
         let glue = Glue::new(storage);
         let mut repository = Self { glue };
 
-        repository.execute(
-            "CREATE TABLE tasks (
+        repository.create_tasks_table()?;
+
+        Ok(repository)
+    }
+}
+
+impl GlueSqlTaskRepository<SledStorage> {
+    pub fn persistent(path: impl AsRef<Path>) -> Result<Self, AppError> {
+        let storage =
+            SledStorage::new(path).map_err(|error| AppError::GlueSql(error.to_string()))?;
+        let glue = Glue::new(storage);
+        let mut repository = Self { glue };
+
+        repository.create_tasks_table()?;
+
+        Ok(repository)
+    }
+}
+
+impl<S> GlueSqlTaskRepository<S>
+where
+    S: GStore + GStoreMut + Planner,
+{
+    fn create_tasks_table(&mut self) -> Result<(), AppError> {
+        self.execute(
+            "CREATE TABLE IF NOT EXISTS tasks (
                 id INTEGER,
                 title TEXT,
                 done BOOLEAN
             );",
         )?;
 
-        Ok(repository)
+        Ok(())
     }
 
     fn execute(&mut self, sql: impl AsRef<str>) -> Result<Vec<Payload>, AppError> {
@@ -39,7 +69,10 @@ impl GlueSqlTaskRepository {
     }
 }
 
-impl TaskRepository for GlueSqlTaskRepository {
+impl<S> TaskRepository for GlueSqlTaskRepository<S>
+where
+    S: GStore + GStoreMut + Planner,
+{
     fn add(&mut self, title: String) -> Result<Task, AppError> {
         let id = next_id(&self.find_all()?);
         let task = Task::new(id, title);
@@ -96,7 +129,10 @@ impl TaskRepository for GlueSqlTaskRepository {
     }
 }
 
-fn find_one(repository: &mut GlueSqlTaskRepository, id: i64) -> Result<Task, AppError> {
+fn find_one<S>(repository: &mut GlueSqlTaskRepository<S>, id: i64) -> Result<Task, AppError>
+where
+    S: GStore + GStoreMut + Planner,
+{
     repository
         .select_tasks(format!(
             "SELECT id, title, done FROM tasks WHERE id = {id};"
@@ -106,11 +142,17 @@ fn find_one(repository: &mut GlueSqlTaskRepository, id: i64) -> Result<Task, App
         .ok_or(AppError::NotFound(id))
 }
 
-fn ensure_exists(repository: &mut GlueSqlTaskRepository, id: i64) -> Result<(), AppError> {
+fn ensure_exists<S>(repository: &mut GlueSqlTaskRepository<S>, id: i64) -> Result<(), AppError>
+where
+    S: GStore + GStoreMut + Planner,
+{
     find_one(repository, id).map(|_| ())
 }
 
-fn select_count(repository: &mut GlueSqlTaskRepository, sql: &str) -> Result<usize, AppError> {
+fn select_count<S>(repository: &mut GlueSqlTaskRepository<S>, sql: &str) -> Result<usize, AppError>
+where
+    S: GStore + GStoreMut + Planner,
+{
     let payloads = repository.execute(sql)?;
     let Some(Payload::Select { labels: _, rows }) = payloads.into_iter().last() else {
         return Err(AppError::GlueSql("expected COUNT result".to_string()));
@@ -204,6 +246,8 @@ fn value_to_string(value: Value) -> String {
 #[cfg(test)]
 mod tests {
     use super::*;
+    use std::fs;
+    use std::path::PathBuf;
 
     #[test]
     fn adds_and_lists_tasks_with_gluesql() {
@@ -359,5 +403,31 @@ mod tests {
         let result = repository.execute_sql("SELECT * FROM missing_table;".to_string());
 
         assert!(matches!(result, Err(AppError::GlueSql(_))));
+    }
+
+    #[test]
+    fn persists_tasks_with_sled_storage() {
+        let path = unique_sled_path("persist");
+        let _ = fs::remove_dir_all(&path);
+
+        {
+            let mut repository = GlueSqlTaskRepository::persistent(&path).unwrap();
+            repository.add("Rust".to_string()).unwrap();
+        }
+
+        {
+            let mut repository = GlueSqlTaskRepository::persistent(&path).unwrap();
+
+            assert_eq!(
+                repository.find_all(),
+                Ok(vec![Task::new(1, "Rust".to_string())])
+            );
+        }
+
+        let _ = fs::remove_dir_all(&path);
+    }
+
+    fn unique_sled_path(name: &str) -> PathBuf {
+        std::env::temp_dir().join(format!("rust-task-db-{name}-{}", std::process::id()))
     }
 }

@@ -2,7 +2,7 @@
 
 ## 에러 처리 큰 그림
 
-현재 Step 11에도 custom error 타입 `AppError`가 있다. 실패 가능성은 `src/error.rs`의 `AppError` enum으로 모인다. REPL의 표준 입력/출력 실패도 `AppError::Io`로 표현한다.
+현재 Step 12에도 custom error 타입 `AppError`가 있다. 실패 가능성은 `src/error.rs`의 `AppError` enum으로 모인다. REPL의 표준 입력/출력 실패도 `AppError::Io`로 표현한다.
 
 ```text
 CLI parsing 실패
@@ -127,7 +127,7 @@ impl From<serde_json::Error> for AppError {
 | `src/cli.rs` `parse_id` | id가 숫자가 아님 | `Err(AppError::InvalidCommand)` |
 | `src/cli.rs` `parse_args` | 모르는 명령 | `Err(AppError::InvalidCommand)` |
 | `src/repl.rs` `run_repl_with_io` | 입력 읽기 또는 출력 쓰기 실패 | `Err(AppError::Io)` |
-| `src/repository/gluesql_repository.rs` `GlueSqlTaskRepository::new` | `tasks` table 생성 실패 | `Err(AppError::GlueSql)` |
+| `src/repository/gluesql_repository.rs` `GlueSqlTaskRepository::persistent` | SledStorage 열기 또는 `tasks` table 생성 실패 | `Err(AppError::GlueSql)` |
 | `src/repository/gluesql_repository.rs` `execute` | SQL 실행 실패 | `Err(AppError::GlueSql)` |
 | `src/repository/gluesql_repository.rs` `execute_sql` | 사용자 SQL 실행 실패 | `Err(AppError::GlueSql)` |
 | `src/repository/gluesql_repository.rs` `row_to_task` | SQL row를 `Task`로 바꾸지 못함 | `Err(AppError::GlueSql)` |

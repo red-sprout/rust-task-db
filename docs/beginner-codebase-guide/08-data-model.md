@@ -8,7 +8,7 @@ CLI 문자열
 -> TaskService
 -> TaskRepository
 -> GlueSqlTaskRepository
--> GlueSQL MemoryStorage
+-> GlueSQL SledStorage
 -> AppError
 -> String title, String keyword, i64 id
 -> Task
@@ -30,7 +30,8 @@ CLI 문자열
 | 각 필드의 의미 | id는 식별자, title은 제목, done은 완료 여부 |
 | 어디서 생성되는가 | `Task::new` |
 | 어디서 사용되는가 | `src/repository/mod.rs`의 `add`, `mark_done`, `delete`, `src/main.rs`의 `print_task` |
-| DB에 저장되는가 | 현재 Step 11에서는 GlueSQL `tasks` table에 저장됨 |
+| DB에 저장되는가 | 현재 Step 12에서는 GlueSQL `tasks` table에 저장됨 |
+| 실제 저장 위치 | `data/rust-task-db` |
 | 외부 응답으로 노출되는가 | CLI 출력으로 노출 |
 | 수정 시 영향받는 파일 | `src/task.rs`, `src/main.rs`, 테스트, 이 문서 세트 |
 
@@ -99,10 +100,10 @@ CLI 문자열
 | --- | --- |
 | 이름 | `GlueSqlTaskRepository` |
 | 파일 경로 | `src/repository/gluesql_repository.rs` |
-| 역할 | GlueSQL `MemoryStorage` 기반 Todo 저장소 |
-| 내부 필드 | `glue: Glue<MemoryStorage>` |
-| 어디서 생성되는가 | `src/main.rs`의 `GlueSqlTaskRepository::new()` |
-| 어디서 사용되는가 | `TaskService<GlueSqlTaskRepository>`, GlueSQL repository 테스트 |
+| 역할 | GlueSQL storage 기반 Todo 저장소 |
+| 내부 필드 | `glue: Glue<S>` |
+| 어디서 생성되는가 | `src/main.rs`의 `GlueSqlTaskRepository::persistent("data/rust-task-db")` |
+| 어디서 사용되는가 | `TaskService<GlueSqlTaskRepository<SledStorage>>`, GlueSQL repository 테스트 |
 
 ## SQL 결과 모델
 
@@ -141,7 +142,16 @@ CLI 문자열
 
 ## Schema/Table/Collection 목록
 
-현재 Step 11에는 GlueSQL table schema가 있다.
+현재 Step 12에는 GlueSQL table schema가 있다.
+
+Step 12 저장 흐름:
+
+```text
+Task
+-> INSERT INTO tasks ...
+-> GlueSqlTaskRepository<SledStorage>
+-> data/rust-task-db
+```
 
 ```sql
 CREATE TABLE tasks (
@@ -151,9 +161,9 @@ CREATE TABLE tasks (
 );
 ```
 
-`src/repository/gluesql_repository.rs`의 `GlueSqlTaskRepository::new`가 이 table을 만든다.
+`src/repository/gluesql_repository.rs`의 `GlueSqlTaskRepository::persistent`가 이 table을 준비한다.
 
-주의: storage는 `MemoryStorage`라서 프로그램이 끝나면 table과 데이터가 사라진다.
+주의: 현재 storage는 `SledStorage`라서 table과 데이터가 `data/rust-task-db`에 유지된다.
 
 ## 보존된 JSON 저장 구조
 
@@ -184,7 +194,7 @@ add:
 Vec<String>
 -> parse_args
 -> Command::Add { title }
--> GlueSqlTaskRepository::new
+-> GlueSqlTaskRepository::persistent("data/rust-task-db")
 -> TaskService::new
 -> service.add
 -> repository.add
@@ -201,7 +211,7 @@ Vec<String>
 -> parse_args
 -> parse_id
 -> Command::Done { id } 또는 Command::Delete { id }
--> GlueSqlTaskRepository::new
+-> GlueSqlTaskRepository::persistent("data/rust-task-db")
 -> TaskService::new
 -> service.done 또는 service.delete
 -> repository.mark_done 또는 repository.delete
@@ -215,7 +225,7 @@ search:
 Vec<String>
 -> parse_args
 -> Command::Search { keyword }
--> GlueSqlTaskRepository::new
+-> GlueSqlTaskRepository::persistent("data/rust-task-db")
 -> TaskService::new
 -> service.search
 -> repository.search
@@ -230,7 +240,7 @@ stats:
 Vec<String>
 -> parse_args
 -> Command::Stats
--> GlueSqlTaskRepository::new
+-> GlueSqlTaskRepository::persistent("data/rust-task-db")
 -> TaskService::new
 -> service.stats
 -> repository.stats
@@ -245,7 +255,7 @@ sql:
 Vec<String>
 -> parse_args
 -> Command::Sql { sql }
--> GlueSqlTaskRepository::new
+-> GlueSqlTaskRepository::persistent("data/rust-task-db")
 -> TaskService::new
 -> service.execute_sql
 -> repository.execute_sql
@@ -261,7 +271,7 @@ repl:
 Vec<String>
 -> parse_args
 -> Command::Repl
--> GlueSqlTaskRepository::new
+-> GlueSqlTaskRepository::persistent("data/rust-task-db")
 -> TaskService::new
 -> repl::run_repl
 -> read_line

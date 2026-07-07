@@ -13,7 +13,7 @@
 
 ## 이 파일 묶음의 역할
 
-Step 2의 CLI parser, Step 3에서 시작한 JSON 저장/로드, Step 4의 repository 동작, Step 5의 service 위임 흐름, Step 6의 custom error, Step 8의 GlueSQL repository, Step 9의 SQL 실행 모드, Step 10의 REPL 모드가 기대대로 동작하는지 검증한다. Step 11에서는 새 기능을 추가하지 않고, 이 흐름을 더 촘촘한 테스트로 보강한다.
+Step 2의 CLI parser, Step 3에서 시작한 JSON 저장/로드, Step 4의 repository 동작, Step 5의 service 위임 흐름, Step 6의 custom error, Step 8의 GlueSQL repository, Step 9의 SQL 실행 모드, Step 10의 REPL 모드가 기대대로 동작하는지 검증한다. Step 11에서는 이 흐름을 더 촘촘한 테스트로 보강했고, Step 12에서는 SledStorage 영속 저장 테스트를 추가했다.
 
 ## 전체 연결 관계
 
@@ -225,7 +225,7 @@ fn adds_task_and_saves_to_json_file() {
 
 ### 이 파일의 역할
 
-`GlueSqlTaskRepository`가 GlueSQL `MemoryStorage`에서 add/list/done/delete/search/stats/sql을 처리하는지 테스트한다.
+`GlueSqlTaskRepository`가 GlueSQL `MemoryStorage`에서 add/list/done/delete/search/stats/sql을 처리하는지 테스트하고, `SledStorage`에서 데이터를 다시 열어도 유지되는지 테스트한다.
 
 ### 핵심 코드 블록
 
@@ -247,6 +247,42 @@ fn adds_and_lists_tasks_with_gluesql() {
 - `repository.add(...)`: SQL `INSERT` 흐름을 실행한다.
 - `repository.find_all()`: 같은 repository 인스턴스 안에서 SQL `SELECT`로 조회한다.
 - `MemoryStorage`: 테스트가 끝나면 데이터가 사라진다.
+
+### Step 12에서 추가된 SledStorage 영속 저장 테스트
+
+```rust
+#[test]
+fn persists_tasks_with_sled_storage() {
+    let path = unique_sled_path("persist");
+    let _ = fs::remove_dir_all(&path);
+
+    {
+        let mut repository = GlueSqlTaskRepository::persistent(&path).unwrap();
+        repository.add("Rust".to_string()).unwrap();
+    }
+
+    {
+        let mut repository = GlueSqlTaskRepository::persistent(&path).unwrap();
+
+        assert_eq!(
+            repository.find_all(),
+            Ok(vec![Task::new(1, "Rust".to_string())])
+        );
+    }
+
+    let _ = fs::remove_dir_all(&path);
+}
+```
+
+읽는 법:
+
+```text
+임시 SledStorage 경로를 만든다.
+-> 첫 번째 repository에서 Todo를 추가한다.
+-> repository를 스코프 밖으로 보내 닫는다.
+-> 같은 경로로 두 번째 repository를 만든다.
+-> 이전 Todo가 다시 조회되는지 확인한다.
+```
 
 ### Step 11에서 추가된 GlueSQL 실패 타입 테스트
 
@@ -345,4 +381,4 @@ assert_eq!(command, Ok(Command::Help));
 
 ## 이 파일을 이해한 뒤 알아야 하는 것
 
-현재 Step 11은 Task 테스트 2개, CLI parser 테스트 16개, error 테스트 5개, service 테스트 7개, REPL 테스트 5개, JSON repository 테스트 9개, GlueSQL repository 테스트 12개, main 보조 테스트 1개로 총 57개 테스트가 있다.
+현재 Step 12는 Task 테스트 2개, CLI parser 테스트 16개, error 테스트 5개, service 테스트 7개, REPL 테스트 5개, JSON repository 테스트 9개, GlueSQL repository 테스트 13개, main 보조 테스트 1개로 총 58개 테스트가 있다.

@@ -16,8 +16,8 @@ help가 아닌 명령은 그 다음 GlueSQL repository를 만든다.
 
 ```text
 Command
--> GlueSqlTaskRepository::new()
--> GlueSQL MemoryStorage
+-> GlueSqlTaskRepository::persistent("data/rust-task-db")
+-> GlueSQL SledStorage
 -> CREATE TABLE tasks (...)
 -> TaskService::new(repository)
 ```
@@ -28,9 +28,9 @@ Command
 | --- | --- | --- |
 | 명령 | add/list/done/delete/search/stats | 명령은 그대로 유지 |
 | 활성 저장소 | `JsonTaskRepository` | `GlueSqlTaskRepository` |
-| 데이터 보관 | `tasks.json` | GlueSQL `MemoryStorage` |
+| 데이터 보관 | `tasks.json` | GlueSQL `SledStorage` |
 | repository 내부 로직 | `Vec<Task>` 수정 | SQL `INSERT`, `SELECT`, `UPDATE`, `DELETE`, `COUNT` |
-| 주의점 | 실행 사이 데이터 유지 | `MemoryStorage`라 실행이 끝나면 데이터 사라짐 |
+| 주의점 | 실행 사이 데이터 유지 | `data/rust-task-db`에 데이터 유지 |
 
 ## Step 8에서 Step 9로 달라진 점
 
@@ -61,7 +61,7 @@ cargo run -- add "Rust 공부"
 ### 전체 실행 흐름
 
 1. `parse_args`가 `Ok(Command::Add { title })`를 반환한다.
-2. `GlueSqlTaskRepository::new`가 GlueSQL `MemoryStorage`와 `tasks` table을 만든다.
+2. `GlueSqlTaskRepository::persistent`가 GlueSQL `SledStorage`와 `tasks` table을 준비한다.
 3. `TaskService::new(repository)`가 service를 만든다.
 4. `service.add(title)`가 Todo 추가 요청을 repository에 위임한다.
 5. 추가된 Task를 출력한다.
@@ -101,7 +101,7 @@ cargo run -- list
 ### 전체 실행 흐름
 
 1. `parse_args`가 `Ok(Command::List)`를 반환한다.
-2. `GlueSqlTaskRepository::new`가 GlueSQL `MemoryStorage`와 `tasks` table을 만든다.
+2. `GlueSqlTaskRepository::persistent`가 GlueSQL `SledStorage`와 `tasks` table을 준비한다.
 3. `TaskService::new(repository)`가 service를 만든다.
 4. `service.list()`가 목록 조회를 repository에 위임한다.
 5. `print_tasks(&tasks)`가 목록을 출력한다.
@@ -131,7 +131,7 @@ cargo run -- done 1
 ### 전체 실행 흐름
 
 1. `parse_args`가 `Ok(Command::Done { id })`를 반환한다.
-2. `GlueSqlTaskRepository::new`가 GlueSQL `MemoryStorage`와 `tasks` table을 만든다.
+2. `GlueSqlTaskRepository::persistent`가 GlueSQL `SledStorage`와 `tasks` table을 준비한다.
 3. `TaskService::new(repository)`가 service를 만든다.
 4. `service.done(id)`가 완료 처리를 repository에 위임한다.
 
@@ -159,7 +159,7 @@ cargo run -- delete 1
 ### 전체 실행 흐름
 
 1. `parse_args`가 `Ok(Command::Delete { id })`를 반환한다.
-2. `GlueSqlTaskRepository::new`가 GlueSQL `MemoryStorage`와 `tasks` table을 만든다.
+2. `GlueSqlTaskRepository::persistent`가 GlueSQL `SledStorage`와 `tasks` table을 준비한다.
 3. `TaskService::new(repository)`가 service를 만든다.
 4. `service.delete(id)`가 삭제 처리를 repository에 위임한다.
 
@@ -186,7 +186,7 @@ cargo run -- search rust
 ### 전체 실행 흐름
 
 1. `parse_args`가 `Ok(Command::Search { keyword })`를 반환한다.
-2. `GlueSqlTaskRepository::new`가 GlueSQL `MemoryStorage`와 `tasks` table을 만든다.
+2. `GlueSqlTaskRepository::persistent`가 GlueSQL `SledStorage`와 `tasks` table을 준비한다.
 3. `TaskService::new(repository)`가 service를 만든다.
 4. `service.search(&keyword)`가 검색을 repository에 위임한다.
 5. `print_tasks(&tasks)`가 검색 결과를 출력한다.
@@ -216,7 +216,7 @@ cargo run -- stats
 ### 전체 실행 흐름
 
 1. `parse_args`가 `Ok(Command::Stats)`를 반환한다.
-2. `GlueSqlTaskRepository::new`가 GlueSQL `MemoryStorage`와 `tasks` table을 만든다.
+2. `GlueSqlTaskRepository::persistent`가 GlueSQL `SledStorage`와 `tasks` table을 준비한다.
 3. `TaskService::new(repository)`가 service를 만든다.
 4. `service.stats()`가 통계 계산을 repository에 위임한다.
 5. `print_stats(&stats)`가 total/done/todo를 출력한다.
@@ -252,7 +252,7 @@ cargo run -- sql "INSERT INTO tasks VALUES (1, 'Rust 공부', FALSE); SELECT * F
 ### 전체 실행 흐름
 
 1. `parse_args`가 `Ok(Command::Sql { sql })`를 반환한다.
-2. `GlueSqlTaskRepository::new`가 GlueSQL `MemoryStorage`와 `tasks` table을 만든다.
+2. `GlueSqlTaskRepository::persistent`가 GlueSQL `SledStorage`와 `tasks` table을 준비한다.
 3. `TaskService::new(repository)`가 service를 만든다.
 4. `service.execute_sql(sql)`이 SQL 실행을 repository에 위임한다.
 5. `GlueSqlTaskRepository::execute_sql`이 GlueSQL `Payload`를 `SqlResult`로 바꾼다.
@@ -303,7 +303,7 @@ rust-task> .exit
 ### 전체 실행 흐름
 
 1. `parse_args`가 `Ok(Command::Repl)`을 반환한다.
-2. `GlueSqlTaskRepository::new`가 GlueSQL `MemoryStorage`와 `tasks` table을 만든다.
+2. `GlueSqlTaskRepository::persistent`가 GlueSQL `SledStorage`와 `tasks` table을 준비한다.
 3. `TaskService::new(repository)`가 service를 만든다.
 4. `main.rs`가 `repl::run_repl(&mut service)`를 호출한다.
 5. `src/repl.rs`가 한 줄씩 입력을 읽는다.
@@ -328,7 +328,7 @@ REPL 입력
 -> repl::run_repl
 -> service.execute_sql
 -> GlueSqlTaskRepository::execute_sql
--> 같은 MemoryStorage에 SQL 실행
+-> 같은 SledStorage repository에 SQL 실행
 -> 결과 출력
 -> 다음 입력 대기
 ```

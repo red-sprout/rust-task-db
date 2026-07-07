@@ -6,11 +6,11 @@
 
 ## 현재 단계
 
-현재 구현 단계는 `Step 11. 테스트 추가`이다.
+현재 구현 단계는 `Step 12. GlueSQL SledStorage 영속 저장소 전환`이다.
 
-현재 코드는 CLI 문자열을 `Command` enum으로 변환한 뒤, `TaskService<GlueSqlTaskRepository>`를 통해 Todo 기능을 실행한다. `add`, `list`, `done`, `delete`, `search`, `stats`, `sql`, `repl`을 지원하며, 실패는 `AppError`로 표현한다. 기존 `JsonTaskRepository`와 `tasks.json`은 삭제하지 않고 보존한다.
+현재 코드는 CLI 문자열을 `Command` enum으로 변환한 뒤, `TaskService<GlueSqlTaskRepository<SledStorage>>`를 통해 Todo 기능을 실행한다. `add`, `list`, `done`, `delete`, `search`, `stats`, `sql`, `repl`을 지원하며, 실패는 `AppError`로 표현한다. 기존 `JsonTaskRepository`, `tasks.json`, MemoryStorage 테스트 흐름은 삭제하지 않고 보존한다.
 
-## 현재 Step 11 목표
+## 현재 Step 12 목표
 
 지원 명령:
 
@@ -71,6 +71,8 @@ cargo run -- repl
 - parser 실패 테스트
 - REPL 에러 지속 테스트
 - GlueSQL 에러 타입 테스트
+- SledStorage
+- 파일 기반 영속 저장
 
 ## 현재 아키텍처
 
@@ -83,12 +85,12 @@ cargo run -- repl
 -> src/service.rs
 -> src/repository/mod.rs
 -> src/repository/gluesql_repository.rs
--> GlueSQL MemoryStorage
+-> GlueSQL SledStorage
 -> src/task.rs
 -> 터미널 출력
 ```
 
-Step 11에서는 Step 10의 REPL 기능 흐름을 유지하면서 테스트를 보강한다. `src/task.rs`는 domain 생성과 통계를 검증하고, `src/cli.rs`는 인자 부족 실패를 검증하며, `src/repl.rs`는 SQL 실패 뒤에도 REPL이 계속 동작하는지 검증한다. `src/repository/gluesql_repository.rs`는 잘못된 SQL이 `AppError::GlueSql`로 올라오는지 확인한다.
+Step 12에서는 Step 11의 테스트 보강 흐름을 유지하면서 기본 저장소를 GlueSQL `MemoryStorage`에서 `SledStorage`로 전환한다. `main.rs`는 `GlueSqlTaskRepository::persistent("data/rust-task-db")`를 호출하고, `src/repository/gluesql_repository.rs`는 `GlueSqlTaskRepository<S>` generic 구조로 MemoryStorage 테스트와 SledStorage 실행을 함께 지원한다.
 
 ## 현재 파일 구조
 
@@ -121,6 +123,7 @@ rust-task/
       step-9-progress.md
       step-10-progress.md
       step-11-progress.md
+      step-12-progress.md
       roadmap.md
 ```
 
@@ -128,7 +131,7 @@ rust-task/
 
 Custom error는 `AppError`로 구현되어 있다.
 
-Step 11의 활성 저장소도 GlueSQL `MemoryStorage`다. 아래 두 명령은 별도 프로세스라 데이터가 이어지지 않을 수 있다.
+Step 12의 활성 저장소는 GlueSQL `SledStorage`다. 아래 두 명령은 별도 프로세스지만 `data/rust-task-db`에 저장된 데이터를 공유한다.
 
 ```bash
 cargo run -- add "Rust 공부"
@@ -151,7 +154,7 @@ cargo run -- repl
 
 ## 이후 단계 요약
 
-현재 `docs/prompt.md` 기준 단계 구현은 Step 11까지 완료되어 있다. 이후 작업은 새 요구가 있을 때 별도 단계로 계획한다.
+현재 `docs/prompt.md` 기준 단계 구현과 Step 8의 영속 저장소 확장은 Step 12까지 완료되어 있다. 이후 작업은 새 요구가 있을 때 별도 단계로 계획한다.
 
 ## 완료 기준
 

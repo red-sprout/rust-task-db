@@ -37,8 +37,8 @@ fn main() {
 3. CLI 인자가 `Vec<String>`으로 모인다.
 4. `cli::parse_args(...)`가 인자를 `Command`로 변환한다.
 5. help 명령이면 파일을 읽지 않고 help를 출력한다.
-6. 그 외 명령이면 `GlueSqlTaskRepository::new()`로 repository를 만든다.
-7. repository가 내부에서 GlueSQL `MemoryStorage`를 만들고 `CREATE TABLE tasks (...)`를 실행한다.
+6. 그 외 명령이면 `GlueSqlTaskRepository::persistent("data/rust-task-db")`로 repository를 만든다.
+7. repository가 내부에서 GlueSQL `SledStorage`를 열고 `CREATE TABLE IF NOT EXISTS tasks (...)`를 실행한다.
 8. `TaskService::new(repository)`로 service를 만든다.
 9. `main()`이 `match command`로 service 메서드를 호출한다.
 10. service가 repository 메서드에 위임한다.
@@ -94,7 +94,7 @@ Step 9:
 | 구분 | Step 7 | Step 8 |
 | --- | --- | --- |
 | 활성 repository | `JsonTaskRepository` | `GlueSqlTaskRepository` |
-| 저장 위치 | `tasks.json` 파일 | GlueSQL `MemoryStorage` |
+| 저장 위치 | `tasks.json` 파일 | GlueSQL `SledStorage`의 `data/rust-task-db` |
 | repository 생성 | JSON 파일 읽기 | `CREATE TABLE tasks (...)` 실행 |
 | 데이터 변경 | `Vec<Task>` 수정 후 JSON 저장 | SQL `INSERT`, `UPDATE`, `DELETE` 실행 |
 | 데이터 조회 | `Vec<Task>` clone/filter/count | SQL `SELECT`, `COUNT` 실행 |
@@ -107,10 +107,10 @@ Step 7:
 JsonTaskRepository가 tasks.json을 읽고 썼다.
 
 Step 8:
-GlueSqlTaskRepository가 GlueSQL MemoryStorage에 SQL을 실행한다.
+GlueSqlTaskRepository가 GlueSQL SledStorage에 SQL을 실행한다.
 ```
 
-주의: Step 8의 `MemoryStorage`는 프로그램이 끝나면 사라진다. 그래서 `cargo run -- add`와 `cargo run -- list`를 별도 실행하면 데이터가 이어지지 않는다.
+주의: Step 12의 `SledStorage`는 `data/rust-task-db`에 데이터를 저장한다. 그래서 `cargo run -- add`와 `cargo run -- list`를 별도 실행해도 데이터가 이어진다.
 
 ## Step 6에서 Step 7으로 달라진 점
 
@@ -157,7 +157,7 @@ Step 6:
 ## Repository 생성 흐름
 
 ```rust
-let repository = match GlueSqlTaskRepository::new() {
+let repository = match GlueSqlTaskRepository::persistent("data/rust-task-db") {
     Ok(repository) => repository,
     Err(message) => {
         eprintln!("{message}");
@@ -169,7 +169,7 @@ let mut service = TaskService::new(repository);
 
 코드 해석:
 
-- `GlueSqlTaskRepository::new()`: GlueSQL `MemoryStorage`를 만들고 `tasks` table을 준비한다.
+- `GlueSqlTaskRepository::persistent("data/rust-task-db")`: GlueSQL `SledStorage`를 열고 `tasks` table을 준비한다.
 - `Ok(repository)`: 저장소 생성 성공
 - `Err(message)`: GlueSQL table 생성 실패
 - `let repository`: 생성 직후에는 repository 변수를 직접 바꾸지 않는다.
@@ -208,9 +208,9 @@ Step 9에서는 GlueSQL 세부사항과 SQL 결과 변환이 `src/repository/glu
 
 ```text
 src/main.rs
--> GlueSqlTaskRepository::new
+-> GlueSqlTaskRepository::persistent("data/rust-task-db")
 -> src/repository/gluesql_repository.rs
--> Glue::new(MemoryStorage::default())
+-> Glue::new(SledStorage::new(...))
 -> CREATE TABLE tasks (...)
 -> TaskService::new
 -> service.add/list/done/delete
@@ -334,7 +334,7 @@ match command {
 REPL 안에서 데이터가 이어지는 이유는 `main.rs`가 service를 한 번 만들고, 그 같은 service를 REPL loop 전체에 넘기기 때문이다.
 
 ```text
-GlueSqlTaskRepository::new()
+GlueSqlTaskRepository::persistent("data/rust-task-db")
 -> TaskService::new(repository)
 -> repl::run_repl(&mut service)
 -> service.execute_sql 반복 호출

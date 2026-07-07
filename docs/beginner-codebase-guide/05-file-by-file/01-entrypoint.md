@@ -49,7 +49,8 @@ Rust CLI 프로그램은 `main()`에서 시작한다. 현재 단계에서는 `ma
 - `src/repository/mod.rs`: `TaskRepository`, 보존된 `JsonTaskRepository`, `GlueSqlTaskRepository` re-export 제공
 - `src/repository/gluesql_repository.rs`: `GlueSqlTaskRepository` 제공
 - `src/task.rs`: `Task` 타입 제공
-- `tasks.json`: 보존된 JSON 저장 데이터. Step 11 기본 실행 경로에서는 사용하지 않는다.
+- `tasks.json`: 보존된 JSON 저장 데이터. Step 12 기본 실행 경로에서는 사용하지 않는다.
+- `data/rust-task-db`: Step 12 기본 실행 데이터가 저장되는 SledStorage 디렉터리
 
 ### 핵심 코드 블록
 
@@ -76,7 +77,7 @@ let command = match cli::parse_args(std::env::args().collect()) {
 ### repository와 service 생성 코드
 
 ```rust
-let repository = match GlueSqlTaskRepository::new() {
+let repository = match GlueSqlTaskRepository::persistent("data/rust-task-db") {
     Ok(repository) => repository,
     Err(message) => {
         eprintln!("{message}");
@@ -88,9 +89,9 @@ let mut service = TaskService::new(repository);
 
 코드 해석:
 
-- `GlueSqlTaskRepository::new`: GlueSQL `MemoryStorage`를 만들고 `tasks` table을 준비한다.
+- `GlueSqlTaskRepository::persistent`: GlueSQL `SledStorage`를 열고 `tasks` table을 준비한다.
 - `TaskService::new(repository)`: repository를 service 안으로 이동시킨다.
-- `let mut service`: Step 11에서는 add/done/delete/list/search/stats/sql/repl 모두 GlueSQL 실행을 위해 service 내부 repository를 mutable하게 빌리므로 `mut`가 필요하다.
+- `let mut service`: Step 12에서는 add/done/delete/list/search/stats/sql/repl 모두 GlueSQL 실행을 위해 service 내부 repository를 mutable하게 빌리므로 `mut`가 필요하다.
 
 ### 실행 분기 코드
 
@@ -173,7 +174,7 @@ if tasks.is_empty() {
 
 ### 이 파일을 이해한 뒤 알아야 하는 것
 
-현재 Todo, SQL, REPL 실행 흐름은 `main.rs -> TaskService -> TaskRepository -> GlueSqlTaskRepository -> GlueSQL MemoryStorage`다. 실패 흐름은 `cli/repository/repl -> AppError -> main.rs 출력`이다. `Command`는 명령을 표현할 뿐 데이터를 저장하지 않는다.
+현재 Todo, SQL, REPL 실행 흐름은 `main.rs -> TaskService -> TaskRepository -> GlueSqlTaskRepository -> GlueSQL SledStorage`다. 실패 흐름은 `cli/repository/repl -> AppError -> main.rs 출력`이다. `Command`는 명령을 표현할 뿐 데이터를 저장하지 않는다.
 
 ## 파일 경로
 

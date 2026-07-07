@@ -2,7 +2,7 @@
 
 ## 이 디렉터리의 목적
 
-현재 Step 11 코드 파일을 하나씩 읽을 수 있게 나눈다.
+현재 Step 12 코드 파일을 하나씩 읽을 수 있게 나눈다.
 
 ## 파일별 해설 문서 목록
 
@@ -19,14 +19,15 @@
 - 에러: `src/error.rs`
 - 서비스: `src/service.rs`
 - 저장소 trait와 JSON 보존 구현체: `src/repository/mod.rs`
-- 현재 활성 GlueSQL 저장소와 SQL 실행: `src/repository/gluesql_repository.rs`
+- 현재 활성 SledStorage 저장소, MemoryStorage 테스트 흐름, SQL 실행: `src/repository/gluesql_repository.rs`
 - 명령 모델: `src/command.rs`
 - CLI parser: `src/cli.rs`
 - Todo 데이터 모델: `src/task.rs`
 - 보존된 JSON 저장 데이터: `tasks.json`
+- 실행 중 생성되는 SledStorage 데이터: `data/rust-task-db`
 - GitHub 첫 화면 소개: `README.md`
 - 설정: `Cargo.toml`
-- 테스트: `src/main.rs`, `src/error.rs`, `src/cli.rs`, `src/service.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`의 `#[cfg(test)] mod tests`
+- 테스트: `src/main.rs`, `src/task.rs`, `src/error.rs`, `src/cli.rs`, `src/service.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`의 `#[cfg(test)] mod tests`
 
 ## 초심자가 먼저 읽을 파일
 

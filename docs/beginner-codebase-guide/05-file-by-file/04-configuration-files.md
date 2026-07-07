@@ -88,7 +88,13 @@ version = "0.1.1"
 
 ### 이 파일을 이해한 뒤 알아야 하는 것
 
-현재 Step 11에서는 `serde`, `serde_json`, `gluesql`, `futures`를 dependency로 사용한다. Step 11 테스트 보강도 새 dependency를 추가하지 않고 Rust 내장 test harness로 처리한다.
+현재 Step 12에서는 `serde`, `serde_json`, `gluesql`, `futures`를 dependency로 사용한다. Step 12에서 새 crate 이름을 직접 추가하지는 않지만, `gluesql` feature에 `gluesql_sled_storage`를 추가해 SledStorage를 사용한다.
+
+현재 `Cargo.toml` 핵심:
+
+```toml
+gluesql = { version = "0.19.0", default-features = false, features = ["gluesql_memory_storage", "gluesql_sled_storage"] }
+```
 
 ## 파일 경로
 

@@ -23,7 +23,7 @@
 | --- | --- | --- |
 | `serde` | `Task`에 `Serialize`, `Deserialize` derive 제공 | `Cargo.toml`, `src/task.rs` |
 | `serde_json` | JSON 문자열과 `Vec<Task>` 변환. 보존된 `JsonTaskRepository`에서 사용 | `Cargo.toml`, `src/repository/mod.rs` |
-| `gluesql` | Rust 코드 안에서 SQL 엔진과 `MemoryStorage` 제공 | `Cargo.toml`, `src/repository/gluesql_repository.rs` |
+| `gluesql` | Rust 코드 안에서 SQL 엔진, `MemoryStorage`, `SledStorage` 제공 | `Cargo.toml`, `src/repository/gluesql_repository.rs` |
 | `futures` | GlueSQL의 async `execute`를 동기 코드에서 기다리는 `block_on` 제공 | `Cargo.toml`, `src/repository/gluesql_repository.rs` |
 
 ## 빌드 도구 기능 목록
@@ -55,7 +55,7 @@
 - `Vec`는 Rust 표준 컬렉션이지 외부 라이브러리가 아니다.
 - `Result`와 `Option`은 Rust 표준 타입이지 외부 라이브러리가 아니다.
 - `std::fs`는 표준 라이브러리이고, `serde_json`은 외부 crate다.
-- `gluesql`은 웹 프레임워크가 아니라 Rust 코드 안에서 쓰는 SQL 엔진 라이브러리다.
+- `gluesql`은 웹 프레임워크가 아니라 Rust 코드 안에서 쓰는 SQL 엔진 라이브러리다. Step 12에서는 `SledStorage`로 데이터를 디렉터리에 유지한다.
 - `futures::executor::block_on`은 `main.rs`를 async로 바꾸지 않고 repository 내부에서 async 작업을 기다리기 위해 쓴다.
 - `cargo test`는 Rust 문법이 아니라 Cargo 명령이다.
 - `Task`는 Rust 내장 타입이 아니라 이 프로젝트가 만든 타입이다.

@@ -2,11 +2,11 @@
 
 ## 이 문서의 목적
 
-현재 Step 11 코드에 실제 등장하는 Rust 문법과 외부 crate 사용만 설명한다.
+현재 Step 12 코드에 실제 등장하는 Rust 문법과 외부 crate 사용만 설명한다.
 
 ## 이 프로젝트에서 자주 등장하는 문법 목록
 
-`mod`, `use`, `derive`, `struct`, `enum`, `trait`, generic, trait bound, struct-like enum variant, `impl`, `Self`, `let`, `mut`, `Vec`, `String`, `Option`, `Result`, `?`, `match`, `loop`, custom error, `Display`, `From`, borrowing, mutable reference, slice, iterator, closure, `filter`, `count`, `collect`, `std::fs`, `Path`, `BufRead`, `Write`, `Cursor`, serde derive, `block_on`, external crate API, `unreachable!`, test attribute, `matches!`
+`mod`, `use`, `derive`, `struct`, `enum`, `trait`, generic, trait bound, struct-like enum variant, `impl`, `Self`, `let`, `mut`, `Vec`, `String`, `Option`, `Result`, `?`, `match`, `loop`, custom error, `Display`, `From`, borrowing, mutable reference, slice, iterator, closure, `filter`, `count`, `collect`, `std::fs`, `Path`, `impl AsRef<Path>`, `BufRead`, `Write`, `Cursor`, serde derive, `block_on`, external crate API, `SledStorage`, `unreachable!`, test attribute, `matches!`
 
 ## 파일별로 등장하는 문법
 
@@ -15,10 +15,63 @@
 - `src/cli.rs`: `Result<Command, AppError>`, `?`, iterator, `let Some(...) else`, `match`
 - `src/service.rs`: generic struct, trait bound, `impl<R: TaskRepository>`, `&self`, `&mut self`
 - `src/repository/mod.rs`: `trait`, `impl Trait for Type`, `&mut self`, `PathBuf`, `SqlResult`, 보존된 JSON 저장소
-- `src/repository/gluesql_repository.rs`: external crate API, `block_on`, `Payload`, `Value`, SQL row 변환, `Payload -> SqlResult` 변환
+- `src/repository/gluesql_repository.rs`: external crate API, `block_on`, `Payload`, `Value`, `MemoryStorage`, `SledStorage`, generic storage 타입, SQL row 변환, `Payload -> SqlResult` 변환
 - `src/repl.rs`: `loop`, `BufRead`, `Write`, `read_line`, `flush`, `Cursor`, mutable borrow
 - `src/task.rs`: `struct`, `impl`, `Self`, `derive`, `Serialize`, `Deserialize`, `TaskStats`, domain tests
 - `src/main.rs`: `mod`, `use`, `let mut`, `match`, enum pattern, `Result`, `&`, slice, `unreachable!`, tests
+
+## 문법 이름
+
+`impl AsRef<Path>`
+
+### 한 줄 설명
+
+`impl AsRef<Path>`는 `Path`, `PathBuf`, `&str`처럼 path로 볼 수 있는 값을 편하게 받기 위한 함수 인자 타입이다.
+
+### 프로젝트 코드 예시
+
+```rust
+pub fn persistent(path: impl AsRef<Path>) -> Result<Self, AppError> {
+    let storage =
+        SledStorage::new(path).map_err(|error| AppError::GlueSql(error.to_string()))?;
+    // ...
+}
+```
+
+### 코드 해석
+
+`persistent`는 `"data/rust-task-db"` 같은 문자열도 받을 수 있고, 테스트에서 만든 `PathBuf`도 받을 수 있다.
+
+### 프로젝트에서의 역할
+
+Step 12에서 CLI는 `"data/rust-task-db"`를 넘기고, 테스트는 임시 디렉터리 `PathBuf`를 넘긴다.
+
+## 문법 이름
+
+generic storage 타입
+
+### 한 줄 설명
+
+하나의 repository 코드가 여러 GlueSQL storage 타입을 받을 수 있게 만든다.
+
+### 프로젝트 코드 예시
+
+```rust
+pub struct GlueSqlTaskRepository<S = MemoryStorage>
+where
+    S: GStore + GStoreMut + Planner,
+{
+    glue: Glue<S>,
+}
+```
+
+### 코드 해석
+
+`S`는 `MemoryStorage`나 `SledStorage`가 들어갈 자리다. `where` 뒤 조건은 GlueSQL이 SQL 실행을 위해 요구하는 storage 기능이다.
+
+### 프로젝트에서의 역할
+
+테스트는 `MemoryStorage`로 빠르게 돌리고, 실제 CLI는 `SledStorage`로 데이터를 디렉터리에 저장한다.
 
 ## 문법 이름
 

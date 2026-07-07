@@ -150,3 +150,18 @@
 - GlueSQL invalid SQL 에러 타입 테스트
 
 현재 총 57개 테스트가 존재한다.
+
+## Step 12. GlueSQL SledStorage 영속 저장소 전환
+
+상태: 완료
+
+완료된 일:
+
+- `gluesql_sled_storage` feature 활성화
+- `GlueSqlTaskRepository<S>` generic 구조로 정리
+- `GlueSqlTaskRepository::persistent(path)` 추가
+- `main.rs` 기본 저장소를 `data/rust-task-db` 기반 SledStorage로 전환
+- 기존 MemoryStorage 테스트 흐름 보존
+- SledStorage 재실행 후 데이터 유지 테스트 추가
+
+현재 총 58개 테스트가 존재한다.

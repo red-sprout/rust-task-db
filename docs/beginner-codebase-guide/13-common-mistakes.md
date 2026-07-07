@@ -169,7 +169,7 @@ futures = "0.3"
 
 ### 예방 방법
 
-현재 Step 11에서는 `serde`, `serde_json`, `gluesql`, `futures`만 둔다. `clap`은 현재 로드맵에서 사용하지 않는다.
+현재 Step 12에서는 `serde`, `serde_json`, `gluesql`, `futures`만 둔다. `clap`은 현재 로드맵에서 사용하지 않는다.
 
 ## 테스트 관련 실수
 
@@ -177,7 +177,7 @@ futures = "0.3"
 
 ### 왜 발생하는가
 
-Step 9의 활성 저장소는 GlueSQL `MemoryStorage`다. 이 저장소는 프로그램이 끝나면 데이터가 사라진다.
+Step 12의 활성 저장소는 GlueSQL `SledStorage`다. 이 저장소는 `data/rust-task-db`에 데이터를 남긴다.
 
 ### 문제가 되는 이유
 
@@ -202,7 +202,7 @@ cargo run -- sql "INSERT INTO tasks VALUES (1, 'Rust 공부', FALSE); SELECT * F
 
 ### 예방 방법
 
-실행 결과가 이상하면 현재 명령이 새 프로세스에서 새 `MemoryStorage`를 만드는지 먼저 생각한다. 같은 실행 안에서 확인하려면 SQL 여러 statement를 한 문자열에 넣는다.
+실행 결과가 이상하면 `data/rust-task-db`에 이전 실행 데이터가 남아 있는지 먼저 확인한다. 깨끗하게 다시 보고 싶으면 해당 디렉터리를 지운 뒤 실행한다.
 
 ## 실수 이름: `sql` 명령과 `repl` 명령을 섞어서 생각함
 
