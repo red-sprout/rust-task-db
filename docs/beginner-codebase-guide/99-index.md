@@ -8,44 +8,44 @@
 
 ## 문서를 읽는 추천 순서
 
-0. `README.md`
-1. `16-run-guide.md`
-2. `00-overview.md`
-3. `01-project-map.md`
-4. `02-reading-order.md`
-5. `03-runtime-flow.md`
-6. `04-feature-flows.md`
-7. `05-file-by-file/00-index.md`
-8. `06-language-from-code.md`
-9. `08-data-model.md`
-10. `10-error-handling.md`
-11. `11-testing.md`
-12. `12-practice-tasks.md`
-13. `13-common-mistakes.md`
-14. `14-glossary.md`
-15. `15-beginner-faq.md`
+0. [README.md](../../README.md)
+1. [16-run-guide.md](16-run-guide.md)
+2. [00-overview.md](00-overview.md)
+3. [01-project-map.md](01-project-map.md)
+4. [02-reading-order.md](02-reading-order.md)
+5. [03-runtime-flow.md](03-runtime-flow.md)
+6. [04-feature-flows.md](04-feature-flows.md)
+7. [05-file-by-file/00-index.md](05-file-by-file/00-index.md)
+8. [06-language-from-code.md](06-language-from-code.md)
+9. [08-data-model.md](08-data-model.md)
+10. [10-error-handling.md](10-error-handling.md)
+11. [11-testing.md](11-testing.md)
+12. [12-practice-tasks.md](12-practice-tasks.md)
+13. [13-common-mistakes.md](13-common-mistakes.md)
+14. [14-glossary.md](14-glossary.md)
+15. [15-beginner-faq.md](15-beginner-faq.md)
 
 ## 각 문서의 역할
 
-- `00-overview.md`: 현재 Step 13 프로젝트 큰 그림
-- `01-project-map.md`: 실제 파일 지도
-- `02-reading-order.md`: 초심자가 읽을 순서
-- `03-runtime-flow.md`: `main()`부터 service, GlueSQL repository 호출까지 흐름
-- `04-feature-flows.md`: add/list/done/delete 흐름
-- `05-file-by-file/`: 파일별 상세 설명
-- `06-language-from-code.md`: 현재 코드에서 배우는 Rust 문법
-- `07-framework-and-libraries.md`: 언어 기능과 외부 crate 구분
-- `08-data-model.md`: `Task`, `Command`, `TaskService`, `TaskRepository`, GlueSQL `tasks` table, REPL 데이터 흐름
-- `09-configuration.md`: Cargo 설정과 dependency
-- `10-error-handling.md`: `AppError` 기반 실패 처리
-- `11-testing.md`: 테스트 코드 해설
-- `12-practice-tasks.md`: 쉬운 실습
-- `13-common-mistakes.md`: 초심자 실수
-- `14-glossary.md`: 용어 사전
-- `15-beginner-faq.md`: 지금까지 나온 질문과 답변 모음
-- `16-run-guide.md`: 프로젝트 실행 방법, SQL/REPL 실행 방법, GlueSQL `SledStorage` 저장 위치
-- `README.md`: GitHub 첫 화면용 요약, 실행 방법, 테스트 방법
-- `docs/todo/step-13-progress.md`: 현재 Step 13 최종 검증 및 문서 정합성 점검 상태
+- [00-overview.md](00-overview.md): 현재 Step 13 프로젝트 큰 그림
+- [01-project-map.md](01-project-map.md): 실제 파일 지도
+- [02-reading-order.md](02-reading-order.md): 초심자가 읽을 순서
+- [03-runtime-flow.md](03-runtime-flow.md): `main()`부터 service, GlueSQL repository 호출까지 흐름
+- [04-feature-flows.md](04-feature-flows.md): add/list/done/delete 흐름
+- [05-file-by-file/](05-file-by-file/00-index.md): 파일별 상세 설명
+- [06-language-from-code.md](06-language-from-code.md): 현재 코드에서 배우는 Rust 문법
+- [07-framework-and-libraries.md](07-framework-and-libraries.md): 언어 기능과 외부 crate 구분
+- [08-data-model.md](08-data-model.md): `Task`, `Command`, `TaskService`, `TaskRepository`, GlueSQL `tasks` table, REPL 데이터 흐름
+- [09-configuration.md](09-configuration.md): Cargo 설정과 dependency
+- [10-error-handling.md](10-error-handling.md): `AppError` 기반 실패 처리
+- [11-testing.md](11-testing.md): 테스트 코드 해설
+- [12-practice-tasks.md](12-practice-tasks.md): 쉬운 실습
+- [13-common-mistakes.md](13-common-mistakes.md): 초심자 실수
+- [14-glossary.md](14-glossary.md): 용어 사전
+- [15-beginner-faq.md](15-beginner-faq.md): 지금까지 나온 질문과 답변 모음
+- [16-run-guide.md](16-run-guide.md): 프로젝트 실행 방법, SQL/REPL 실행 방법, GlueSQL `SledStorage` 저장 위치
+- [README.md](../../README.md): GitHub 첫 화면용 요약, 실행 방법, 테스트 방법
+- [docs/todo/step-13-progress.md](../todo/step-13-progress.md): 현재 Step 13 최종 검증 및 문서 정합성 점검 상태
 
 ## 이 문서만 보고 할 수 있어야 하는 것
 
@@ -83,11 +83,11 @@
 
 ## 처음 읽는 사람이 가장 먼저 봐야 할 5개 파일
 
-1. `src/main.rs`
-2. `src/service.rs`
-3. `src/repository/mod.rs`
-4. `src/task.rs`
-5. `src/repository/gluesql_repository.rs`
+1. [src/main.rs](../../src/main.rs)
+2. [src/service.rs](../../src/service.rs)
+3. [src/repository/mod.rs](../../src/repository/mod.rs)
+4. [src/task.rs](../../src/task.rs)
+5. [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs)
 
 ## 다음 단계 안내
 

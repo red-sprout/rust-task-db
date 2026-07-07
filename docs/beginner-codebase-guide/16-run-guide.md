@@ -365,9 +365,9 @@ Note: Step 12 stores GlueSQL data under data/rust-task-db.
 | `could not find Cargo.toml` | 프로젝트 루트가 아닌 곳에서 실행 | `/Users/jujaewan/1_Projects/rust-task-db`로 이동 |
 | `list`가 예상과 다름 | Step 12의 `SledStorage`는 이전 실행 데이터를 유지함 | 깨끗하게 확인하려면 `data/rust-task-db`를 지운 뒤 다시 실행 |
 | `Task not found: 1` | `data/rust-task-db`에 id 1 Todo가 없음 | 먼저 Todo를 추가하거나 저장 디렉터리 상태를 확인 |
-| `GlueSQL error: ...` | GlueSQL SQL 실행 또는 row 변환 실패 | `src/repository/gluesql_repository.rs`의 SQL 문자열 확인 |
+| `GlueSQL error: ...` | GlueSQL SQL 실행 또는 row 변환 실패 | [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs)의 SQL 문자열 확인 |
 | `id must be an integer` | `parse_id`가 숫자 변환에 실패 | 숫자 id를 입력 |
 
 ## 다음에 읽을 문서
 
-실행을 확인했다면 `03-runtime-flow.md`에서 service, repository, AppError 흐름을 읽는다.
+실행을 확인했다면 [03-runtime-flow.md](03-runtime-flow.md)에서 service, repository, AppError 흐름을 읽는다.

@@ -46,7 +46,7 @@ cargo run -- add "Rust 공부"
 
 ## 관련 문서
 
-`04-feature-flows.md`
+[04-feature-flows.md](04-feature-flows.md)
 
 ## 실습 이름: parser 테스트 추가
 
@@ -102,7 +102,7 @@ cargo test missing_add_title_returns_error
 
 ## 관련 문서
 
-`11-testing.md`
+[11-testing.md](11-testing.md)
 
 ## 실습 이름: 빈 목록 메시지 추가
 

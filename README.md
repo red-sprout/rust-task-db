@@ -122,18 +122,18 @@ src/main.rs
 
 초심자용 상세 문서는 아래에서 시작하면 된다.
 
-- `docs/beginner-codebase-guide/99-index.md`
-- `docs/beginner-codebase-guide/16-run-guide.md`
-- `docs/beginner-codebase-guide/00-overview.md`
-- `docs/beginner-codebase-guide/11-testing.md`
+- [초심자용 코드베이스 완전 해설서](docs/beginner-codebase-guide/99-index.md)
+- [실행 가이드](docs/beginner-codebase-guide/16-run-guide.md)
+- [프로젝트 전체 개요](docs/beginner-codebase-guide/00-overview.md)
+- [테스트 해설](docs/beginner-codebase-guide/11-testing.md)
 
 작업 단계와 진행 상태는 아래 문서에 정리되어 있다.
 
-- `docs/prompt.md`
-- `docs/todo/roadmap.md`
-- `docs/todo/step-11-progress.md`
-- `docs/todo/step-12-progress.md`
-- `docs/todo/step-13-progress.md`
+- [구현 프롬프트](docs/prompt.md)
+- [단계별 로드맵](docs/todo/roadmap.md)
+- [Step 11 진행 상황](docs/todo/step-11-progress.md)
+- [Step 12 진행 상황](docs/todo/step-12-progress.md)
+- [Step 13 진행 상황](docs/todo/step-13-progress.md)
 
 ## 기술 스택
 

@@ -21,7 +21,7 @@ docs/beginner-codebase-guide/99-index.md
 - 현재 단계보다 뒤 기능을 먼저 구현하지 않는다.
 - 뒤 단계 문법을 현재 단계 코드에 섞지 않는다.
 - 단계가 바뀌면 코드와 문서를 같이 갱신한다.
-- 구현을 바꾸면 `docs/beginner-codebase-guide/`도 현재 코드 기준으로 갱신한다.
+- 구현을 바꾸면 [docs/beginner-codebase-guide/](beginner-codebase-guide/99-index.md)도 현재 코드 기준으로 갱신한다.
 
 ## 현재 Step 13 작업 절차
 
@@ -194,7 +194,7 @@ src/cli.rs
 
 추가된 것:
 
-- `docs/todo/step-13-progress.md`
+- [docs/todo/step-13-progress.md](todo/step-13-progress.md)
 - 최종 검증과 문서 정합성 점검 단계 정의
 - README와 주요 진행 문서의 현재 단계 표시 갱신
 

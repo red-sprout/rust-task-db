@@ -4,7 +4,7 @@
 
 Step 13 현재도 공통 에러 파일 `src/error.rs`가 있다. 유틸, 설정 모듈 파일은 없다.
 
-`src/error.rs`는 여러 계층에서 함께 쓰는 공통 에러 파일이다. repository 설명은 `02-domain-or-feature-files.md`에서 다룬다.
+[src/error.rs](../../../src/error.rs)는 여러 계층에서 함께 쓰는 공통 에러 파일이다. repository 설명은 [02-domain-or-feature-files.md](02-domain-or-feature-files.md)에서 다룬다.
 
 ## 이 파일 묶음의 역할
 

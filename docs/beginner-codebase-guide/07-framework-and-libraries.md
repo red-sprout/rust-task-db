@@ -44,7 +44,7 @@
 | --- | --- |
 | 이름 | Step 기반 구현 |
 | 분류 | 프로젝트 자체 규칙 |
-| 등장 위치 | `docs/prompt.md`, `docs/todo/roadmap.md` |
+| 등장 위치 | [docs/prompt.md](../prompt.md), [docs/todo/roadmap.md](../todo/roadmap.md) |
 | 역할 | 초심자가 문법을 순서대로 배우도록 구현 범위를 제한 |
 | 언어 자체 기능인지 여부 | Rust 문법이 아님 |
 | 프로젝트에서 쓰인 이유 | 학습 난이도 조절 |

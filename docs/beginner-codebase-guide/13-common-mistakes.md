@@ -60,7 +60,7 @@ Step 7에서는 `src/command.rs`, `src/cli.rs`, `src/error.rs`, `src/main.rs`, `
 
 ### 관련 파일
 
-`docs/todo/roadmap.md`
+[docs/todo/roadmap.md](../todo/roadmap.md)
 
 ### 예방 방법
 
@@ -93,11 +93,11 @@ src/cli.rs에 parser 테스트 추가
 
 ### 관련 파일
 
-`src/command.rs`, `src/cli.rs`, `src/main.rs`
+[src/command.rs](../../src/command.rs), [src/cli.rs](../../src/cli.rs), [src/main.rs](../../src/main.rs)
 
 ### 예방 방법
 
-`08-data-model.md`의 `Command` 변경 체크리스트를 따른다.
+[08-data-model.md](08-data-model.md)의 `Command` 변경 체크리스트를 따른다.
 
 ## 데이터 모델 관련 실수
 
@@ -129,11 +129,11 @@ pub priority: i64,
 
 ### 관련 파일
 
-`src/task.rs`, `src/main.rs`
+[src/task.rs](../../src/task.rs), [src/main.rs](../../src/main.rs)
 
 ### 예방 방법
 
-`08-data-model.md`의 체크리스트를 따른다.
+[08-data-model.md](08-data-model.md)의 체크리스트를 따른다.
 
 ## 설정 관련 실수
 
@@ -198,7 +198,7 @@ cargo run -- sql "INSERT INTO tasks VALUES (1, 'Rust 공부', FALSE); SELECT * F
 
 ### 관련 파일
 
-`src/repository/mod.rs`, `03-runtime-flow.md`
+[src/repository/mod.rs](../../src/repository/mod.rs), [03-runtime-flow.md](03-runtime-flow.md)
 
 ### 예방 방법
 

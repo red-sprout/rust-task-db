@@ -285,13 +285,13 @@ Vec<String>
 
 `Task`에 필드를 추가하면 아래를 같이 수정한다.
 
-- `src/task.rs`: struct와 `Task::new`
-- `src/repository/mod.rs`: 저장/로드 테스트 기대값
-- `src/repository/gluesql_repository.rs`: `CREATE TABLE`, `row_to_task`, SQL projection
-- `src/service.rs`: service 테스트 기대값
-- `src/main.rs`: `print_task`
-- `docs/beginner-codebase-guide/08-data-model.md`
-- `docs/beginner-codebase-guide/04-feature-flows.md`
+- [src/task.rs](../../src/task.rs): struct와 `Task::new`
+- [src/repository/mod.rs](../../src/repository/mod.rs): 저장/로드 테스트 기대값
+- [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs): `CREATE TABLE`, `row_to_task`, SQL projection
+- [src/service.rs](../../src/service.rs): service 테스트 기대값
+- [src/main.rs](../../src/main.rs): `print_task`
+- [docs/beginner-codebase-guide/08-data-model.md](08-data-model.md)
+- [docs/beginner-codebase-guide/04-feature-flows.md](04-feature-flows.md)
 
 `Command`에 명령을 추가하면 아래를 같이 수정한다.
 
