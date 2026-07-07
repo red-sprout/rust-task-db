@@ -165,3 +165,22 @@
 - SledStorage 재실행 후 데이터 유지 테스트 추가
 
 현재 총 58개 테스트가 존재한다.
+
+## Step 13. 최종 검증 및 문서 정합성 점검
+
+상태: 완료
+
+범위:
+
+- 새 CLI 명령 추가 없음
+- 새 외부 crate 추가 없음
+- Step 12의 GlueSQL `SledStorage` 활성 저장소 유지
+- `JsonTaskRepository`, `tasks.json`, MemoryStorage 테스트 흐름 보존
+- README, 단계 문서, 초심자 가이드 시작 문서가 현재 코드와 같은 상태를 설명하는지 점검
+
+완료 기준:
+
+- `cargo fmt --check` 통과
+- `cargo check` 통과
+- `cargo test` 통과
+- 현재 총 58개 테스트 유지

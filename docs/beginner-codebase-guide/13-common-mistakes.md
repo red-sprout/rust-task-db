@@ -159,7 +159,7 @@ anyhow = "1"
 ```toml
 serde = { version = "1", features = ["derive"] }
 serde_json = "1"
-gluesql = { version = "0.19.0", default-features = false, features = ["gluesql_memory_storage"] }
+gluesql = { version = "0.19.0", default-features = false, features = ["gluesql_memory_storage", "gluesql_sled_storage"] }
 futures = "0.3"
 ```
 
@@ -169,7 +169,7 @@ futures = "0.3"
 
 ### 예방 방법
 
-현재 Step 12에서는 `serde`, `serde_json`, `gluesql`, `futures`만 둔다. `clap`은 현재 로드맵에서 사용하지 않는다.
+Step 13 현재는 `serde`, `serde_json`, `gluesql`, `futures`만 둔다. `clap`은 현재 로드맵에서 사용하지 않는다.
 
 ## 테스트 관련 실수
 

@@ -2,9 +2,9 @@
 
 ## 이 문서 세트의 목적
 
-이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 12 코드만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL SledStorage 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, 테스트, 수정 포인트를 이해하게 만드는 것이다.
+이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 13 코드와 문서만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL SledStorage 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, 테스트, 수정 포인트를 이해하게 만드는 것이다.
 
-현재 구현은 `Step 12. GlueSQL SledStorage 영속 저장소 전환`까지다.
+현재 구현은 `Step 13. 최종 검증 및 문서 정합성 점검` 단계다. 기능 구현은 Step 12의 GlueSQL `SledStorage` 영속 저장 전환까지 완료되어 있다.
 
 ## 문서를 읽는 추천 순서
 
@@ -27,7 +27,7 @@
 
 ## 각 문서의 역할
 
-- `00-overview.md`: 현재 Step 12 프로젝트 큰 그림
+- `00-overview.md`: 현재 Step 13 프로젝트 큰 그림
 - `01-project-map.md`: 실제 파일 지도
 - `02-reading-order.md`: 초심자가 읽을 순서
 - `03-runtime-flow.md`: `main()`부터 service, GlueSQL repository 호출까지 흐름
@@ -45,6 +45,7 @@
 - `15-beginner-faq.md`: 지금까지 나온 질문과 답변 모음
 - `16-run-guide.md`: 프로젝트 실행 방법, SQL/REPL 실행 방법, GlueSQL `SledStorage` 저장 위치
 - `README.md`: GitHub 첫 화면용 요약, 실행 방법, 테스트 방법
+- `docs/todo/step-13-progress.md`: 현재 Step 13 최종 검증 및 문서 정합성 점검 상태
 
 ## 이 문서만 보고 할 수 있어야 하는 것
 
@@ -90,4 +91,4 @@
 
 ## 다음 단계 안내
 
-현재 단계 구현은 Step 12까지 완료되어 있다.
+현재 단계는 Step 13이다. 새 기능은 추가하지 않고, Step 12까지 구현된 기능과 문서가 일치하는지 검증한다.

@@ -2,7 +2,7 @@
 
 ## 이 문서의 목적
 
-현재 Step 12 코드에 실제 등장하는 Rust 문법과 외부 crate 사용만 설명한다.
+현재 Step 13 코드에 실제 등장하는 Rust 문법과 외부 crate 사용만 설명한다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지한다.
 
 ## 이 프로젝트에서 자주 등장하는 문법 목록
 
@@ -44,7 +44,7 @@ pub fn persistent(path: impl AsRef<Path>) -> Result<Self, AppError> {
 
 ### 프로젝트에서의 역할
 
-Step 12에서 CLI는 `"data/rust-task-db"`를 넘기고, 테스트는 임시 디렉터리 `PathBuf`를 넘긴다.
+Step 12부터 CLI는 `"data/rust-task-db"`를 넘기고, 테스트는 임시 디렉터리 `PathBuf`를 넘긴다.
 
 ## 문법 이름
 

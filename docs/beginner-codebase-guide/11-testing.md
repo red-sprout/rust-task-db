@@ -278,7 +278,7 @@ fn missing_add_title_returns_error() {
 
 ## 현재 테스트 개수
 
-현재 Step 12는 총 58개 테스트가 있다.
+현재 Step 13에서도 기능 테스트 수는 총 58개다. Step 13은 새 기능 테스트를 추가하기보다 기존 테스트가 현재 코드와 문서 설명을 뒷받침하는지 확인한다.
 
 - `src/task.rs`: domain 테스트 2개
 - `src/cli.rs`: CLI parser 테스트 16개

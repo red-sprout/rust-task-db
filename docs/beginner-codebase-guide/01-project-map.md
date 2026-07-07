@@ -36,7 +36,9 @@ rust-task-db/
     │   ├── step-8-progress.md
     │   ├── step-9-progress.md
     │   ├── step-10-progress.md
-    │   └── step-11-progress.md
+    │   ├── step-11-progress.md
+    │   ├── step-12-progress.md
+    │   └── step-13-progress.md
     └── beginner-codebase-guide/
 ```
 
@@ -48,7 +50,7 @@ rust-task-db/
 | 역할 | GitHub 첫 화면용 프로젝트 소개 문서 |
 | 이 파일이 필요한 이유 | 프로젝트 목적, 실행 방법, 테스트 방법, MemoryStorage 주의점을 빠르게 보여주기 위해 필요하다. |
 | 연결된 파일 | `docs/beginner-codebase-guide/99-index.md`, `docs/beginner-codebase-guide/16-run-guide.md`, `src/main.rs` |
-| 초심자가 봐야 할 핵심 | 현재 Step 12 상태, 지원 명령, `SledStorage` 저장 위치 |
+| 초심자가 봐야 할 핵심 | 현재 Step 13 상태, 지원 명령, `SledStorage` 저장 위치 |
 | 설명 깊이 | 짧은 설명으로 충분 |
 
 | 항목 | 내용 |
@@ -77,6 +79,15 @@ rust-task-db/
 | 연결된 파일 | `src/main.rs`, `src/repository/gluesql_repository.rs`, `.gitignore` |
 | 초심자가 봐야 할 핵심 | 이 디렉터리는 실행 중 생성되며 git에 커밋하지 않는다. |
 | 설명 깊이 | 중간 설명 필요 |
+
+| 항목 | 내용 |
+| --- | --- |
+| 파일 경로 | `docs/todo/step-13-progress.md` |
+| 역할 | Step 13 최종 검증 및 문서 정합성 점검 진행 상태 |
+| 이 파일이 필요한 이유 | 새 기능을 추가하지 않는 최종 점검 단계임을 명확히 남기기 위해 필요하다. |
+| 연결된 파일 | `docs/todo/roadmap.md`, `README.md`, `docs/project-plan.md`, `docs/step-by-step-workflow.md` |
+| 초심자가 봐야 할 핵심 | Step 13은 기능 추가가 아니라 현재 코드와 문서가 일치하는지 확인하는 단계다. |
+| 설명 깊이 | 짧은 설명으로 충분 |
 
 | 항목 | 내용 |
 | --- | --- |

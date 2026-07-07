@@ -2,7 +2,7 @@
 
 ## 이 디렉터리의 목적
 
-현재 Step 12 코드 파일을 하나씩 읽을 수 있게 나눈다.
+현재 Step 13 코드와 문서 파일을 하나씩 읽을 수 있게 나눈다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지한다.
 
 ## 파일별 해설 문서 목록
 
@@ -26,6 +26,7 @@
 - 보존된 JSON 저장 데이터: `tasks.json`
 - 실행 중 생성되는 SledStorage 데이터: `data/rust-task-db`
 - GitHub 첫 화면 소개: `README.md`
+- 단계 진행 문서: `docs/todo/step-13-progress.md`, `docs/todo/roadmap.md`
 - 설정: `Cargo.toml`
 - 테스트: `src/main.rs`, `src/task.rs`, `src/error.rs`, `src/cli.rs`, `src/service.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`의 `#[cfg(test)] mod tests`
 

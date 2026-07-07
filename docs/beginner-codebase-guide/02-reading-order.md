@@ -31,7 +31,7 @@
 ## 2-1단계: GlueSQL repository 이해
 
 - 읽을 파일: `src/repository/gluesql_repository.rs`
-- 읽는 이유: 현재 Step 12의 활성 저장소 구현체다.
+- 읽는 이유: Step 13 현재 활성 저장소 구현체다.
 - 이 파일에서 봐야 할 코드: `GlueSqlTaskRepository::persistent`, `execute`, `execute_sql`, `payload_to_sql_result`, `select_tasks`, `row_to_task`, `select_count`
 - 이 파일을 읽고 나면 알아야 하는 것: GlueSQL `Payload`와 `Value`를 프로젝트 타입인 `Task`, `TaskStats`, `SqlResult`로 바꾼다.
 - 다음에 읽을 파일: `src/repl.rs`
@@ -97,7 +97,7 @@
 - 읽을 파일: `src/cli.rs`, `src/error.rs`, `src/service.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs`의 `mod tests`
 - 읽는 이유: parser 테스트, service 테스트, repository 저장소 테스트가 분리되어 있다.
 - 이 파일에서 봐야 할 코드: `parses_add_command`, `parses_sql_command`, `add_delegates_to_repository`, `executes_select_sql_with_gluesql`
-- 이 파일을 읽고 나면 알아야 하는 것: Step 12 테스트는 총 58개다.
+- 이 파일을 읽고 나면 알아야 하는 것: Step 13에서도 기능 테스트 수는 총 58개다.
 - 다음에 읽을 파일: `12-practice-tasks.md`
 
 ## 최종 체크리스트

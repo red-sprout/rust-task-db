@@ -2,7 +2,7 @@
 
 ## 이 문서의 목적
 
-이 문서는 초심자가 `rust-task`를 터미널에서 직접 실행하고, 현재 Step 12의 GlueSQL SledStorage 저장 흐름, SQL 실행 흐름, REPL 흐름, 테스트 상태를 이해하게 돕는다.
+이 문서는 초심자가 `rust-task`를 터미널에서 직접 실행하고, 현재 Step 13의 최종 검증 상태와 Step 12에서 완성된 GlueSQL SledStorage 저장 흐름, SQL 실행 흐름, REPL 흐름, 테스트 상태를 이해하게 돕는다.
 
 ## 실행 전 확인
 
@@ -42,7 +42,7 @@ cargo check
 cargo test
 ```
 
-현재 Step 12 기준으로 테스트는 `src/task.rs`, `src/cli.rs`, `src/error.rs`, `src/service.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs` 안에 있다.
+Step 13 현재도 테스트는 `src/task.rs`, `src/cli.rs`, `src/error.rs`, `src/service.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs` 안에 있다.
 
 정상 결과 예시:
 

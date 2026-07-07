@@ -4,7 +4,7 @@
 
 ## 현재 단계
 
-- 현재 단계: Step 12. GlueSQL SledStorage 영속 저장소 전환
+- 현재 단계: Step 13. 최종 검증 및 문서 정합성 점검
 - 현재 저장 방식: `GlueSqlTaskRepository`가 관리하는 GlueSQL `SledStorage`
 - 현재 지원 명령: `add`, `list`, `done`, `delete`, `search`, `stats`, `sql`, `repl`
 - 현재 CLI 구조: `std::env::args()`를 `src/cli.rs`의 `parse_args`가 `Command` enum으로 변환하고, `src/main.rs`가 `TaskService<GlueSqlTaskRepository>`를 통해 명령을 실행하며 실패는 `AppError`로 표현한다.
@@ -26,6 +26,7 @@
 - Step 10에서는 `repl` 명령과 `.schema`, `.exit`, `.quit`을 지원한다.
 - Step 11에서는 새 기능보다 테스트 보강을 우선한다.
 - Step 12에서는 `GlueSqlTaskRepository::persistent("data/rust-task-db")`를 사용해 CLI 실행 간 Todo가 유지되게 한다.
+- Step 13에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, 코드와 문서가 Step 12 최종 기능 상태를 일관되게 설명하는지 검증한다.
 - 구현을 변경할 때마다 `docs/beginner-codebase-guide/`의 초심자 가이드를 함께 업데이트한다.
 - 초심자 가이드는 실제 코드 경로, 함수명, 타입명, 실행 흐름, 수정 포인트를 코드와 연결해서 설명해야 한다.
 - Markdown view 모드에서 줄이 붙지 않도록 `파일 경로: ...`, `역할: ...` 같은 key-value 설명은 표 또는 bullet list로 작성한다.
@@ -59,6 +60,8 @@
 - `docs/todo/step-9-progress.md`: Step 9 진행 상태
 - `docs/todo/step-10-progress.md`: Step 10 진행 상태
 - `docs/todo/step-11-progress.md`: Step 11 진행 상태
+- `docs/todo/step-12-progress.md`: Step 12 진행 상태
+- `docs/todo/step-13-progress.md`: Step 13 진행 상태
 - `docs/todo/roadmap.md`: 이후 단계 작업 계획
 - `docs/beginner-codebase-guide/`: 현재 단계 코드를 초심자가 읽을 수 있게 설명하는 문서 세트
 
@@ -129,6 +132,16 @@ cargo run -- repl
 
 주의: Step 12는 GlueSQL `SledStorage`를 사용하므로 `cargo run`을 여러 번 나눠 실행해도 `data/rust-task-db`에 데이터가 유지된다. 테스트에서는 빠른 단위 검증을 위해 `MemoryStorage`도 계속 사용한다.
 
+## Step 13 검증 명령
+
+```bash
+cargo fmt --check
+cargo check
+cargo test
+```
+
+주의: Step 13은 새 기능 구현 단계가 아니라 최종 검증과 문서 정합성 점검 단계다. 기능 검증이 필요하면 Step 12 검증 명령을 그대로 사용한다.
+
 ## 앞으로 작업 요청을 받았을 때
 
 1. 현재 단계의 `docs/todo/step-N-progress.md`와 `docs/todo/roadmap.md`를 먼저 확인한다.
@@ -178,5 +191,6 @@ cargo run -- repl
 - Step 10에서만 `repl` 명령과 `.schema`, `.exit`, `.quit`을 추가한다. 이미 추가되어 있으므로 이후 단계에서는 이 구조를 유지한다.
 - Step 11에서는 테스트를 보강한다. 새 명령이나 저장소 기능을 추가하지 않는다.
 - Step 12에서는 GlueSQL `SledStorage`를 도입해 CLI 기본 저장소를 영속 저장소로 전환한다. 새 CLI 명령은 추가하지 않는다.
+- Step 13에서는 새 기능을 추가하지 않고 최종 검증과 문서 정합성 점검을 수행한다.
 
 단계를 전환할 때는 초심자 가이드도 같은 단계 기준으로 재구성한다. 예를 들어 Step 2로 넘어가면 `Command` enum과 CLI parser를 현재 구현으로 설명하고, Step 3 이후 기능은 계속 예정으로 남긴다.

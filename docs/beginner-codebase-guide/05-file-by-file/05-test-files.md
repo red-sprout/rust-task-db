@@ -381,4 +381,4 @@ assert_eq!(command, Ok(Command::Help));
 
 ## 이 파일을 이해한 뒤 알아야 하는 것
 
-현재 Step 12는 Task 테스트 2개, CLI parser 테스트 16개, error 테스트 5개, service 테스트 7개, REPL 테스트 5개, JSON repository 테스트 9개, GlueSQL repository 테스트 13개, main 보조 테스트 1개로 총 58개 테스트가 있다.
+Step 13 현재도 Task 테스트 2개, CLI parser 테스트 16개, error 테스트 5개, service 테스트 7개, REPL 테스트 5개, JSON repository 테스트 9개, GlueSQL repository 테스트 13개, main 보조 테스트 1개로 총 58개 테스트가 있다.

@@ -2,7 +2,7 @@
 
 ## 프로젝트 한 줄 요약
 
-`rust-task`는 Rust 문법을 단계별로 배우기 위한 CLI Todo 앱이며, 현재는 Step 12로 GlueSQL SQL 실행 모드, REPL 모드, 테스트 보강, SledStorage 영속 저장까지 구현되어 있다.
+`rust-task`는 Rust 문법을 단계별로 배우기 위한 CLI Todo 앱이며, 현재는 Step 13으로 최종 검증과 문서 정합성 점검을 진행한다. 기능 구현은 Step 12에서 GlueSQL SQL 실행 모드, REPL 모드, 테스트 보강, SledStorage 영속 저장까지 완료되어 있다.
 
 ## 이 프로젝트가 해결하는 문제
 
@@ -54,6 +54,7 @@ cargo run -- add "Rust 공부"
 Step 10의 핵심 변화는 `sql` 명령을 한 번 실행하는 것에서 나아가, `repl` 안에서 여러 SQL을 순서대로 실행할 수 있게 된 것이다.
 Step 11의 핵심 변화는 새 기능 추가가 아니라 기존 구조를 테스트로 더 단단하게 묶은 것이다.
 Step 12의 핵심 변화는 `MemoryStorage` 대신 `SledStorage`를 사용해서 CLI 실행 간 Todo가 유지되게 한 것이다.
+Step 13의 핵심 변화는 새 기능 추가가 아니라 현재 코드와 문서가 같은 상태를 설명하는지 점검하는 것이다.
 
 ```text
 src/main.rs

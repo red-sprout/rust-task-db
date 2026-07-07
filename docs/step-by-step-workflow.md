@@ -10,6 +10,7 @@
 AGENTS.md
 docs/todo/roadmap.md
 docs/todo/step-12-progress.md
+docs/todo/step-13-progress.md
 docs/prompt.md
 docs/review_docs.md
 docs/beginner-codebase-guide/99-index.md
@@ -22,7 +23,21 @@ docs/beginner-codebase-guide/99-index.md
 - 단계가 바뀌면 코드와 문서를 같이 갱신한다.
 - 구현을 바꾸면 `docs/beginner-codebase-guide/`도 현재 코드 기준으로 갱신한다.
 
-## 현재 Step 12 작업 절차
+## 현재 Step 13 작업 절차
+
+Step 13에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않는다. Step 12에서 완성된 GlueSQL `SledStorage` 기반 CLI가 코드, README, 단계 문서, 초심자 가이드에서 같은 상태로 설명되는지 점검한다.
+
+검증:
+
+```bash
+cargo fmt --check
+cargo check
+cargo test
+```
+
+필요하면 Step 12 기능 검증 명령도 그대로 실행한다.
+
+## Step 12 작업 절차
 
 Step 12에서는 새 CLI 명령을 추가하지 않고 GlueSQL 기본 저장소를 SledStorage로 전환한다. 아래 파일이 현재 구현 범위다.
 
@@ -174,6 +189,14 @@ src/cli.rs
 - `GlueSqlTaskRepository::persistent(path)`
 - CLI 기본 저장 위치 `data/rust-task-db`
 - SledStorage 영속 저장 테스트
+
+## Step 13 구현 진행 상태
+
+추가된 것:
+
+- `docs/todo/step-13-progress.md`
+- 최종 검증과 문서 정합성 점검 단계 정의
+- README와 주요 진행 문서의 현재 단계 표시 갱신
 
 ## 문서 작성 절차
 

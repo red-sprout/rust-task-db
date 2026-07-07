@@ -2,7 +2,7 @@
 
 ## 에러 처리 큰 그림
 
-현재 Step 12에도 custom error 타입 `AppError`가 있다. 실패 가능성은 `src/error.rs`의 `AppError` enum으로 모인다. REPL의 표준 입력/출력 실패도 `AppError::Io`로 표현한다.
+Step 13 현재도 custom error 타입 `AppError`가 있다. 실패 가능성은 `src/error.rs`의 `AppError` enum으로 모인다. REPL의 표준 입력/출력 실패도 `AppError::Io`로 표현한다.
 
 ```text
 CLI parsing 실패

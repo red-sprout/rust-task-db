@@ -8,7 +8,7 @@ Rust + GlueSQL 미니 프로젝트: CLI Todo List
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | Step 12. GlueSQL SledStorage 영속 저장소 전환 |
+| 현재 단계 | Step 13. 최종 검증 및 문서 정합성 점검 |
 | 실행 방식 | Cargo로 실행하는 CLI 앱 |
 | 활성 저장소 | `GlueSqlTaskRepository` + GlueSQL `SledStorage` |
 | 저장 위치 | `data/rust-task-db` |
@@ -133,6 +133,7 @@ src/main.rs
 - `docs/todo/roadmap.md`
 - `docs/todo/step-11-progress.md`
 - `docs/todo/step-12-progress.md`
+- `docs/todo/step-13-progress.md`
 
 ## 기술 스택
 

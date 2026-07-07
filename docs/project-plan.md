@@ -6,11 +6,15 @@
 
 ## 현재 단계
 
-현재 구현 단계는 `Step 12. GlueSQL SledStorage 영속 저장소 전환`이다.
+현재 구현 단계는 `Step 13. 최종 검증 및 문서 정합성 점검`이다.
 
 현재 코드는 CLI 문자열을 `Command` enum으로 변환한 뒤, `TaskService<GlueSqlTaskRepository<SledStorage>>`를 통해 Todo 기능을 실행한다. `add`, `list`, `done`, `delete`, `search`, `stats`, `sql`, `repl`을 지원하며, 실패는 `AppError`로 표현한다. 기존 `JsonTaskRepository`, `tasks.json`, MemoryStorage 테스트 흐름은 삭제하지 않고 보존한다.
 
-## 현재 Step 12 목표
+## 현재 Step 13 목표
+
+Step 13은 새 기능을 추가하지 않고 최종 검증과 문서 정합성을 점검한다.
+
+## 현재 기능 상태
 
 지원 명령:
 
@@ -124,6 +128,7 @@ rust-task/
       step-10-progress.md
       step-11-progress.md
       step-12-progress.md
+      step-13-progress.md
       roadmap.md
 ```
 
@@ -154,7 +159,7 @@ cargo run -- repl
 
 ## 이후 단계 요약
 
-현재 `docs/prompt.md` 기준 단계 구현과 Step 8의 영속 저장소 확장은 Step 12까지 완료되어 있다. 이후 작업은 새 요구가 있을 때 별도 단계로 계획한다.
+현재 `docs/prompt.md` 기준 단계 구현과 Step 8의 영속 저장소 확장은 Step 12까지 완료되어 있다. Step 13은 최종 검증과 문서 정합성 점검 단계다. 이후 작업은 새 요구가 있을 때 별도 단계로 계획한다.
 
 ## 완료 기준
 
