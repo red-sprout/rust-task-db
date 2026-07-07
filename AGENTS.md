@@ -15,6 +15,7 @@
 
 - `docs/prompt.md`의 단계 순서를 지킨다.
 - `docs/review_docs.md`의 문서화 원칙을 지킨다.
+- 구현을 변경할 때마다 `README.md`도 함께 확인하고, 실행 방법/지원 기능/현재 단계/주의점이 바뀌었으면 갱신한다.
 - 다음 단계 기능을 미리 구현하지 않는다.
 - 현재 단계에서 설명해야 할 Rust 문법만 코드에 남긴다.
 - Step 11에서는 `serde`, `serde_json`, `gluesql`, `futures`만 외부 crate로 사용한다.
@@ -28,6 +29,8 @@
 - 초심자 가이드는 실제 코드 경로, 함수명, 타입명, 실행 흐름, 수정 포인트를 코드와 연결해서 설명해야 한다.
 - Markdown view 모드에서 줄이 붙지 않도록 `파일 경로: ...`, `역할: ...` 같은 key-value 설명은 표 또는 bullet list로 작성한다.
 - 코드에는 존재하지 않는 뒤 단계 기능을 현재 구현처럼 설명하지 않는다. 뒤 단계 내용은 반드시 "예정" 또는 "TODO"로 표시한다.
+- 사용자가 명시적으로 커밋을 요청하기 전에는 `git commit`을 실행하지 않는다.
+- 사용자가 명시적으로 푸시를 요청하기 전에는 `git push`를 실행하지 않는다.
 
 ## 현재 파일 역할
 
@@ -40,6 +43,7 @@
 - `src/command.rs`: CLI 명령을 표현하는 `Command` enum. `Search`, `Stats`, `Sql`, `Repl` 포함
 - `src/cli.rs`: `std::env::args()` 결과를 `Command`로 바꾸는 parser와 parser 테스트
 - `src/task.rs`: `Task` struct, `TaskStats` struct, `Task::new`, serde derive, task 테스트
+- `README.md`: GitHub 첫 화면용 프로젝트 소개, 실행 방법, 테스트 방법, 현재 저장소 주의점
 - `Cargo.toml`: Rust package 설정. `serde`, `serde_json`, `gluesql`, `futures` dependency 포함
 - `tasks.json`: Step 7까지 사용한 JSON 저장 파일. Step 11 현재 기본 실행 저장소는 아니지만 삭제하지 않는다.
 - `docs/todo/step-1-progress.md`: Step 1 진행 상태
@@ -129,8 +133,34 @@ cargo run -- repl
 3. 사용자가 특정 단계를 요청하지 않으면 현재 단계 범위 안에서만 수정한다.
 4. 다음 단계로 넘어가자는 요청이 있으면 roadmap의 순서대로 구현한다.
 5. 구현 후 `docs/todo/` 진행 문서와 `docs/beginner-codebase-guide/` 초심자 가이드를 함께 갱신한다.
-6. `cargo fmt --check`와 `cargo test`를 실행한다.
-7. 최종 보고에 코드 변경과 문서 변경을 모두 적는다.
+6. `README.md`가 현재 기능, 실행 방법, 테스트 방법과 어긋나지 않는지 확인하고 필요하면 갱신한다.
+7. `cargo fmt --check`와 `cargo test`를 실행한다.
+8. 최종 보고에 코드 변경과 문서 변경을 모두 적는다.
+
+## Git 작업 규칙
+
+- 사용자가 커밋을 요청하기 전에는 커밋하지 않는다.
+- 사용자가 푸시를 요청하기 전에는 푸시하지 않는다.
+- 커밋 전에는 `git status --short`로 포함 파일을 확인한다.
+- 커밋 전에는 가능한 경우 `cargo fmt --check`와 `cargo test`를 통과시킨다.
+- 커밋 메시지는 아래 템플릿을 기본으로 사용한다.
+
+```text
+<type>: <짧은 요약>
+
+- <변경 사항 1>
+- <변경 사항 2>
+- <문서/테스트 변경 사항>
+```
+
+권장 type:
+
+- `feat`: 새 기능
+- `fix`: 버그 수정
+- `test`: 테스트 추가/수정
+- `docs`: 문서 수정
+- `refactor`: 동작 변경 없는 구조 개선
+- `chore`: 설정, 정리 작업
 
 ## 단계 전환 규칙
 

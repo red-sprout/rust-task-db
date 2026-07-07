@@ -4,6 +4,7 @@
 
 ```text
 rust-task-db/
+├── README.md
 ├── Cargo.toml
 ├── Cargo.lock
 ├── AGENTS.md
@@ -39,6 +40,15 @@ rust-task-db/
 ```
 
 ## 루트 파일 설명
+
+| 항목 | 내용 |
+| --- | --- |
+| 파일 경로 | `README.md` |
+| 역할 | GitHub 첫 화면용 프로젝트 소개 문서 |
+| 이 파일이 필요한 이유 | 프로젝트 목적, 실행 방법, 테스트 방법, MemoryStorage 주의점을 빠르게 보여주기 위해 필요하다. |
+| 연결된 파일 | `docs/beginner-codebase-guide/99-index.md`, `docs/beginner-codebase-guide/16-run-guide.md`, `src/main.rs` |
+| 초심자가 봐야 할 핵심 | 현재 Step 11 상태, 지원 명령, `MemoryStorage` 주의점 |
+| 설명 깊이 | 짧은 설명으로 충분 |
 
 | 항목 | 내용 |
 | --- | --- |

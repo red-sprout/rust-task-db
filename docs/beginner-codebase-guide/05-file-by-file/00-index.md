@@ -24,6 +24,7 @@
 - CLI parser: `src/cli.rs`
 - Todo 데이터 모델: `src/task.rs`
 - 보존된 JSON 저장 데이터: `tasks.json`
+- GitHub 첫 화면 소개: `README.md`
 - 설정: `Cargo.toml`
 - 테스트: `src/main.rs`, `src/error.rs`, `src/cli.rs`, `src/service.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`의 `#[cfg(test)] mod tests`
 

@@ -8,6 +8,7 @@
 
 ## 문서를 읽는 추천 순서
 
+0. `README.md`
 1. `16-run-guide.md`
 2. `00-overview.md`
 3. `01-project-map.md`
@@ -43,6 +44,7 @@
 - `14-glossary.md`: 용어 사전
 - `15-beginner-faq.md`: 지금까지 나온 질문과 답변 모음
 - `16-run-guide.md`: 프로젝트 실행 방법, SQL/REPL 실행 방법, GlueSQL `MemoryStorage` 주의점
+- `README.md`: GitHub 첫 화면용 요약, 실행 방법, 테스트 방법
 
 ## 이 문서만 보고 할 수 있어야 하는 것
 
