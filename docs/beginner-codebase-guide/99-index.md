@@ -2,9 +2,9 @@
 
 ## 이 문서 세트의 목적
 
-이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 16 코드와 문서만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL SledStorage 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, GlueSQL transaction 관찰 테스트, GlueSQL Engine/Storage Adapter 구조, Minimal Custom Storage 책임, 수정 포인트를 이해하게 만드는 것이다.
+이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 17 코드와 문서만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL SledStorage 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, GlueSQL transaction 관찰 테스트, GlueSQL Engine/Storage Adapter 구조, Minimal Custom Storage 책임, Query Execution 변환 흐름, 수정 포인트를 이해하게 만드는 것이다.
 
-현재 구현은 `Step 16. Minimal Custom Storage 분석` 단계다. CLI 기능 구현은 Step 12의 GlueSQL `SledStorage` 영속 저장 전환까지 완료되어 있고, Step 16에서는 새 CLI 명령 없이 custom storage를 만들 때 필요한 trait 책임과 구현 순서를 문서로 분석한다.
+현재 구현은 `Step 17. Query Execution 상세 분석` 단계다. CLI 기능 구현은 Step 12의 GlueSQL `SledStorage` 영속 저장 전환까지 완료되어 있고, Step 17에서는 새 CLI 명령 없이 Todo 명령별 SQL 생성과 `Payload` 변환 흐름을 문서로 분석한다.
 
 ## 문서를 읽는 추천 순서
 
@@ -26,10 +26,11 @@
 15. [15-beginner-faq.md](15-beginner-faq.md)
 16. [17-gluesql-internals.md](17-gluesql-internals.md)
 17. [18-custom-storage.md](18-custom-storage.md)
+18. [19-query-execution.md](19-query-execution.md)
 
 ## 각 문서의 역할
 
-- [00-overview.md](00-overview.md): 현재 Step 16 프로젝트 큰 그림
+- [00-overview.md](00-overview.md): 현재 Step 17 프로젝트 큰 그림
 - [01-project-map.md](01-project-map.md): 실제 파일 지도
 - [02-reading-order.md](02-reading-order.md): 초심자가 읽을 순서
 - [03-runtime-flow.md](03-runtime-flow.md): `main()`부터 service, GlueSQL repository 호출까지 흐름
@@ -48,11 +49,13 @@
 - [16-run-guide.md](16-run-guide.md): 프로젝트 실행 방법, SQL/REPL 실행 방법, GlueSQL `SledStorage` 저장 위치
 - [17-gluesql-internals.md](17-gluesql-internals.md): GlueSQL Parser/Planner/Executor/Store 흐름과 Storage별 차이
 - [18-custom-storage.md](18-custom-storage.md): Minimal Custom Storage를 만들 때 필요한 trait 책임과 구현 순서
+- [19-query-execution.md](19-query-execution.md): Todo 명령별 SQL 생성과 `Payload` 변환 흐름
 - [README.md](../../README.md): GitHub 첫 화면용 요약, 실행 방법, 테스트 방법
 - [docs/todo/step-13-progress.md](../todo/step-13-progress.md): Step 13 최종 검증 및 문서 정합성 점검 기록
 - [docs/todo/step-14-progress.md](../todo/step-14-progress.md): Step 14 GlueSQL transaction/snapshot/write lock 관찰 기록
 - [docs/todo/step-15-progress.md](../todo/step-15-progress.md): Step 15 GlueSQL Engine/Storage Adapter 분석 완료 상태
-- [docs/todo/step-16-progress.md](../todo/step-16-progress.md): 현재 Step 16 Minimal Custom Storage 분석 상태
+- [docs/todo/step-16-progress.md](../todo/step-16-progress.md): Step 16 Minimal Custom Storage 분석 완료 상태
+- [docs/todo/step-17-progress.md](../todo/step-17-progress.md): 현재 Step 17 Query Execution 상세 분석 상태
 
 ## 이 문서만 보고 할 수 있어야 하는 것
 
@@ -74,6 +77,8 @@
 - Step 15에서 `GStore`, `GStoreMut`, `Planner` trait bound가 필요한 이유 설명
 - Step 16에서 custom storage를 만들 때 읽기/쓰기/transaction/index 책임이 어떻게 나뉘는지 설명
 - Step 16에서 `TaskRepository`와 GlueSQL `Store` 계층이 서로 다른 추상화임을 설명
+- Step 17에서 Todo 명령이 어떤 SQL을 만들고 `Payload`가 어떤 프로젝트 타입으로 바뀌는지 설명
+- Step 17에서 `row_to_task`, `select_count`, `payload_to_sql_result`의 역할 설명
 - Step 10에서 REPL 안에서는 같은 저장소 인스턴스가 유지되는 이유 설명
 - `mod`, `derive`, `impl`, `match`, `Result`, `?`, `std::fs`, `Serialize`, `Deserialize`, `block_on`이 무엇인지 설명
 - `cargo run`, `cargo test`, `cargo check`로 현재 프로젝트 실행/검증
@@ -104,4 +109,4 @@
 
 ## 다음 단계 안내
 
-현재 단계는 Step 16이다. 새 CLI 명령은 추가하지 않고, Step 12까지 구현된 기능 위에서 Minimal Custom Storage의 책임과 구현 순서를 문서로 분석한다.
+현재 단계는 Step 17이다. 새 CLI 명령은 추가하지 않고, Step 12까지 구현된 기능 위에서 Query Execution의 SQL 생성과 결과 변환 흐름을 문서로 분석한다.

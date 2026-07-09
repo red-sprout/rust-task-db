@@ -90,6 +90,8 @@ TaskService
 -> 추가된 Task 출력
 ```
 
+명령별 SQL과 `Payload` 변환의 더 자세한 설명은 [19-query-execution.md](19-query-execution.md)에서 다룬다.
+
 ## 기능명: list
 
 ### 실행 명령
@@ -233,7 +235,7 @@ Command::Stats => match service.stats() {
 },
 ```
 
-`stats`는 데이터를 바꾸지 않고 `SELECT COUNT(*) FROM tasks`와 `SELECT COUNT(*) FROM tasks WHERE done = TRUE`를 실행한다.
+`stats`는 데이터를 바꾸지 않고 `SELECT COUNT(*) FROM tasks`와 `SELECT COUNT(*) FROM tasks WHERE done = TRUE`를 실행한다. `select_count`가 `Value::I64`를 `usize`로 바꾸는 흐름은 [19-query-execution.md](19-query-execution.md)에서 다룬다.
 
 ## 기능명: sql
 
@@ -257,6 +259,8 @@ cargo run -- sql "INSERT INTO tasks VALUES (1, 'Rust 공부', FALSE); SELECT * F
 4. `service.execute_sql(sql)`이 SQL 실행을 repository에 위임한다.
 5. `GlueSqlTaskRepository::execute_sql`이 GlueSQL `Payload`를 `SqlResult`로 바꾼다.
 6. `print_sql_results(&results)`가 SELECT 결과 또는 변경 건수를 출력한다.
+
+`Payload::Select`, `Payload::Insert`, `Payload::Update`, `Payload::Delete`가 `SqlResult`로 바뀌는 표는 [19-query-execution.md](19-query-execution.md)에 있다.
 
 ### 핵심 코드 블록
 

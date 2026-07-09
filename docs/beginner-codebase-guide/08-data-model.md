@@ -30,7 +30,7 @@ CLI 문자열
 | 각 필드의 의미 | id는 식별자, title은 제목, done은 완료 여부 |
 | 어디서 생성되는가 | `Task::new` |
 | 어디서 사용되는가 | `src/repository/mod.rs`의 `add`, `mark_done`, `delete`, `src/main.rs`의 `print_task` |
-| DB에 저장되는가 | Step 16 현재는 GlueSQL `tasks` table에 저장됨 |
+| DB에 저장되는가 | Step 17 현재는 GlueSQL `tasks` table에 저장됨 |
 | 실제 저장 위치 | `data/rust-task-db` |
 | 외부 응답으로 노출되는가 | CLI 출력으로 노출 |
 | 수정 시 영향받는 파일 | `src/task.rs`, `src/main.rs`, 테스트, 이 문서 세트 |
@@ -142,7 +142,7 @@ CLI 문자열
 
 ## Schema/Table/Collection 목록
 
-Step 16 현재도 GlueSQL table schema가 있다.
+Step 17 현재도 GlueSQL table schema가 있다.
 
 Step 12 저장 흐름:
 

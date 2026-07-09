@@ -42,7 +42,7 @@ fn main() {
 8. `TaskService::new(repository)`로 service를 만든다.
 9. `main()`이 `match command`로 service 메서드를 호출한다.
 10. service가 repository 메서드에 위임한다.
-11. repository가 GlueSQL SQL을 실행한다.
+11. repository가 `execute(sql)`을 통해 GlueSQL SQL을 실행한다.
 12. Todo 명령이면 `Payload`와 `Value`를 `Task` 또는 `TaskStats`로 바꾼 뒤 결과를 출력한다.
 13. `sql` 명령이면 `Payload`를 `SqlResult`로 바꾼 뒤 SQL 결과를 출력한다.
 14. `repl` 명령이면 `src/repl.rs`의 입력 루프 안에서 여러 SQL을 반복 실행한다.
@@ -204,7 +204,7 @@ pub fn add(&mut self, title: String) -> Result<Task, AppError> {
 
 ## GlueSQL 실행 흐름은 어디에 있나?
 
-Step 9에서는 GlueSQL 세부사항과 SQL 결과 변환이 `src/repository/gluesql_repository.rs` 안에 있다.
+Step 17 현재 GlueSQL 세부사항과 SQL 결과 변환은 `src/repository/gluesql_repository.rs` 안에 있다. 명령별 SQL과 `Payload` 변환 상세는 [19-query-execution.md](19-query-execution.md)에서 다룬다.
 
 ```text
 src/main.rs

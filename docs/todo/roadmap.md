@@ -254,3 +254,25 @@
 - README, AGENTS, 초심자 가이드, 단계 문서 갱신
 
 현재 총 65개 테스트가 유지된다.
+
+## Step 17. Query Execution 상세 분석
+
+상태: 완료
+
+범위:
+
+- 새 CLI 명령 추가 없음
+- 새 외부 crate 추가 없음
+- 기본 실행 저장소는 GlueSQL `SledStorage` 유지
+- GlueSQL Parser/Planner/Executor를 직접 호출하지 않음
+- 현재 Todo 명령이 만드는 SQL과 `Payload` 변환 경로를 실제 코드와 연결
+
+완료된 일:
+
+- `docs/beginner-codebase-guide/19-query-execution.md` 추가
+- `add`, `list`, `done`, `delete`, `search`, `stats`, `sql`, `repl`의 query execution 흐름 문서화
+- `execute`, `select_tasks`, `row_to_task`, `select_count`, `payload_to_sql_result`, `value_to_string` 설명
+- `Payload`가 `Task`, `TaskStats`, `SqlResult`로 나뉘어 변환되는 경계 정리
+- README, AGENTS, 초심자 가이드, 단계 문서 갱신
+
+현재 총 65개 테스트가 유지된다.

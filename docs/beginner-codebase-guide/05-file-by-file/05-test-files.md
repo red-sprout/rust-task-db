@@ -453,4 +453,4 @@ assert_eq!(command, Ok(Command::Help));
 
 ## 이 파일을 이해한 뒤 알아야 하는 것
 
-Step 16 현재는 Task 테스트 2개, CLI parser 테스트 16개, error 테스트 5개, service 테스트 7개, REPL 테스트 5개, JSON repository 테스트 10개, GlueSQL repository 테스트 19개, main 보조 테스트 1개로 총 65개 테스트가 있다. Step 16은 문서 분석 단계라 테스트 수는 Step 15와 같다.
+Step 17 현재는 Task 테스트 2개, CLI parser 테스트 16개, error 테스트 5개, service 테스트 7개, REPL 테스트 5개, JSON repository 테스트 10개, GlueSQL repository 테스트 19개, main 보조 테스트 1개로 총 65개 테스트가 있다. Step 17은 문서 분석 단계라 테스트 수는 Step 15와 같다.

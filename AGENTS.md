@@ -4,7 +4,7 @@
 
 ## 현재 단계
 
-- 현재 단계: Step 16. Minimal Custom Storage 분석
+- 현재 단계: Step 17. Query Execution 상세 분석
 - 현재 저장 방식: `GlueSqlTaskRepository`가 관리하는 GlueSQL `SledStorage`
 - 현재 지원 명령: `add`, `list`, `done`, `delete`, `search`, `stats`, `sql`, `repl`
 - 현재 CLI 구조: `std::env::args()`를 `src/cli.rs`의 `parse_args`가 `Command` enum으로 변환하고, `src/main.rs`가 `TaskService<GlueSqlTaskRepository>`를 통해 명령을 실행하며 실패는 `AppError`로 표현한다.
@@ -32,6 +32,7 @@
 - Step 15에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, GlueSQL `Glue::execute` 내부 흐름(Parser -> Planner -> Executor -> Store), `GStore`/`GStoreMut`/`Planner` trait bound, Storage별 기능 차이를 문서와 테스트로 분석한다.
 - Step 15에서도 GlueSQL upstream source를 복사하거나 수정하지 않는다. 현재 프로젝트 코드는 public API와 local crate source 관찰을 문서화하는 수준으로 유지한다.
 - Step 16에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, 실제 custom storage를 production code에 도입하지 않는다. 대신 최소 custom storage를 만들 때 필요한 GlueSQL Store trait 책임, 읽기 전용 storage와 쓰기 가능 storage의 차이, 현재 repository 구조와 연결되는 지점을 문서화한다.
+- Step 17에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, Todo 명령별 SQL 생성 흐름과 GlueSQL `Payload`가 `Task`, `TaskStats`, `SqlResult`로 변환되는 경로를 문서화한다.
 - 구현을 변경할 때마다 `docs/beginner-codebase-guide/`의 초심자 가이드를 함께 업데이트한다.
 - 초심자 가이드는 실제 코드 경로, 함수명, 타입명, 실행 흐름, 수정 포인트를 코드와 연결해서 설명해야 한다.
 - Markdown view 모드에서 줄이 붙지 않도록 `파일 경로: ...`, `역할: ...` 같은 key-value 설명은 표 또는 bullet list로 작성한다.
@@ -70,6 +71,7 @@
 - `docs/todo/step-14-progress.md`: Step 14 진행 상태
 - `docs/todo/step-15-progress.md`: Step 15 진행 상태
 - `docs/todo/step-16-progress.md`: Step 16 진행 상태
+- `docs/todo/step-17-progress.md`: Step 17 진행 상태
 - `docs/todo/roadmap.md`: 이후 단계 작업 계획
 - `docs/beginner-codebase-guide/`: 현재 단계 코드를 초심자가 읽을 수 있게 설명하는 문서 세트
 
@@ -103,6 +105,7 @@ docs/beginner-codebase-guide/15-beginner-faq.md
 docs/beginner-codebase-guide/16-run-guide.md
 docs/beginner-codebase-guide/17-gluesql-internals.md
 docs/beginner-codebase-guide/18-custom-storage.md
+docs/beginner-codebase-guide/19-query-execution.md
 ```
 
 업데이트 기준:
@@ -182,6 +185,16 @@ cargo test
 
 주의: Step 16은 production custom storage를 도입하는 단계가 아니라 Minimal Custom Storage 구조를 문서로 분석하는 단계다. `cargo test` 기준 65개 테스트가 유지되어야 한다.
 
+## Step 17 검증 명령
+
+```bash
+cargo fmt --check
+cargo check
+cargo test
+```
+
+주의: Step 17은 새 CLI 기능을 추가하는 단계가 아니라 현재 Todo 명령의 SQL 생성과 `Payload` 변환 흐름을 문서로 분석하는 단계다. `cargo test` 기준 65개 테스트가 유지되어야 한다.
+
 ## 앞으로 작업 요청을 받았을 때
 
 1. 현재 단계의 `docs/todo/step-N-progress.md`와 `docs/todo/roadmap.md`를 먼저 확인한다.
@@ -235,5 +248,6 @@ cargo test
 - Step 14에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고 GlueSQL `SledStorage` transaction/snapshot/write lock 관찰 테스트와 문서를 추가한다.
 - Step 15에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고 GlueSQL Parser/Planner/Executor/Store 흐름, Store trait 책임, Storage별 기능 차이, 기여 전략을 문서화하고 관찰 테스트를 보강한다.
 - Step 16에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고 Minimal Custom Storage를 만들 때 필요한 trait 책임과 구현 순서를 문서화한다.
+- Step 17에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고 Todo 명령별 SQL 생성과 query result 변환 흐름을 문서화한다.
 
 단계를 전환할 때는 초심자 가이드도 같은 단계 기준으로 재구성한다. 예를 들어 Step 2로 넘어가면 `Command` enum과 CLI parser를 현재 구현으로 설명하고, Step 3 이후 기능은 계속 예정으로 남긴다.
