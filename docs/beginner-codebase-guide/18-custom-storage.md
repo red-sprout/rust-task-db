@@ -93,7 +93,7 @@ SQL String
 | transaction storage | begin/commit/rollback 상태 관리 | `BEGIN`, `COMMIT`, `ROLLBACK` |
 | index storage | index 생성, index lookup, index 갱신 | index가 필요한 최적화 |
 
-현재 Todo CLI는 add/list/done/delete/search/stats/sql/repl을 지원한다. 그래서 현재 활성 storage인 `SledStorage`는 읽기와 쓰기 모두 가능해야 한다.
+현재 Todo CLI는 add/list/done/delete/search/stats/sql/repl을 지원한다. 그래서 현재 활성 storage인 `SledStorage`는 읽기와 쓰기 모두 가능해야 한다. Storage별 기능 차이와 현재 코드 도입 여부는 [20-storage-comparison.md](20-storage-comparison.md)에서 더 자세히 비교한다.
 
 ## 현재 Todo 기능과 storage 책임 연결
 

@@ -276,3 +276,25 @@
 - README, AGENTS, 초심자 가이드, 단계 문서 갱신
 
 현재 총 65개 테스트가 유지된다.
+
+## Step 18. Storage별 기능 비교표 고도화
+
+상태: 완료
+
+범위:
+
+- 새 CLI 명령 추가 없음
+- 새 외부 crate 추가 없음
+- 기본 실행 저장소는 GlueSQL `SledStorage` 유지
+- `SharedMemoryStorage`, `JsonStorage`, `MongoStorage`, `CompositeStorage`는 코드에 도입하지 않음
+- 현재 프로젝트에서 실제 사용하는 저장소와 문서 비교 대상 storage를 구분
+
+완료된 일:
+
+- `docs/beginner-codebase-guide/20-storage-comparison.md` 추가
+- `JsonTaskRepository`, `MemoryStorage`, `SledStorage`, `SharedMemoryStorage`, `JsonStorage`, `MongoStorage`, `CompositeStorage` 비교표 작성
+- 영속성, 동시 접근, transaction, SQL 실행 관점의 차이 정리
+- 현재 코드 증거와 "코드에서 확인되지 않음" 범위 명시
+- README, AGENTS, 초심자 가이드, 단계 문서 갱신
+
+현재 총 65개 테스트가 유지된다.

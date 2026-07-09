@@ -2,11 +2,11 @@
 
 ## 프로젝트 한 줄 요약
 
-`rust-task`는 Rust 문법을 단계별로 배우기 위한 CLI Todo 앱이며, 현재는 Step 17로 Query Execution의 SQL 생성과 결과 변환 흐름을 현재 코드와 연결해 분석한다. CLI 기능 구현은 Step 12에서 GlueSQL SQL 실행 모드, REPL 모드, 테스트 보강, SledStorage 영속 저장까지 완료되어 있다.
+`rust-task`는 Rust 문법을 단계별로 배우기 위한 CLI Todo 앱이며, 현재는 Step 18로 Storage별 기능 차이를 현재 코드와 연결해 분석한다. CLI 기능 구현은 Step 12에서 GlueSQL SQL 실행 모드, REPL 모드, 테스트 보강, SledStorage 영속 저장까지 완료되어 있다.
 
 ## 이 프로젝트가 해결하는 문제
 
-Rust 초심자가 `struct`, `enum`, `trait`, generic, `impl`, `Vec`, ownership, borrowing, `Option`, `Result`, `match`, custom error, 파일 I/O, serde JSON 변환, GlueSQL 저장소 교체, SQL 결과 매핑, storage별 transaction 차이, GlueSQL Parser/Planner/Executor/Store 흐름, Minimal Custom Storage 책임, Query Execution 변환 흐름을 실제 코드 안에서 볼 수 있게 한다.
+Rust 초심자가 `struct`, `enum`, `trait`, generic, `impl`, `Vec`, ownership, borrowing, `Option`, `Result`, `match`, custom error, 파일 I/O, serde JSON 변환, GlueSQL 저장소 교체, SQL 결과 매핑, storage별 transaction 차이, GlueSQL Parser/Planner/Executor/Store 흐름, Minimal Custom Storage 책임, Query Execution 변환 흐름, Storage별 기능 차이를 실제 코드 안에서 볼 수 있게 한다.
 
 ## 핵심 기능 목록
 
@@ -59,6 +59,7 @@ Step 14의 핵심 변화는 새 CLI 명령 없이 `src/repository/gluesql_reposi
 Step 15의 핵심 변화는 새 CLI 명령 없이 `Glue::execute` 뒤의 Parser, Planner, Executor, Store 흐름과 Storage Adapter 책임을 문서화하고, commit/nested transaction/SQL 미지원 경계 테스트를 추가한 것이다.
 Step 16의 핵심 변화는 production custom storage를 추가하지 않고, custom storage를 만들 때 필요한 읽기/쓰기/transaction/index 책임을 문서화한 것이다.
 Step 17의 핵심 변화는 새 CLI 명령 없이 Todo 명령별 SQL 생성과 `Payload`가 `Task`, `TaskStats`, `SqlResult`로 변환되는 경로를 문서화한 것이다.
+Step 18의 핵심 변화는 새 storage를 도입하지 않고, 현재 코드에서 실제 사용하는 storage와 문서 비교 대상 storage를 표로 구분한 것이다.
 
 ```text
 src/main.rs
@@ -100,6 +101,7 @@ Step 10에서는 `Command::Repl`, `src/repl.rs`, `BufRead`, `Write`, `.schema`, 
 - 현재 GlueSQL 내부 흐름 해설 위치: `docs/beginner-codebase-guide/17-gluesql-internals.md`
 - 현재 custom storage 분석 위치: `docs/beginner-codebase-guide/18-custom-storage.md`
 - 현재 query execution 분석 위치: `docs/beginner-codebase-guide/19-query-execution.md`
+- 현재 storage 비교표 위치: `docs/beginner-codebase-guide/20-storage-comparison.md`
 - 보존된 저장 파일: `tasks.json`
 - SQL 결과 모델: `SqlResult`
 - REPL 모듈: `src/repl.rs`

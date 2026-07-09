@@ -110,7 +110,7 @@ GlueSqlTaskRepository<SledStorage>
 
 ## Storage별 기능 차이
 
-GlueSQL은 SQL engine과 storage를 분리한다. 그래서 모든 storage가 같은 기능을 지원한다고 보면 안 된다.
+GlueSQL은 SQL engine과 storage를 분리한다. 그래서 모든 storage가 같은 기능을 지원한다고 보면 안 된다. 더 자세한 비교표는 [20-storage-comparison.md](20-storage-comparison.md)에서 다룬다.
 
 | Storage | 현재 프로젝트에서의 상태 | 관찰한 기능 | 주의할 점 |
 | --- | --- | --- | --- |

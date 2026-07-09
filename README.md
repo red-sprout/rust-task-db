@@ -2,13 +2,13 @@
 
 Rust + GlueSQL 미니 프로젝트: CLI Todo List
 
-`rust-task-db`는 Rust 문법과 간단한 아키텍처 분리를 단계별로 학습하기 위한 CLI Todo 프로젝트다. 현재는 `Command` enum, CLI parser, service layer, repository trait, custom error, GlueSQL `SledStorage`, SQL 실행 모드, REPL 모드, 테스트 보강, GlueSQL `SledStorage` 트랜잭션/동시성 관찰 테스트, GlueSQL Engine/Storage Adapter 분석, Minimal Custom Storage 분석, Query Execution 상세 분석 문서까지 구현되어 있다.
+`rust-task-db`는 Rust 문법과 간단한 아키텍처 분리를 단계별로 학습하기 위한 CLI Todo 프로젝트다. 현재는 `Command` enum, CLI parser, service layer, repository trait, custom error, GlueSQL `SledStorage`, SQL 실행 모드, REPL 모드, 테스트 보강, GlueSQL `SledStorage` 트랜잭션/동시성 관찰 테스트, GlueSQL Engine/Storage Adapter 분석, Minimal Custom Storage 분석, Query Execution 상세 분석, Storage별 기능 비교표 문서까지 구현되어 있다.
 
 ## 현재 상태
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | Step 17. Query Execution 상세 분석 |
+| 현재 단계 | Step 18. Storage별 기능 비교표 고도화 |
 | 실행 방식 | Cargo로 실행하는 CLI 앱 |
 | 활성 저장소 | `GlueSqlTaskRepository` + GlueSQL `SledStorage` |
 | 저장 위치 | `data/rust-task-db` |
@@ -128,6 +128,12 @@ Step 17에서는 Todo 명령이 실제로 어떤 SQL을 만들고, GlueSQL `Payl
 - `sql`과 `repl`은 `Payload`를 CLI 출력용 `SqlResult`로 변환한다.
 - 핵심 변환 지점은 `execute`, `select_tasks`, `row_to_task`, `select_count`, `payload_to_sql_result`, `value_to_string`이다.
 
+Step 18에서는 storage별 기능 비교표를 고도화했다.
+
+- 현재 코드에서 실제 사용하는 저장소는 `JsonTaskRepository`, `MemoryStorage` 테스트 흐름, `SledStorage` 기본 실행 흐름이다.
+- `SharedMemoryStorage`, `JsonStorage`, `MongoStorage`, `CompositeStorage`는 문서 비교 대상으로만 다룬다.
+- GlueSQL `JsonStorage`와 프로젝트의 `JsonTaskRepository`는 서로 다른 개념으로 구분한다.
+
 ## 프로젝트 구조
 
 ```text
@@ -171,6 +177,7 @@ src/main.rs
 - [Step 15 진행 상황](docs/todo/step-15-progress.md)
 - [Step 16 진행 상황](docs/todo/step-16-progress.md)
 - [Step 17 진행 상황](docs/todo/step-17-progress.md)
+- [Step 18 진행 상황](docs/todo/step-18-progress.md)
 
 ## 기술 스택
 

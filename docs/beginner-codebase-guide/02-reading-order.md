@@ -31,7 +31,7 @@
 ## 2-1단계: GlueSQL repository 이해
 
 - 읽을 파일: [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs)
-- 읽는 이유: Step 17 현재 활성 저장소 구현체이며 transaction 관찰 테스트와 GlueSQL 실행 경계 테스트도 이 파일에 있다. Query Execution 분석에서도 이 파일의 SQL 생성과 변환 함수를 계속 참조한다.
+- 읽는 이유: Step 18 현재 활성 저장소 구현체이며 transaction 관찰 테스트와 GlueSQL 실행 경계 테스트도 이 파일에 있다. Storage 비교에서도 이 파일의 `MemoryStorage`/`SledStorage` 생성 흐름을 계속 참조한다.
 - 이 파일에서 봐야 할 코드: `GlueSqlTaskRepository::persistent`, `execute`, `execute_sql`, `payload_to_sql_result`, `select_tasks`, `row_to_task`, `select_count`
 - 이 파일을 읽고 나면 알아야 하는 것: GlueSQL `Payload`와 `Value`를 프로젝트 타입인 `Task`, `TaskStats`, `SqlResult`로 바꾼다.
 - 다음에 읽을 파일: [19-query-execution.md](19-query-execution.md)
@@ -42,6 +42,14 @@
 - 읽는 이유: Todo 명령별 SQL 생성과 `Payload`가 `Task`, `TaskStats`, `SqlResult`로 변환되는 흐름을 한 번에 본다.
 - 이 파일에서 봐야 할 코드: `execute`, `select_tasks`, `row_to_task`, `select_count`, `payload_to_sql_result`, `value_to_string`
 - 이 파일을 읽고 나면 알아야 하는 것: Todo 전용 명령과 사용자 SQL 명령은 같은 `execute`를 지나지만 반환 타입 변환 경계가 다르다.
+- 다음에 읽을 파일: [20-storage-comparison.md](20-storage-comparison.md)
+
+## 2-1-2단계: Storage별 차이 이해
+
+- 읽을 파일: [20-storage-comparison.md](20-storage-comparison.md)
+- 읽는 이유: 현재 코드에 실제로 연결된 storage와 비교 문서에만 등장하는 storage를 구분한다.
+- 이 파일에서 봐야 할 코드: `JsonTaskRepository::execute_sql`, `GlueSqlTaskRepository::new`, `GlueSqlTaskRepository::persistent`
+- 이 파일을 읽고 나면 알아야 하는 것: `JsonTaskRepository`, `MemoryStorage`, `SledStorage`는 현재 코드에서 확인되고, `SharedMemoryStorage`, `JsonStorage`, `MongoStorage`, `CompositeStorage`는 현재 코드에 도입하지 않았다.
 - 다음에 읽을 파일: [src/repl.rs](../../src/repl.rs)
 
 ## 2-2단계: REPL 입력 흐름 이해
@@ -105,7 +113,7 @@
 - 읽을 파일: [src/cli.rs](../../src/cli.rs), [src/error.rs](../../src/error.rs), [src/service.rs](../../src/service.rs), [src/repository/mod.rs](../../src/repository/mod.rs), [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs), [src/main.rs](../../src/main.rs)의 `mod tests`
 - 읽는 이유: parser 테스트, service 테스트, repository 저장소 테스트가 분리되어 있다.
 - 이 파일에서 봐야 할 코드: `parses_add_command`, `parses_sql_command`, `add_delegates_to_repository`, `executes_select_sql_with_gluesql`
-- 이 파일을 읽고 나면 알아야 하는 것: Step 17에서는 기능 테스트 수가 총 65개로 유지되며 Query Execution 상세 분석 문서가 추가되었다.
+- 이 파일을 읽고 나면 알아야 하는 것: Step 18에서는 기능 테스트 수가 총 65개로 유지되며 Storage별 기능 비교표 문서가 추가되었다.
 - 다음에 읽을 파일: [12-practice-tasks.md](12-practice-tasks.md)
 
 ## 최종 체크리스트

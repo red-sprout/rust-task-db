@@ -2,7 +2,7 @@
 
 ## 이 디렉터리의 목적
 
-현재 Step 17 코드와 문서 파일을 하나씩 읽을 수 있게 나눈다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 17 문서는 Query Execution 상세 분석을 추가한다.
+현재 Step 18 코드와 문서 파일을 하나씩 읽을 수 있게 나눈다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 18 문서는 Storage별 기능 비교표를 추가한다.
 
 ## 파일별 해설 문서 목록
 
@@ -14,6 +14,7 @@
 - [../17-gluesql-internals.md](../17-gluesql-internals.md): GlueSQL 내부 실행 흐름과 Storage Adapter 해설
 - [../18-custom-storage.md](../18-custom-storage.md): Minimal Custom Storage trait 책임과 구현 순서
 - [../19-query-execution.md](../19-query-execution.md): Todo 명령별 SQL 생성과 `Payload` 변환 흐름
+- [../20-storage-comparison.md](../20-storage-comparison.md): Storage별 기능 차이와 현재 코드 도입 여부 비교
 
 ## 도메인별 파일 묶음
 
@@ -29,7 +30,7 @@
 - 보존된 JSON 저장 데이터: [tasks.json](../../../tasks.json)
 - 실행 중 생성되는 SledStorage 데이터: `data/rust-task-db`
 - GitHub 첫 화면 소개: [README.md](../../../README.md)
-- 단계 진행 문서: [docs/todo/step-17-progress.md](../../todo/step-17-progress.md), [docs/todo/step-16-progress.md](../../todo/step-16-progress.md), [docs/todo/step-15-progress.md](../../todo/step-15-progress.md), [docs/todo/roadmap.md](../../todo/roadmap.md)
+- 단계 진행 문서: [docs/todo/step-18-progress.md](../../todo/step-18-progress.md), [docs/todo/step-17-progress.md](../../todo/step-17-progress.md), [docs/todo/step-16-progress.md](../../todo/step-16-progress.md), [docs/todo/step-15-progress.md](../../todo/step-15-progress.md), [docs/todo/roadmap.md](../../todo/roadmap.md)
 - 설정: [Cargo.toml](../../../Cargo.toml)
 - 테스트: `src/main.rs`, `src/task.rs`, `src/error.rs`, `src/cli.rs`, `src/service.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`의 `#[cfg(test)] mod tests`
 

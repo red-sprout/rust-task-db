@@ -217,3 +217,54 @@ cargo test sled_storage_rolls_back_uncommitted_insert
 ## 주의
 
 `MemoryStorage`는 명시적 transaction을 지원하지 않는다. 이 실습은 `GlueSqlTaskRepository::persistent`로 만든 `SledStorage` repository에서 확인한다.
+
+## 실습 이름: Storage 비교표에서 코드 증거 찾기
+
+## 난이도
+
+쉬움
+
+## 목표
+
+[20-storage-comparison.md](20-storage-comparison.md)의 표를 보고 현재 코드에 실제로 등장하는 storage와 문서 비교 대상 storage를 구분한다.
+
+## 배우는 개념
+
+GlueSQL storage, repository 구현체, 코드에서 확인되지 않음
+
+## 확인할 파일
+
+- `src/repository/mod.rs`
+- `src/repository/gluesql_repository.rs`
+- `docs/beginner-codebase-guide/20-storage-comparison.md`
+
+## 확인할 코드
+
+```rust
+pub struct JsonTaskRepository {
+    path: PathBuf,
+    tasks: Vec<Task>,
+}
+```
+
+```rust
+let storage = MemoryStorage::default();
+```
+
+```rust
+SledStorage::new(path)
+```
+
+## 왜 이렇게 확인하는가
+
+Step 18에서는 새 storage를 추가하지 않는다. 대신 `JsonTaskRepository`, `MemoryStorage`, `SledStorage`는 현재 코드에서 확인하고, `SharedMemoryStorage`, `JsonStorage`, `MongoStorage`, `CompositeStorage`는 현재 코드에 없는 비교 대상으로 구분한다.
+
+## 동작 확인 방법
+
+```bash
+rg -n "JsonTaskRepository|MemoryStorage|SledStorage|SharedMemoryStorage|JsonStorage|MongoStorage|CompositeStorage" src docs/beginner-codebase-guide/20-storage-comparison.md
+```
+
+## 실패할 경우 확인할 것
+
+`SharedMemoryStorage`, `JsonStorage`, `MongoStorage`, `CompositeStorage`는 현재 `src/` 코드에 직접 등장하지 않아야 한다.

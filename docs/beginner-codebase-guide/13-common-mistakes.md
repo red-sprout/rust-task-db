@@ -169,7 +169,7 @@ futures = "0.3"
 
 ### 예방 방법
 
-Step 17 현재는 `serde`, `serde_json`, `gluesql`, `futures`만 둔다. Query Execution 분석 문서를 추가했지만 새 crate는 추가하지 않는다. `clap`은 현재 로드맵에서 사용하지 않는다.
+Step 18 현재는 `serde`, `serde_json`, `gluesql`, `futures`만 둔다. Storage별 기능 비교표를 추가했지만 새 crate는 추가하지 않는다. `clap`은 현재 로드맵에서 사용하지 않는다.
 
 ## 실수 이름: 같은 SledStorage 경로를 동시에 두 번 열려고 함
 

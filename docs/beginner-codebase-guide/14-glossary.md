@@ -43,7 +43,7 @@
 | 외부 crate | 라이브러리 | Cargo dependency로 추가하는 Rust 패키지 | `serde`, `serde_json`, `gluesql`, `futures` | `Cargo.toml` | Step 12는 새 crate 이름 대신 `gluesql_sled_storage` feature를 추가했고, Step 16도 이를 유지한다. |
 | serde | 라이브러리 | Rust 값을 다른 형식으로 바꾸는 기반 crate | `Serialize`, `Deserialize` | `src/task.rs` | derive feature가 필요하다. |
 | serde_json | 라이브러리 | Rust 값과 JSON 문자열을 서로 변환한다. | `serde_json::from_str` | `src/repository/mod.rs` | JSON 문법 오류는 parsing 실패가 된다. |
-| gluesql | 라이브러리 | Rust 코드 안에서 SQL 엔진과 storage를 제공한다. | `Glue::new` | `src/repository/gluesql_repository.rs` | Step 17 현재도 repository 내부 구현, `sql` 명령, REPL SQL 실행, transaction 관찰 테스트에 사용한다. |
+| gluesql | 라이브러리 | Rust 코드 안에서 SQL 엔진과 storage를 제공한다. | `Glue::new` | `src/repository/gluesql_repository.rs` | Step 18 현재도 repository 내부 구현, `sql` 명령, REPL SQL 실행, transaction 관찰 테스트에 사용한다. |
 | futures | 라이브러리 | async Future를 실행하거나 조합하는 도구를 제공한다. | `block_on` | `src/repository/gluesql_repository.rs` | `main.rs`를 async로 바꾸지 않기 위해 repository 내부에서만 사용한다. |
 
 ## 빌드 도구
@@ -60,10 +60,14 @@
 | JSON 파일 저장 | 저장 방식 | 데이터를 JSON 파일에 저장한다. | `tasks.json` | `tasks.json`, `src/repository/mod.rs` | 프로그램 종료 후에도 데이터가 남는다. |
 | Repository | 저장소 패턴 | 데이터를 어디에 저장하는지 감싸는 역할이다. | `TaskRepository` | `src/repository/mod.rs` | 현재는 JSON 구현체와 GlueSQL 구현체가 함께 있다. |
 | Service layer | 애플리케이션 계층 | 명령 실행 흐름과 저장소 사이에 있는 계층이다. | `TaskService` | `src/service.rs` | 현재는 repository에 위임하는 역할이 중심이다. |
-| JsonTaskRepository | 저장소 구현체 | `tasks.json`을 사용하는 Todo 저장소다. | `JsonTaskRepository::new` | `src/repository/mod.rs` | Step 17 현재도 삭제하지 않고 보존된 구현체이며 SQL은 지원하지 않는다. |
-| GlueSqlTaskRepository | 저장소 구현체 | GlueSQL storage를 사용하는 Todo 저장소다. | `GlueSqlTaskRepository::persistent` | `src/repository/gluesql_repository.rs` | Step 17 현재 `main.rs`가 사용하는 활성 구현체다. |
+| JsonTaskRepository | 저장소 구현체 | `tasks.json`을 사용하는 Todo 저장소다. | `JsonTaskRepository::new` | `src/repository/mod.rs` | Step 18 현재도 삭제하지 않고 보존된 구현체이며 SQL은 지원하지 않는다. |
+| GlueSqlTaskRepository | 저장소 구현체 | GlueSQL storage를 사용하는 Todo 저장소다. | `GlueSqlTaskRepository::persistent` | `src/repository/gluesql_repository.rs` | Step 18 현재 `main.rs`가 사용하는 활성 구현체다. |
 | MemoryStorage | GlueSQL 저장 방식 | 프로그램 실행 중 메모리에만 SQL table을 둔다. | `MemoryStorage::default()` | `src/repository/gluesql_repository.rs` | 현재는 테스트에서 주로 사용한다. |
 | SledStorage | GlueSQL 저장 방식 | 디렉터리에 SQL table 데이터를 저장한다. | `SledStorage::new(path)` | `src/repository/gluesql_repository.rs` | Step 12 기본 실행 저장소이며 Step 14에서 transaction 관찰 대상이다. |
+| SharedMemoryStorage | GlueSQL 저장 방식 | `MemoryStorage`를 여러 thread에서 공유하는 패턴을 볼 수 있는 storage다. | 코드에서 확인되지 않음 | `docs/beginner-codebase-guide/20-storage-comparison.md` | 현재 dependency와 코드에는 직접 도입하지 않았다. |
+| JsonStorage | GlueSQL 저장 방식 | GlueSQL storage 계층의 JSON storage다. | 코드에서 확인되지 않음 | `docs/beginner-codebase-guide/20-storage-comparison.md` | 프로젝트의 `JsonTaskRepository`와 다르다. |
+| MongoStorage | GlueSQL 저장 방식 | MongoDB 위에 GlueSQL storage adapter를 붙이는 분석 후보이다. | 코드에서 확인되지 않음 | `docs/beginner-codebase-guide/20-storage-comparison.md` | 현재 외부 DB 설정을 추가하지 않는다. |
+| CompositeStorage | GlueSQL 저장 방식 | 여러 storage를 조합하는 구조를 볼 수 있는 분석 후보이다. | 코드에서 확인되지 않음 | `docs/beginner-codebase-guide/20-storage-comparison.md` | 현재 코드에 도입하지 않는다. |
 | Transaction | DB 동작 단위 | 여러 SQL을 하나의 작업 단위로 묶는다. | `BEGIN`, `COMMIT`, `ROLLBACK` | `src/repository/gluesql_repository.rs` | `MemoryStorage`는 명시적 transaction을 지원하지 않고, `SledStorage`에서 관찰한다. |
 | Snapshot | DB 읽기 시점 | transaction이 시작된 시점의 데이터를 계속 보게 하는 관찰 대상이다. | `sled_storage_keeps_repeatable_read_snapshot_until_commit` | `src/repository/gluesql_repository.rs` | 현재 프로젝트는 GlueSQL 내부 구현체를 직접 수정하지 않고 테스트로 결과를 확인한다. |
 | Write lock | DB 쓰기 제어 | 한 writer transaction이 열려 있을 때 다른 writer를 막는 동작이다. | `database is locked` | `src/repository/gluesql_repository.rs` | 현재 테스트는 에러 메시지에 `database is locked`가 포함되는지 확인한다. |
@@ -99,6 +103,7 @@
 | Step 15 | 프로젝트 학습 단계 | GlueSQL Engine/Storage Adapter 구조를 문서와 테스트로 분석한 단계 | `17-gluesql-internals.md` | `docs/beginner-codebase-guide/17-gluesql-internals.md` | Parser/Planner/Executor를 직접 구현하지 않는다. |
 | Step 16 | 프로젝트 학습 단계 | Minimal Custom Storage 책임과 구현 순서를 문서로 분석한 단계 | `18-custom-storage.md` | `docs/beginner-codebase-guide/18-custom-storage.md` | 실제 custom storage를 production code에 도입하지 않는다. |
 | Step 17 | 프로젝트 학습 단계 | Todo 명령별 SQL 생성과 `Payload` 변환 흐름을 문서로 분석한 단계 | `19-query-execution.md` | `docs/beginner-codebase-guide/19-query-execution.md` | 새 CLI 명령이나 새 외부 crate를 추가하지 않는다. |
+| Step 18 | 프로젝트 학습 단계 | Storage별 기능 차이와 현재 코드 도입 여부를 문서로 분석한 단계 | `20-storage-comparison.md` | `docs/beginner-codebase-guide/20-storage-comparison.md` | 새 storage를 코드에 도입하지 않는다. |
 
 ## 테스트
 
