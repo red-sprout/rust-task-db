@@ -100,7 +100,7 @@ impl<R: TaskRepository> TaskService<R> {
 }
 ```
 
-Step 15 현재도 service가 add/list/done/delete/search/stats/sql/repl 요청을 repository에 위임한다. REPL도 내부적으로 `TaskService::execute_sql`을 사용한다. 실패 타입은 `AppError`다.
+Step 16 현재도 service가 add/list/done/delete/search/stats/sql/repl 요청을 repository에 위임한다. REPL도 내부적으로 `TaskService::execute_sql`을 사용한다. 실패 타입은 `AppError`다.
 
 ## 파일 경로
 
@@ -167,7 +167,7 @@ impl TaskRepository for JsonTaskRepository {
 
 ### 이 파일의 역할
 
-`GlueSqlTaskRepository<S>`를 정의한다. Step 15 현재 `main.rs`가 사용하는 활성 저장소는 `GlueSqlTaskRepository<SledStorage>`이며, `sql` 명령과 `repl` 안의 SQL도 여기서 실행한다. 테스트에서는 `GlueSqlTaskRepository<MemoryStorage>`도 사용하고, `SledStorage::clone()`으로 두 repository가 같은 DB를 관찰하는 transaction 테스트도 둔다. `GStore`, `GStoreMut`, `Planner` trait bound 해설은 [17-gluesql-internals.md](../17-gluesql-internals.md)에서 다룬다.
+`GlueSqlTaskRepository<S>`를 정의한다. Step 16 현재 `main.rs`가 사용하는 활성 저장소는 `GlueSqlTaskRepository<SledStorage>`이며, `sql` 명령과 `repl` 안의 SQL도 여기서 실행한다. 테스트에서는 `GlueSqlTaskRepository<MemoryStorage>`도 사용하고, `SledStorage::clone()`으로 두 repository가 같은 DB를 관찰하는 transaction 테스트도 둔다. `GStore`, `GStoreMut`, `Planner` trait bound 해설은 [17-gluesql-internals.md](../17-gluesql-internals.md)에서 다루고, custom storage를 직접 만들 때의 최소 책임은 [18-custom-storage.md](../18-custom-storage.md)에서 다룬다.
 
 핵심 코드:
 
@@ -285,7 +285,7 @@ pub enum Command {
 
 ### 초심자가 수정할 수 있는 부분
 
-새 명령을 추가하려면 먼저 여기에 variant를 추가한다. Step 15 현재는 새 명령을 추가하지 않고 `Repl`까지 유지한다.
+새 명령을 추가하려면 먼저 여기에 variant를 추가한다. Step 16 현재는 새 명령을 추가하지 않고 `Repl`까지 유지한다.
 
 ## 파일 경로
 

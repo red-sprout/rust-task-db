@@ -31,7 +31,7 @@
 ## 2-1단계: GlueSQL repository 이해
 
 - 읽을 파일: [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs)
-- 읽는 이유: Step 15 현재 활성 저장소 구현체이며 transaction 관찰 테스트와 GlueSQL 실행 경계 테스트도 이 파일에 있다.
+- 읽는 이유: Step 16 현재 활성 저장소 구현체이며 transaction 관찰 테스트와 GlueSQL 실행 경계 테스트도 이 파일에 있다. Custom Storage 분석에서도 이 파일의 generic 구조를 계속 참조한다.
 - 이 파일에서 봐야 할 코드: `GlueSqlTaskRepository::persistent`, `execute`, `execute_sql`, `payload_to_sql_result`, `select_tasks`, `row_to_task`, `select_count`
 - 이 파일을 읽고 나면 알아야 하는 것: GlueSQL `Payload`와 `Value`를 프로젝트 타입인 `Task`, `TaskStats`, `SqlResult`로 바꾼다.
 - 다음에 읽을 파일: [src/repl.rs](../../src/repl.rs)
@@ -97,7 +97,7 @@
 - 읽을 파일: [src/cli.rs](../../src/cli.rs), [src/error.rs](../../src/error.rs), [src/service.rs](../../src/service.rs), [src/repository/mod.rs](../../src/repository/mod.rs), [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs), [src/main.rs](../../src/main.rs)의 `mod tests`
 - 읽는 이유: parser 테스트, service 테스트, repository 저장소 테스트가 분리되어 있다.
 - 이 파일에서 봐야 할 코드: `parses_add_command`, `parses_sql_command`, `add_delegates_to_repository`, `executes_select_sql_with_gluesql`
-- 이 파일을 읽고 나면 알아야 하는 것: Step 15에서는 기능 테스트 수가 총 65개이며 GlueSQL transaction 관찰 테스트와 SQL 미지원 경계 테스트가 포함된다.
+- 이 파일을 읽고 나면 알아야 하는 것: Step 16에서는 기능 테스트 수가 총 65개로 유지되며 Minimal Custom Storage 분석 문서가 추가되었다.
 - 다음에 읽을 파일: [12-practice-tasks.md](12-practice-tasks.md)
 
 ## 최종 체크리스트

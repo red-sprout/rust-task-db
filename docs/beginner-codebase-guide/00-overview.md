@@ -2,11 +2,11 @@
 
 ## 프로젝트 한 줄 요약
 
-`rust-task`는 Rust 문법을 단계별로 배우기 위한 CLI Todo 앱이며, 현재는 Step 15로 GlueSQL Engine/Storage Adapter 구조를 현재 코드와 연결해 분석한다. CLI 기능 구현은 Step 12에서 GlueSQL SQL 실행 모드, REPL 모드, 테스트 보강, SledStorage 영속 저장까지 완료되어 있다.
+`rust-task`는 Rust 문법을 단계별로 배우기 위한 CLI Todo 앱이며, 현재는 Step 16으로 Minimal Custom Storage의 책임과 구현 순서를 현재 코드와 연결해 분석한다. CLI 기능 구현은 Step 12에서 GlueSQL SQL 실행 모드, REPL 모드, 테스트 보강, SledStorage 영속 저장까지 완료되어 있다.
 
 ## 이 프로젝트가 해결하는 문제
 
-Rust 초심자가 `struct`, `enum`, `trait`, generic, `impl`, `Vec`, ownership, borrowing, `Option`, `Result`, `match`, custom error, 파일 I/O, serde JSON 변환, GlueSQL 저장소 교체, SQL 결과 매핑, storage별 transaction 차이, GlueSQL Parser/Planner/Executor/Store 흐름을 실제 코드 안에서 볼 수 있게 한다.
+Rust 초심자가 `struct`, `enum`, `trait`, generic, `impl`, `Vec`, ownership, borrowing, `Option`, `Result`, `match`, custom error, 파일 I/O, serde JSON 변환, GlueSQL 저장소 교체, SQL 결과 매핑, storage별 transaction 차이, GlueSQL Parser/Planner/Executor/Store 흐름, Minimal Custom Storage 책임을 실제 코드 안에서 볼 수 있게 한다.
 
 ## 핵심 기능 목록
 
@@ -57,6 +57,7 @@ Step 12의 핵심 변화는 `MemoryStorage` 대신 `SledStorage`를 사용해서
 Step 13의 핵심 변화는 새 기능 추가가 아니라 현재 코드와 문서가 같은 상태를 설명하는지 점검하는 것이다.
 Step 14의 핵심 변화는 새 CLI 명령 없이 `src/repository/gluesql_repository.rs` 테스트에서 `MemoryStorage` transaction 미지원, `SledStorage` rollback, repeatable read snapshot, write lock 충돌을 관찰하는 것이다.
 Step 15의 핵심 변화는 새 CLI 명령 없이 `Glue::execute` 뒤의 Parser, Planner, Executor, Store 흐름과 Storage Adapter 책임을 문서화하고, commit/nested transaction/SQL 미지원 경계 테스트를 추가한 것이다.
+Step 16의 핵심 변화는 production custom storage를 추가하지 않고, custom storage를 만들 때 필요한 읽기/쓰기/transaction/index 책임을 문서화한 것이다.
 
 ```text
 src/main.rs
@@ -96,6 +97,7 @@ Step 10에서는 `Command::Repl`, `src/repl.rs`, `BufRead`, `Write`, `.schema`, 
 - 현재 저장 위치: `data/rust-task-db`
 - 현재 transaction 관찰 위치: `src/repository/gluesql_repository.rs` 테스트
 - 현재 GlueSQL 내부 흐름 해설 위치: `docs/beginner-codebase-guide/17-gluesql-internals.md`
+- 현재 custom storage 분석 위치: `docs/beginner-codebase-guide/18-custom-storage.md`
 - 보존된 저장 파일: `tasks.json`
 - SQL 결과 모델: `SqlResult`
 - REPL 모듈: `src/repl.rs`

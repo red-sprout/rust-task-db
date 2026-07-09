@@ -304,7 +304,7 @@ fn missing_add_title_returns_error() {
 
 ## 현재 테스트 개수
 
-현재 Step 15의 기능 테스트 수는 총 65개다. Step 15는 새 CLI 명령을 추가하지 않고 GlueSQL engine/storage adapter 분석과 storage 지원 경계 테스트를 추가한다.
+현재 Step 16의 기능 테스트 수는 총 65개다. Step 16은 새 CLI 명령이나 새 테스트를 추가하지 않고 Minimal Custom Storage 책임을 문서로 분석한다. Step 15에서 추가한 GlueSQL engine/storage adapter 분석과 storage 지원 경계 테스트는 그대로 유지한다.
 
 - `src/task.rs`: domain 테스트 2개
 - `src/cli.rs`: CLI parser 테스트 16개

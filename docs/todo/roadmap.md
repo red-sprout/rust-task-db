@@ -231,3 +231,26 @@
 - README, AGENTS, 초심자 가이드, 단계 문서 갱신
 
 현재 총 65개 테스트가 존재한다.
+
+## Step 16. Minimal Custom Storage 분석
+
+상태: 완료
+
+범위:
+
+- 새 CLI 명령 추가 없음
+- 새 외부 crate 추가 없음
+- 기본 실행 저장소는 GlueSQL `SledStorage` 유지
+- 실제 custom storage를 production code에 도입하지 않음
+- GlueSQL upstream 수정 없음
+- Minimal Custom Storage를 만들 때 필요한 trait 책임과 구현 순서를 현재 프로젝트 문서에 연결
+
+완료된 일:
+
+- `docs/beginner-codebase-guide/18-custom-storage.md` 추가
+- 읽기 전용 storage와 쓰기 가능 storage의 책임 차이 문서화
+- `Store`, `StoreMut`, `GStore`, `GStoreMut`, `Planner`를 현재 `GlueSqlTaskRepository<S>` generic 구조와 연결
+- custom storage가 현재 `TaskRepository`와 어떻게 만나는지 설명
+- README, AGENTS, 초심자 가이드, 단계 문서 갱신
+
+현재 총 65개 테스트가 유지된다.

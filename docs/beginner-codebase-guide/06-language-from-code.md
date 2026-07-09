@@ -2,7 +2,7 @@
 
 ## 이 문서의 목적
 
-현재 Step 15 코드에 실제 등장하는 Rust 문법과 외부 crate 사용만 설명한다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 15에서는 GlueSQL Engine/Storage Adapter 분석 문서와 transaction 경계 테스트가 추가되었다.
+현재 Step 16 코드에 실제 등장하는 Rust 문법과 외부 crate 사용만 설명한다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 16에서는 Minimal Custom Storage 책임을 문서로 분석한다. production custom storage 구현이나 새 Rust 문법은 추가하지 않았다.
 
 ## 이 프로젝트에서 자주 등장하는 문법 목록
 

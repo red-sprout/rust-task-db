@@ -40,7 +40,8 @@ rust-task-db/
     │   ├── step-12-progress.md
     │   ├── step-13-progress.md
     │   ├── step-14-progress.md
-    │   └── step-15-progress.md
+    │   ├── step-15-progress.md
+    │   └── step-16-progress.md
     └── beginner-codebase-guide/
 ```
 
@@ -52,7 +53,7 @@ rust-task-db/
 | 역할 | GitHub 첫 화면용 프로젝트 소개 문서 |
 | 이 파일이 필요한 이유 | 프로젝트 목적, 실행 방법, 테스트 방법, MemoryStorage 주의점을 빠르게 보여주기 위해 필요하다. |
 | 연결된 파일 | [docs/beginner-codebase-guide/99-index.md](99-index.md), [docs/beginner-codebase-guide/16-run-guide.md](16-run-guide.md), [src/main.rs](../../src/main.rs) |
-| 초심자가 봐야 할 핵심 | 현재 Step 15 상태, 지원 명령, `SledStorage` 저장 위치, GlueSQL Engine/Storage Adapter 분석 |
+| 초심자가 봐야 할 핵심 | 현재 Step 16 상태, 지원 명령, `SledStorage` 저장 위치, Minimal Custom Storage 분석 |
 | 설명 깊이 | 짧은 설명으로 충분 |
 
 | 항목 | 내용 |
@@ -80,6 +81,15 @@ rust-task-db/
 | 이 파일이 필요한 이유 | CLI 명령을 여러 번 나눠 실행해도 Todo가 유지되게 한다. |
 | 연결된 파일 | `src/main.rs`, `src/repository/gluesql_repository.rs`, `.gitignore` |
 | 초심자가 봐야 할 핵심 | 이 디렉터리는 실행 중 생성되며 git에 커밋하지 않는다. |
+| 설명 깊이 | 중간 설명 필요 |
+
+| 항목 | 내용 |
+| --- | --- |
+| 파일 경로 | [docs/todo/step-16-progress.md](../todo/step-16-progress.md) |
+| 역할 | Step 16 Minimal Custom Storage 분석 진행 상태 |
+| 이 파일이 필요한 이유 | custom storage를 production code에 도입하지 않고 trait 책임을 문서로 분석하는 단계임을 남기기 위해 필요하다. |
+| 연결된 파일 | [docs/todo/roadmap.md](../todo/roadmap.md), [README.md](../../README.md), [docs/beginner-codebase-guide/18-custom-storage.md](18-custom-storage.md), [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs) |
+| 초심자가 봐야 할 핵심 | 읽기 전용 storage, 쓰기 가능 storage, `TaskRepository`와 GlueSQL `Store`의 차이 |
 | 설명 깊이 | 중간 설명 필요 |
 
 | 항목 | 내용 |
@@ -218,6 +228,15 @@ rust-task-db/
 | 이 파일이 필요한 이유 | Step 15에서 Notion 분석 리포트 수준의 GlueSQL 내부 구조 관점을 프로젝트 문서에 반영하기 위해 필요하다. |
 | 연결된 파일 | [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs), [src/repository/mod.rs](../../src/repository/mod.rs), [Cargo.toml](../../Cargo.toml) |
 | 초심자가 봐야 할 핵심 | `GlueSqlTaskRepository::execute`, `Glue::execute`, `Payload`, `SqlResult`, storage별 기능 차이 |
+| 설명 깊이 | 상세 설명 필요 |
+
+| 항목 | 내용 |
+| --- | --- |
+| 파일 경로 | [docs/beginner-codebase-guide/18-custom-storage.md](18-custom-storage.md) |
+| 역할 | Minimal Custom Storage를 만들 때 필요한 GlueSQL Store trait 책임과 구현 순서 설명 |
+| 이 파일이 필요한 이유 | Step 16에서 Storage Adapter Framework를 손에 잡히는 구현 책임으로 바꿔 이해하기 위해 필요하다. |
+| 연결된 파일 | [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs), [src/repository/mod.rs](../../src/repository/mod.rs) |
+| 초심자가 봐야 할 핵심 | 앱 계층 `TaskRepository`와 GlueSQL 계층 `Store`/`StoreMut`는 다른 추상화다. |
 | 설명 깊이 | 상세 설명 필요 |
 
 ## 배포/인프라 파일 설명
