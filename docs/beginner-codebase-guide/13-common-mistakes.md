@@ -169,7 +169,40 @@ futures = "0.3"
 
 ### 예방 방법
 
-Step 13 현재는 `serde`, `serde_json`, `gluesql`, `futures`만 둔다. `clap`은 현재 로드맵에서 사용하지 않는다.
+Step 15 현재는 `serde`, `serde_json`, `gluesql`, `futures`만 둔다. `clap`은 현재 로드맵에서 사용하지 않는다.
+
+## 실수 이름: 같은 SledStorage 경로를 동시에 두 번 열려고 함
+
+### 왜 발생하는가
+
+Step 14에서 reader/writer repository를 나눠 만들 때 같은 path로 `SledStorage::new(path)`를 두 번 호출하면 될 것처럼 보인다.
+
+### 문제가 되는 이유
+
+Sled는 DB 디렉터리에 OS 파일 락을 잡는다. 같은 프로세스 안에서도 같은 path를 동시에 두 번 열면 `could not acquire lock` 오류가 날 수 있다.
+
+### 잘못된 코드
+
+```rust
+let first = SledStorage::new(&path).unwrap();
+let second = SledStorage::new(&path).unwrap();
+```
+
+### 올바른 코드
+
+```rust
+let storage = SledStorage::new(&path).unwrap();
+let first = storage.clone();
+let second = storage;
+```
+
+### 관련 파일
+
+`src/repository/gluesql_repository.rs`
+
+### 예방 방법
+
+같은 Sled DB를 여러 `Glue` 인스턴스에서 관찰하려면 `sled_repository_pair`처럼 `SledStorage::clone()`을 사용한다.
 
 ## 테스트 관련 실수
 

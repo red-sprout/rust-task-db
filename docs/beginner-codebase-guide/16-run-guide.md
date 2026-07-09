@@ -2,7 +2,7 @@
 
 ## 이 문서의 목적
 
-이 문서는 초심자가 `rust-task`를 터미널에서 직접 실행하고, 현재 Step 13의 최종 검증 상태와 Step 12에서 완성된 GlueSQL SledStorage 저장 흐름, SQL 실행 흐름, REPL 흐름, 테스트 상태를 이해하게 돕는다.
+이 문서는 초심자가 `rust-task`를 터미널에서 직접 실행하고, 현재 Step 15의 GlueSQL Engine/Storage Adapter 분석 상태와 Step 12에서 완성된 저장 흐름, SQL 실행 흐름, REPL 흐름, 테스트 상태를 이해하게 돕는다.
 
 ## 실행 전 확인
 
@@ -42,16 +42,18 @@ cargo check
 cargo test
 ```
 
-Step 13 현재도 테스트는 `src/task.rs`, `src/cli.rs`, `src/error.rs`, `src/service.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs` 안에 있다.
+Step 15 현재도 테스트는 `src/task.rs`, `src/cli.rs`, `src/error.rs`, `src/service.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs` 안에 있다.
 
 정상 결과 예시:
 
 ```text
-running 58 tests
-test result: ok. 58 passed
+running 65 tests
+test result: ok. 65 passed
 ```
 
 Step 12는 GlueSQL `SledStorage`를 사용한다. 이 저장소는 `data/rust-task-db`에 데이터를 저장하므로, 여러 CLI 명령을 나눠 실행해도 이전 데이터가 유지된다.
+
+Step 15는 CLI 명령을 추가하지 않는다. 대신 `cargo test` 안에서 `MemoryStorage` transaction 미지원, `SledStorage` rollback/commit/snapshot/write lock/nested transaction, `JsonTaskRepository` SQL 미지원을 확인한다.
 
 ## CLI 실행: add
 

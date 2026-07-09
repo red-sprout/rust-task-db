@@ -249,6 +249,22 @@ mod tests {
         assert_eq!(result, Ok(TaskStats::new(2, 1)));
     }
 
+    #[test]
+    fn json_repository_reports_sql_as_unsupported() {
+        let path = unique_test_path("unsupported-sql");
+        let mut repository = JsonTaskRepository::new(&path).unwrap();
+
+        let result = repository.execute_sql("SELECT * FROM tasks;".to_string());
+        let _ = fs::remove_file(&path);
+
+        assert_eq!(
+            result,
+            Err(AppError::Unsupported(
+                "SQL command is only supported by GlueSqlTaskRepository".to_string()
+            ))
+        );
+    }
+
     fn unique_test_path(name: &str) -> PathBuf {
         let mut path = std::env::temp_dir();
         let nanos = std::time::SystemTime::now()

@@ -148,7 +148,7 @@ match command.as_str() {
 
 ## `add` 분기는 어떻게 읽는가?
 
-Step 13 현재도 `add` 처리는 CLI parsing, GlueSQL SledStorage repository 생성, service 생성, Todo 추가, SQL 실행으로 나뉜다. 실패가 생기면 `AppError`로 표현된다.
+Step 15 현재도 `add` 처리는 CLI parsing, GlueSQL SledStorage repository 생성, service 생성, Todo 추가, SQL 실행으로 나뉜다. 실패가 생기면 `AppError`로 표현된다.
 
 `src/cli.rs`:
 
@@ -191,7 +191,7 @@ parse_args가 명령어 "add"를 확인한다.
 
 Step 1과 Step 2에서는 Todo가 메모리에만 있었다. 프로그램이 끝나면 데이터도 사라졌다.
 
-Step 3부터 Step 7까지는 `tasks.json`에 저장했다. Step 13 현재는 `main.rs`가 `TaskService`를 호출하고, 실제 저장 책임은 `GlueSqlTaskRepository<SledStorage>`가 맡는다. 실패는 `AppError`로 표현한다.
+Step 3부터 Step 7까지는 `tasks.json`에 저장했다. Step 15 현재는 `main.rs`가 `TaskService`를 호출하고, 실제 저장 책임은 `GlueSqlTaskRepository<SledStorage>`가 맡는다. 실패는 `AppError`로 표현한다.
 
 ```text
 cargo run -- add "Rust 공부"
@@ -205,7 +205,7 @@ cargo run -- list
 
 ## `load_tasks`는 전체적으로 무슨 일을 하나?
 
-`load_tasks`는 `tasks.json` 파일을 읽어서 Rust의 `Vec<Task>`로 바꾸는 함수다. Step 13 현재는 기본 실행 경로가 아니라, 보존된 `JsonTaskRepository` 안에 있다.
+`load_tasks`는 `tasks.json` 파일을 읽어서 Rust의 `Vec<Task>`로 바꾸는 함수다. Step 15 현재는 기본 실행 경로가 아니라, 보존된 `JsonTaskRepository` 안에 있다.
 
 현재 코드:
 

@@ -2,18 +2,18 @@
 
 Rust + GlueSQL 미니 프로젝트: CLI Todo List
 
-`rust-task-db`는 Rust 문법과 간단한 아키텍처 분리를 단계별로 학습하기 위한 CLI Todo 프로젝트다. 현재는 `Command` enum, CLI parser, service layer, repository trait, custom error, GlueSQL `SledStorage`, SQL 실행 모드, REPL 모드, 테스트 보강까지 구현되어 있다.
+`rust-task-db`는 Rust 문법과 간단한 아키텍처 분리를 단계별로 학습하기 위한 CLI Todo 프로젝트다. 현재는 `Command` enum, CLI parser, service layer, repository trait, custom error, GlueSQL `SledStorage`, SQL 실행 모드, REPL 모드, 테스트 보강, GlueSQL `SledStorage` 트랜잭션/동시성 관찰 테스트, GlueSQL Engine/Storage Adapter 분석 문서까지 구현되어 있다.
 
 ## 현재 상태
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | Step 13. 최종 검증 및 문서 정합성 점검 |
+| 현재 단계 | Step 15. GlueSQL Engine/Storage Adapter 분석 보강 |
 | 실행 방식 | Cargo로 실행하는 CLI 앱 |
 | 활성 저장소 | `GlueSqlTaskRepository` + GlueSQL `SledStorage` |
 | 저장 위치 | `data/rust-task-db` |
 | 보존된 저장소 | `JsonTaskRepository` + `tasks.json`, MemoryStorage 테스트 흐름 |
-| 테스트 | `cargo test` 기준 58개 |
+| 테스트 | `cargo test` 기준 65개 |
 
 ## 주요 기능
 
@@ -76,7 +76,7 @@ cargo fmt --check
 cargo test
 ```
 
-현재 테스트는 domain, CLI parser, custom error, service, JSON repository, GlueSQL repository, SQL 실행, REPL 흐름을 검증한다.
+현재 테스트는 domain, CLI parser, custom error, service, JSON repository, GlueSQL repository, SQL 실행, REPL 흐름, GlueSQL `SledStorage` rollback/snapshot/write lock/commit/nested transaction 흐름을 검증한다.
 
 ## 주의할 점
 
@@ -94,6 +94,26 @@ cargo run -- repl
 ```
 
 `tasks.json`은 이전 단계의 `JsonTaskRepository`를 보존하기 위해 남아 있다. 현재 기본 실행 저장소는 `tasks.json`이 아니라 `data/rust-task-db`다.
+
+GlueSQL의 동시성 제어는 core가 하나의 방식으로 강제하기보다 storage 구현체에 달려 있다. 이 프로젝트는 새 CLI 명령을 추가하지 않고 `src/repository/gluesql_repository.rs` 테스트에서 다음을 관찰한다.
+
+- `MemoryStorage`는 명시적 transaction을 지원하지 않는다.
+- `SledStorage`는 `BEGIN`, `COMMIT`, `ROLLBACK`을 SQL로 실행할 수 있다.
+- 열린 transaction 안에서 읽은 repository는 commit 전 snapshot을 계속 본다.
+- 같은 `SledStorage`를 여러 `Glue` 인스턴스에서 보려면 같은 경로를 두 번 여는 대신 `SledStorage::clone()`으로 나눈다.
+- transaction이 write lock을 잡은 동안 다른 writer는 `database is locked` 에러를 받는다.
+
+Step 15에서는 Notion의 GlueSQL 분석 리포트 기준으로 SQL 실행 흐름과 Storage Adapter 구조도 문서화했다. 현재 프로젝트는 GlueSQL 내부 Parser/Planner/Executor를 직접 호출하지 않고 `Glue::execute`로 간접 관찰한다.
+
+```text
+사용자 SQL
+-> GlueSqlTaskRepository::execute
+-> Glue::execute
+-> Parser / Planner / Executor
+-> GStore / GStoreMut / Planner trait bound를 만족하는 Storage
+-> Payload
+-> SqlResult
+```
 
 ## 프로젝트 구조
 
@@ -134,6 +154,8 @@ src/main.rs
 - [Step 11 진행 상황](docs/todo/step-11-progress.md)
 - [Step 12 진행 상황](docs/todo/step-12-progress.md)
 - [Step 13 진행 상황](docs/todo/step-13-progress.md)
+- [Step 14 진행 상황](docs/todo/step-14-progress.md)
+- [Step 15 진행 상황](docs/todo/step-15-progress.md)
 
 ## 기술 스택
 

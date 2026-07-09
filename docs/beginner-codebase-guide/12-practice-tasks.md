@@ -155,3 +155,65 @@ fn print_tasks(tasks: &[Task]) {
 ```bash
 cargo run -- list
 ```
+
+## 실습 이름: SledStorage rollback 테스트 추가
+
+## 난이도
+
+중간
+
+## 목표
+
+`src/repository/gluesql_repository.rs`에 transaction 안에서 `INSERT`한 뒤 `ROLLBACK`하면 Todo가 남지 않는 테스트를 직접 읽고 변형한다.
+
+## 배우는 개념
+
+`BEGIN`, `ROLLBACK`, `Result`, `assert_eq!`, GlueSQL storage별 transaction 차이
+
+## 수정할 파일
+
+`src/repository/gluesql_repository.rs`
+
+## 수정 전 코드
+
+```rust
+repository
+    .execute_sql(
+        "
+        BEGIN;
+        INSERT INTO tasks VALUES (1, 'temporary', FALSE);
+        ROLLBACK;
+        "
+        .to_string(),
+    )
+    .unwrap();
+```
+
+## 수정 후 코드
+
+```rust
+repository
+    .execute_sql(
+        "
+        BEGIN;
+        INSERT INTO tasks VALUES (1, 'temporary', FALSE);
+        COMMIT;
+        "
+        .to_string(),
+    )
+    .unwrap();
+```
+
+## 왜 이렇게 수정하는가
+
+`ROLLBACK`은 transaction 안의 변경을 취소하고, `COMMIT`은 변경을 확정한다. 같은 테스트 구조에서 마지막 SQL만 바꿔도 결과가 달라진다.
+
+## 동작 확인 방법
+
+```bash
+cargo test sled_storage_rolls_back_uncommitted_insert
+```
+
+## 주의
+
+`MemoryStorage`는 명시적 transaction을 지원하지 않는다. 이 실습은 `GlueSqlTaskRepository::persistent`로 만든 `SledStorage` repository에서 확인한다.

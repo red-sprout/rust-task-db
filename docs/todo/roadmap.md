@@ -184,3 +184,50 @@
 - `cargo check` 통과
 - `cargo test` 통과
 - 현재 총 58개 테스트 유지
+
+## Step 14. GlueSQL SledStorage 트랜잭션과 동시성 관찰
+
+상태: 완료
+
+범위:
+
+- 새 CLI 명령 추가 없음
+- 새 외부 crate 추가 없음
+- Step 12의 GlueSQL `SledStorage` 활성 저장소 유지
+- GlueSQL core가 아니라 storage 구현체별로 transaction/동시성 특성이 달라진다는 점을 테스트와 문서로 설명
+- `MemoryStorage`와 `SledStorage`의 transaction 차이를 현재 Todo table로 확인
+
+완료된 일:
+
+- `MemoryStorage`가 명시적 `BEGIN`을 지원하지 않는 테스트 추가
+- `SledStorage`에서 `BEGIN` 후 `ROLLBACK`하면 insert가 사라지는 테스트 추가
+- `SledStorage`에서 reader transaction이 commit 전 snapshot을 유지하는 테스트 추가
+- `SledStorage`에서 열린 writer transaction 때문에 다른 writer가 `database is locked`를 받는 테스트 추가
+- 같은 Sled DB를 두 repository가 함께 볼 때 같은 path를 두 번 열지 않고 `SledStorage::clone()`을 사용하는 테스트 helper 추가
+- README, AGENTS, 초심자 가이드, 단계 문서 갱신
+
+현재 총 62개 테스트가 존재한다.
+
+## Step 15. GlueSQL Engine/Storage Adapter 분석 보강
+
+상태: 완료
+
+범위:
+
+- 새 CLI 명령 추가 없음
+- 새 외부 crate 추가 없음
+- async `main.rs`, 웹 서버, GlueSQL upstream 수정 없음
+- Notion의 GlueSQL 분석 리포트 기준으로 SQL 실행 흐름과 Storage Adapter 구조를 현재 코드와 연결
+- `MemoryStorage`, `SharedMemoryStorage`, `SledStorage`, `JsonStorage`, `MongoStorage`, `CompositeStorage` 차이를 문서로 비교
+
+완료된 일:
+
+- `docs/beginner-codebase-guide/17-gluesql-internals.md` 추가
+- `Glue::execute`가 Parser -> Planner -> Executor -> Store 흐름을 감싼다는 점을 현재 `execute`, `execute_sql`, `payload_to_sql_result`와 연결
+- `GStore`, `GStoreMut`, `Planner` trait bound가 `GlueSqlTaskRepository<S>`에서 필요한 이유 설명
+- `JsonTaskRepository::execute_sql`이 `AppError::Unsupported`를 반환하는 테스트 추가
+- `SledStorage` explicit `BEGIN`/`COMMIT` 성공 테스트 추가
+- `SledStorage` nested transaction 실패 테스트 추가
+- README, AGENTS, 초심자 가이드, 단계 문서 갱신
+
+현재 총 65개 테스트가 존재한다.

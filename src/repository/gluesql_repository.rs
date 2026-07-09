@@ -427,6 +427,168 @@ mod tests {
         let _ = fs::remove_dir_all(&path);
     }
 
+    #[test]
+    fn memory_storage_rejects_explicit_transactions() {
+        let mut repository = GlueSqlTaskRepository::new().unwrap();
+
+        let result = repository.execute_sql("BEGIN;".to_string());
+
+        assert!(
+            matches!(result, Err(AppError::GlueSql(message)) if message.contains("transaction is not supported"))
+        );
+    }
+
+    #[test]
+    fn sled_storage_rolls_back_uncommitted_insert() {
+        let path = unique_sled_path("rollback");
+        let _ = fs::remove_dir_all(&path);
+        let mut repository = GlueSqlTaskRepository::persistent(&path).unwrap();
+
+        repository
+            .execute_sql(
+                "
+                BEGIN;
+                INSERT INTO tasks VALUES (1, 'temporary', FALSE);
+                ROLLBACK;
+                "
+                .to_string(),
+            )
+            .unwrap();
+
+        assert_eq!(repository.find_all(), Ok(Vec::new()));
+
+        let _ = fs::remove_dir_all(&path);
+    }
+
+    #[test]
+    fn sled_storage_commits_explicit_transaction() {
+        let path = unique_sled_path("commit");
+        let _ = fs::remove_dir_all(&path);
+        let mut repository = GlueSqlTaskRepository::persistent(&path).unwrap();
+
+        repository
+            .execute_sql(
+                "
+                BEGIN;
+                INSERT INTO tasks VALUES (1, 'committed', FALSE);
+                COMMIT;
+                "
+                .to_string(),
+            )
+            .unwrap();
+
+        assert_eq!(
+            repository.find_all(),
+            Ok(vec![Task::new(1, "committed".to_string())])
+        );
+
+        let _ = fs::remove_dir_all(&path);
+    }
+
+    #[test]
+    fn sled_storage_rejects_nested_transaction() {
+        let path = unique_sled_path("nested-transaction");
+        let _ = fs::remove_dir_all(&path);
+        let mut repository = GlueSqlTaskRepository::persistent(&path).unwrap();
+
+        repository.execute_sql("BEGIN;".to_string()).unwrap();
+        let result = repository.execute_sql("BEGIN;".to_string());
+
+        assert!(
+            matches!(result, Err(AppError::GlueSql(message)) if message.contains("nested transaction is not supported"))
+        );
+
+        repository.execute_sql("ROLLBACK;".to_string()).unwrap();
+        let _ = fs::remove_dir_all(&path);
+    }
+
+    #[test]
+    fn sled_storage_keeps_repeatable_read_snapshot_until_commit() {
+        let path = unique_sled_path("snapshot");
+        let _ = fs::remove_dir_all(&path);
+        let (mut writer, mut reader) = sled_repository_pair(&path);
+
+        writer.add("before".to_string()).unwrap();
+
+        reader.execute_sql("BEGIN;".to_string()).unwrap();
+        writer
+            .execute_sql(
+                "
+                BEGIN;
+                INSERT INTO tasks VALUES (2, 'after', FALSE);
+                COMMIT;
+                "
+                .to_string(),
+            )
+            .unwrap();
+
+        assert_eq!(
+            reader.find_all(),
+            Ok(vec![Task::new(1, "before".to_string())])
+        );
+
+        reader.execute_sql("COMMIT;".to_string()).unwrap();
+
+        assert_eq!(
+            reader.find_all(),
+            Ok(vec![
+                Task::new(1, "before".to_string()),
+                Task::new(2, "after".to_string())
+            ])
+        );
+
+        let _ = fs::remove_dir_all(&path);
+    }
+
+    #[test]
+    fn sled_storage_reports_database_locked_for_competing_writes() {
+        let path = unique_sled_path("write-lock");
+        let _ = fs::remove_dir_all(&path);
+        let (mut first, mut second) = sled_repository_pair(&path);
+
+        first
+            .execute_sql(
+                "
+                BEGIN;
+                INSERT INTO tasks VALUES (1, 'first writer', FALSE);
+                "
+                .to_string(),
+            )
+            .unwrap();
+
+        let result =
+            second.execute_sql("INSERT INTO tasks VALUES (2, 'second writer', FALSE);".to_string());
+
+        assert!(
+            matches!(result, Err(AppError::GlueSql(message)) if message.contains("database is locked"))
+        );
+
+        first.execute_sql("ROLLBACK;".to_string()).unwrap();
+        let _ = fs::remove_dir_all(&path);
+    }
+
+    fn sled_repository_pair(
+        path: impl AsRef<std::path::Path>,
+    ) -> (
+        GlueSqlTaskRepository<SledStorage>,
+        GlueSqlTaskRepository<SledStorage>,
+    ) {
+        let storage = SledStorage::new(path).unwrap();
+        let first_storage = storage.clone();
+        let second_storage = storage;
+        let mut first = GlueSqlTaskRepository {
+            glue: Glue::new(first_storage),
+        };
+        let mut second = GlueSqlTaskRepository {
+            glue: Glue::new(second_storage),
+        };
+
+        first.create_tasks_table().unwrap();
+        second.create_tasks_table().unwrap();
+
+        (first, second)
+    }
+
     fn unique_sled_path(name: &str) -> PathBuf {
         std::env::temp_dir().join(format!("rust-task-db-{name}-{}", std::process::id()))
     }

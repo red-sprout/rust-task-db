@@ -4,12 +4,12 @@
 
 ## 현재 단계
 
-- 현재 단계: Step 13. 최종 검증 및 문서 정합성 점검
+- 현재 단계: Step 15. GlueSQL Engine/Storage Adapter 분석 보강
 - 현재 저장 방식: `GlueSqlTaskRepository`가 관리하는 GlueSQL `SledStorage`
 - 현재 지원 명령: `add`, `list`, `done`, `delete`, `search`, `stats`, `sql`, `repl`
 - 현재 CLI 구조: `std::env::args()`를 `src/cli.rs`의 `parse_args`가 `Command` enum으로 변환하고, `src/main.rs`가 `TaskService<GlueSqlTaskRepository>`를 통해 명령을 실행하며 실패는 `AppError`로 표현한다.
 - 보존된 이전 저장소: `JsonTaskRepository`, `tasks.json`, MemoryStorage 기반 테스트 흐름은 삭제하지 않고 남긴다.
-- 아직 도입하지 않는 것: 새 기능 명령, 웹 서버, async 앱 구조
+- 아직 도입하지 않는 것: 새 기능 명령, 새 외부 crate, 웹 서버, async 앱 구조, 사용자-facing 동시성 제어 명령, GlueSQL upstream 수정
 
 ## 핵심 원칙
 
@@ -27,6 +27,10 @@
 - Step 11에서는 새 기능보다 테스트 보강을 우선한다.
 - Step 12에서는 `GlueSqlTaskRepository::persistent("data/rust-task-db")`를 사용해 CLI 실행 간 Todo가 유지되게 한다.
 - Step 13에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, 코드와 문서가 Step 12 최종 기능 상태를 일관되게 설명하는지 검증한다.
+- Step 14에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, `src/repository/gluesql_repository.rs` 테스트로 `MemoryStorage` transaction 미지원, `SledStorage` rollback, repeatable read snapshot, write lock 충돌을 관찰한다.
+- 같은 Sled DB를 여러 repository에서 관찰할 때는 같은 path를 두 번 `SledStorage::new`로 열지 말고, 먼저 만든 `SledStorage`를 `clone()`해서 `Glue::new`에 넣는 테스트 helper를 사용한다.
+- Step 15에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, GlueSQL `Glue::execute` 내부 흐름(Parser -> Planner -> Executor -> Store), `GStore`/`GStoreMut`/`Planner` trait bound, Storage별 기능 차이를 문서와 테스트로 분석한다.
+- Step 15에서도 GlueSQL upstream source를 복사하거나 수정하지 않는다. 현재 프로젝트 코드는 public API와 local crate source 관찰을 문서화하는 수준으로 유지한다.
 - 구현을 변경할 때마다 `docs/beginner-codebase-guide/`의 초심자 가이드를 함께 업데이트한다.
 - 초심자 가이드는 실제 코드 경로, 함수명, 타입명, 실행 흐름, 수정 포인트를 코드와 연결해서 설명해야 한다.
 - Markdown view 모드에서 줄이 붙지 않도록 `파일 경로: ...`, `역할: ...` 같은 key-value 설명은 표 또는 bullet list로 작성한다.
@@ -41,7 +45,7 @@
 - `src/error.rs`: `AppError`, `Display`, `Error`, `From` 구현
 - `src/service.rs`: `TaskService<R: TaskRepository>`, service 테스트
 - `src/repository/mod.rs`: `TaskRepository` trait, `SqlResult`, `JsonTaskRepository`, `tasks.json` 읽기/쓰기, search/stats, SQL unsupported 처리, repository 테스트
-- `src/repository/gluesql_repository.rs`: `GlueSqlTaskRepository<S>`, GlueSQL `MemoryStorage` 테스트 흐름, GlueSQL `SledStorage` 영속 저장소, `tasks` table 생성, SQL 기반 CRUD/search/stats/sql, repository 테스트
+- `src/repository/gluesql_repository.rs`: `GlueSqlTaskRepository<S>`, GlueSQL `MemoryStorage` 테스트 흐름, GlueSQL `SledStorage` 영속 저장소, `tasks` table 생성, SQL 기반 CRUD/search/stats/sql, rollback/snapshot/write lock, explicit commit, nested transaction 관찰 테스트
 - `src/command.rs`: CLI 명령을 표현하는 `Command` enum. `Search`, `Stats`, `Sql`, `Repl` 포함
 - `src/cli.rs`: `std::env::args()` 결과를 `Command`로 바꾸는 parser와 parser 테스트
 - `src/task.rs`: `Task` struct, `TaskStats` struct, `Task::new`, serde derive, task 테스트
@@ -62,6 +66,8 @@
 - `docs/todo/step-11-progress.md`: Step 11 진행 상태
 - `docs/todo/step-12-progress.md`: Step 12 진행 상태
 - `docs/todo/step-13-progress.md`: Step 13 진행 상태
+- `docs/todo/step-14-progress.md`: Step 14 진행 상태
+- `docs/todo/step-15-progress.md`: Step 15 진행 상태
 - `docs/todo/roadmap.md`: 이후 단계 작업 계획
 - `docs/beginner-codebase-guide/`: 현재 단계 코드를 초심자가 읽을 수 있게 설명하는 문서 세트
 
@@ -93,6 +99,7 @@ docs/beginner-codebase-guide/13-common-mistakes.md
 docs/beginner-codebase-guide/14-glossary.md
 docs/beginner-codebase-guide/15-beginner-faq.md
 docs/beginner-codebase-guide/16-run-guide.md
+docs/beginner-codebase-guide/17-gluesql-internals.md
 ```
 
 업데이트 기준:
@@ -141,6 +148,26 @@ cargo test
 ```
 
 주의: Step 13은 새 기능 구현 단계가 아니라 최종 검증과 문서 정합성 점검 단계다. 기능 검증이 필요하면 Step 12 검증 명령을 그대로 사용한다.
+
+## Step 14 검증 명령
+
+```bash
+cargo fmt --check
+cargo check
+cargo test
+```
+
+주의: Step 14는 CLI 기능을 늘리는 단계가 아니라 GlueSQL storage 동시성/트랜잭션 특성을 테스트로 관찰하는 단계다. `cargo test` 기준 62개 테스트가 통과해야 한다.
+
+## Step 15 검증 명령
+
+```bash
+cargo fmt --check
+cargo check
+cargo test
+```
+
+주의: Step 15는 CLI 기능을 늘리는 단계가 아니라 GlueSQL engine/storage adapter 분석을 문서화하고 테스트 경계를 보강하는 단계다. `cargo test` 기준 65개 테스트가 통과해야 한다.
 
 ## 앞으로 작업 요청을 받았을 때
 
@@ -192,5 +219,7 @@ cargo test
 - Step 11에서는 테스트를 보강한다. 새 명령이나 저장소 기능을 추가하지 않는다.
 - Step 12에서는 GlueSQL `SledStorage`를 도입해 CLI 기본 저장소를 영속 저장소로 전환한다. 새 CLI 명령은 추가하지 않는다.
 - Step 13에서는 새 기능을 추가하지 않고 최종 검증과 문서 정합성 점검을 수행한다.
+- Step 14에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고 GlueSQL `SledStorage` transaction/snapshot/write lock 관찰 테스트와 문서를 추가한다.
+- Step 15에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고 GlueSQL Parser/Planner/Executor/Store 흐름, Store trait 책임, Storage별 기능 차이, 기여 전략을 문서화하고 관찰 테스트를 보강한다.
 
 단계를 전환할 때는 초심자 가이드도 같은 단계 기준으로 재구성한다. 예를 들어 Step 2로 넘어가면 `Command` enum과 CLI parser를 현재 구현으로 설명하고, Step 3 이후 기능은 계속 예정으로 남긴다.

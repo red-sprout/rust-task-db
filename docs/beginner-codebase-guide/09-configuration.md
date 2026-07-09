@@ -29,7 +29,7 @@
 
 ## 데이터베이스 설정
 
-별도 데이터베이스 설정 파일은 코드에서 확인되지 않음. Step 13 현재도 `src/main.rs`가 `GlueSqlTaskRepository::persistent("data/rust-task-db")`를 호출한다.
+별도 데이터베이스 설정 파일은 코드에서 확인되지 않음. Step 15 현재도 `src/main.rs`가 `GlueSqlTaskRepository::persistent("data/rust-task-db")`를 호출한다.
 
 ```rust
 let repository = GlueSqlTaskRepository::persistent("data/rust-task-db");
@@ -59,7 +59,7 @@ let repository = GlueSqlTaskRepository::persistent("data/rust-task-db");
 
 ## 수정하면 위험한 값
 
-Step 13 현재 `[dependencies]`에는 `serde`, `serde_json`, `gluesql`, `futures`를 둔다. `gluesql` feature에는 `gluesql_memory_storage`와 `gluesql_sled_storage`가 포함된다.
+Step 15 현재 `[dependencies]`에는 `serde`, `serde_json`, `gluesql`, `futures`를 둔다. `gluesql` feature에는 `gluesql_memory_storage`와 `gluesql_sled_storage`가 포함된다.
 
 ## 설정 오류 해결 가이드
 

@@ -56,6 +56,9 @@
 - `Result`와 `Option`은 Rust 표준 타입이지 외부 라이브러리가 아니다.
 - `std::fs`는 표준 라이브러리이고, `serde_json`은 외부 crate다.
 - `gluesql`은 웹 프레임워크가 아니라 Rust 코드 안에서 쓰는 SQL 엔진 라이브러리다. Step 12에서는 `SledStorage`로 데이터를 디렉터리에 유지한다.
+- GlueSQL의 transaction/동시성 특성은 core 하나로 고정되는 것이 아니라 storage 구현체별로 달라진다. Step 15 테스트는 `MemoryStorage`, `SledStorage`, `JsonTaskRepository`의 지원 경계를 현재 Todo table과 repository trait으로 관찰한다.
+- Step 15 문서는 `Glue::execute`가 Parser, Planner, Executor, Store 호출 흐름을 감싼다는 점을 설명한다. 현재 프로젝트는 이 내부 계층을 직접 호출하지 않는다.
+- `SledStorage`를 같은 DB에서 여러 `Glue` 인스턴스와 함께 쓰려면 같은 path를 동시에 두 번 열지 말고 `SledStorage::clone()`으로 handle을 나눠 쓰는 패턴을 사용한다.
 - `futures::executor::block_on`은 `main.rs`를 async로 바꾸지 않고 repository 내부에서 async 작업을 기다리기 위해 쓴다.
 - `cargo test`는 Rust 문법이 아니라 Cargo 명령이다.
 - `Task`는 Rust 내장 타입이 아니라 이 프로젝트가 만든 타입이다.

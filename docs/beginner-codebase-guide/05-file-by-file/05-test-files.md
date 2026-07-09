@@ -225,7 +225,7 @@ fn adds_task_and_saves_to_json_file() {
 
 ### 이 파일의 역할
 
-`GlueSqlTaskRepository`가 GlueSQL `MemoryStorage`에서 add/list/done/delete/search/stats/sql을 처리하는지 테스트하고, `SledStorage`에서 데이터를 다시 열어도 유지되는지 테스트한다.
+`GlueSqlTaskRepository`가 GlueSQL `MemoryStorage`에서 add/list/done/delete/search/stats/sql을 처리하는지 테스트하고, `SledStorage`에서 데이터를 다시 열어도 유지되는지 테스트한다. Step 14에서는 `MemoryStorage`와 `SledStorage`의 transaction 차이, rollback, snapshot, write lock 충돌도 같은 파일에서 관찰한다.
 
 ### 핵심 코드 블록
 
@@ -283,6 +283,78 @@ fn persists_tasks_with_sled_storage() {
 -> 같은 경로로 두 번째 repository를 만든다.
 -> 이전 Todo가 다시 조회되는지 확인한다.
 ```
+
+### Step 14에서 추가된 transaction과 동시성 관찰 테스트
+
+```rust
+#[test]
+fn sled_storage_keeps_repeatable_read_snapshot_until_commit() {
+    let path = unique_sled_path("snapshot");
+    let _ = fs::remove_dir_all(&path);
+    let (mut writer, mut reader) = sled_repository_pair(&path);
+
+    writer.add("before".to_string()).unwrap();
+
+    reader.execute_sql("BEGIN;".to_string()).unwrap();
+    writer
+        .execute_sql(
+            "
+            BEGIN;
+            INSERT INTO tasks VALUES (2, 'after', FALSE);
+            COMMIT;
+            "
+            .to_string(),
+        )
+        .unwrap();
+
+    assert_eq!(
+        reader.find_all(),
+        Ok(vec![Task::new(1, "before".to_string())])
+    );
+}
+```
+
+읽는 법:
+
+```text
+writer와 reader가 같은 SledStorage를 clone해서 나눠 가진다.
+-> reader가 BEGIN으로 읽기 시점을 잡는다.
+-> writer가 새 Todo를 INSERT하고 COMMIT한다.
+-> reader는 아직 자기 transaction 안이라 이전 snapshot만 본다.
+-> reader가 COMMIT한 뒤에는 최신 Todo를 볼 수 있다.
+```
+
+`sled_repository_pair` helper는 같은 path를 `SledStorage::new(path)`로 두 번 열지 않는다. Sled는 같은 DB 디렉터리에 OS 파일 락을 잡기 때문에 동시에 두 번 열면 실패할 수 있다. 그래서 먼저 만든 `SledStorage`를 `clone()`해서 두 `GlueSqlTaskRepository<SledStorage>`에 넣는다.
+
+```rust
+fn sled_repository_pair(
+    path: impl AsRef<std::path::Path>,
+) -> (
+    GlueSqlTaskRepository<SledStorage>,
+    GlueSqlTaskRepository<SledStorage>,
+) {
+    let storage = SledStorage::new(path).unwrap();
+    let first_storage = storage.clone();
+    let second_storage = storage;
+    let mut first = GlueSqlTaskRepository {
+        glue: Glue::new(first_storage),
+    };
+    let mut second = GlueSqlTaskRepository {
+        glue: Glue::new(second_storage),
+    };
+
+    first.create_tasks_table().unwrap();
+    second.create_tasks_table().unwrap();
+
+    (first, second)
+}
+```
+
+Step 14의 나머지 테스트:
+
+- `memory_storage_rejects_explicit_transactions`: `MemoryStorage`는 명시적 `BEGIN`을 지원하지 않음을 확인한다.
+- `sled_storage_rolls_back_uncommitted_insert`: `ROLLBACK` 후 transaction 안의 insert가 사라지는지 확인한다.
+- `sled_storage_reports_database_locked_for_competing_writes`: writer transaction이 열려 있으면 다른 writer가 `database is locked`를 받는지 확인한다.
 
 ### Step 11에서 추가된 GlueSQL 실패 타입 테스트
 
@@ -381,4 +453,4 @@ assert_eq!(command, Ok(Command::Help));
 
 ## 이 파일을 이해한 뒤 알아야 하는 것
 
-Step 13 현재도 Task 테스트 2개, CLI parser 테스트 16개, error 테스트 5개, service 테스트 7개, REPL 테스트 5개, JSON repository 테스트 9개, GlueSQL repository 테스트 13개, main 보조 테스트 1개로 총 58개 테스트가 있다.
+Step 15 현재는 Task 테스트 2개, CLI parser 테스트 16개, error 테스트 5개, service 테스트 7개, REPL 테스트 5개, JSON repository 테스트 10개, GlueSQL repository 테스트 19개, main 보조 테스트 1개로 총 65개 테스트가 있다.

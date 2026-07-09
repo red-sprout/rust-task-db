@@ -2,9 +2,9 @@
 
 ## 이 문서 세트의 목적
 
-이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 13 코드와 문서만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL SledStorage 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, 테스트, 수정 포인트를 이해하게 만드는 것이다.
+이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 15 코드와 문서만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL SledStorage 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, GlueSQL transaction 관찰 테스트, GlueSQL Engine/Storage Adapter 구조, 수정 포인트를 이해하게 만드는 것이다.
 
-현재 구현은 `Step 13. 최종 검증 및 문서 정합성 점검` 단계다. 기능 구현은 Step 12의 GlueSQL `SledStorage` 영속 저장 전환까지 완료되어 있다.
+현재 구현은 `Step 15. GlueSQL Engine/Storage Adapter 분석 보강` 단계다. CLI 기능 구현은 Step 12의 GlueSQL `SledStorage` 영속 저장 전환까지 완료되어 있고, Step 15에서는 새 CLI 명령 없이 GlueSQL 내부 실행 흐름과 storage adapter 책임을 문서와 테스트로 관찰한다.
 
 ## 문서를 읽는 추천 순서
 
@@ -24,10 +24,11 @@
 13. [13-common-mistakes.md](13-common-mistakes.md)
 14. [14-glossary.md](14-glossary.md)
 15. [15-beginner-faq.md](15-beginner-faq.md)
+16. [17-gluesql-internals.md](17-gluesql-internals.md)
 
 ## 각 문서의 역할
 
-- [00-overview.md](00-overview.md): 현재 Step 13 프로젝트 큰 그림
+- [00-overview.md](00-overview.md): 현재 Step 15 프로젝트 큰 그림
 - [01-project-map.md](01-project-map.md): 실제 파일 지도
 - [02-reading-order.md](02-reading-order.md): 초심자가 읽을 순서
 - [03-runtime-flow.md](03-runtime-flow.md): `main()`부터 service, GlueSQL repository 호출까지 흐름
@@ -44,8 +45,11 @@
 - [14-glossary.md](14-glossary.md): 용어 사전
 - [15-beginner-faq.md](15-beginner-faq.md): 지금까지 나온 질문과 답변 모음
 - [16-run-guide.md](16-run-guide.md): 프로젝트 실행 방법, SQL/REPL 실행 방법, GlueSQL `SledStorage` 저장 위치
+- [17-gluesql-internals.md](17-gluesql-internals.md): GlueSQL Parser/Planner/Executor/Store 흐름과 Storage별 차이
 - [README.md](../../README.md): GitHub 첫 화면용 요약, 실행 방법, 테스트 방법
-- [docs/todo/step-13-progress.md](../todo/step-13-progress.md): 현재 Step 13 최종 검증 및 문서 정합성 점검 상태
+- [docs/todo/step-13-progress.md](../todo/step-13-progress.md): Step 13 최종 검증 및 문서 정합성 점검 기록
+- [docs/todo/step-14-progress.md](../todo/step-14-progress.md): Step 14 GlueSQL transaction/snapshot/write lock 관찰 기록
+- [docs/todo/step-15-progress.md](../todo/step-15-progress.md): 현재 Step 15 GlueSQL Engine/Storage Adapter 분석 상태
 
 ## 이 문서만 보고 할 수 있어야 하는 것
 
@@ -61,6 +65,10 @@
 - Step 11에서 보강된 테스트가 무엇을 지키는지 설명
 - Step 12에서 `SledStorage`로 데이터가 유지되는 이유 설명
 - Step 12에서 `GlueSqlTaskRepository`가 GlueSQL `SledStorage`에 SQL을 직접 실행하는 방식 설명
+- Step 14에서 `MemoryStorage`와 `SledStorage`의 transaction 차이를 테스트로 설명
+- Step 14에서 `SledStorage::clone()`으로 같은 Sled DB를 여러 `Glue` 인스턴스에 연결하는 이유 설명
+- Step 15에서 `Glue::execute`가 Parser/Planner/Executor/Store 흐름을 감싼다는 점 설명
+- Step 15에서 `GStore`, `GStoreMut`, `Planner` trait bound가 필요한 이유 설명
 - Step 10에서 REPL 안에서는 같은 저장소 인스턴스가 유지되는 이유 설명
 - `mod`, `derive`, `impl`, `match`, `Result`, `?`, `std::fs`, `Serialize`, `Deserialize`, `block_on`이 무엇인지 설명
 - `cargo run`, `cargo test`, `cargo check`로 현재 프로젝트 실행/검증
@@ -91,4 +99,4 @@
 
 ## 다음 단계 안내
 
-현재 단계는 Step 13이다. 새 기능은 추가하지 않고, Step 12까지 구현된 기능과 문서가 일치하는지 검증한다.
+현재 단계는 Step 15이다. 새 CLI 명령은 추가하지 않고, Step 12까지 구현된 기능 위에서 GlueSQL Engine/Storage Adapter 구조를 문서와 테스트로 관찰한다.
