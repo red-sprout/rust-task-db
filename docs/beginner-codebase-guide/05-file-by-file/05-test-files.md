@@ -1,11 +1,13 @@
 # 테스트 파일
 
+Step 28 테스트는 80개다. 관계형 repository 테스트는 Project CRUD/통계, priority, Tag 연결/중복/해제/filter, 상세 JOIN, 삭제 정리와 Seed idempotency를 검증한다.
+
 ## 포함된 파일 목록
 
 - `src/cli.rs`의 `#[cfg(test)] mod tests`
 - `src/task.rs`의 `#[cfg(test)] mod tests`
 - `src/error.rs`의 `#[cfg(test)] mod tests`
-- `src/service.rs`의 `#[cfg(test)] mod tests`
+- `src/service/mod.rs`의 `#[cfg(test)] mod tests`
 - `src/repl.rs`의 `#[cfg(test)] mod tests`
 - `src/repository/mod.rs`의 `#[cfg(test)] mod tests`
 - `src/repository/gluesql_repository.rs`의 `#[cfg(test)] mod tests`
@@ -22,7 +24,7 @@ cargo test
 -> src/cli.rs tests -> parse_args -> Command
 -> src/task.rs tests -> Task::new / TaskStats::new
 -> src/error.rs tests -> AppError -> Display / From
--> src/service.rs tests -> TaskService -> FakeTaskRepository
+-> src/service/mod.rs tests -> TaskService -> FakeTaskRepository
 -> src/repl.rs tests -> run_repl_with_io -> TaskService -> GlueSqlTaskRepository
 -> src/repository/mod.rs tests -> JsonTaskRepository -> tasks.json 형식의 임시 JSON file
 -> src/repository/gluesql_repository.rs tests -> GlueSqlTaskRepository -> GlueSQL MemoryStorage
@@ -77,7 +79,7 @@ fn displays_invalid_command_message_without_prefix() {
 
 ## 파일 경로
 
-`src/service.rs`
+`src/service/mod.rs`
 
 ### 이 파일의 역할
 
@@ -453,4 +455,4 @@ assert_eq!(command, Ok(Command::Help));
 
 ## 이 파일을 이해한 뒤 알아야 하는 것
 
-Step 18 현재는 Task 테스트 2개, CLI parser 테스트 16개, error 테스트 5개, service 테스트 7개, REPL 테스트 5개, JSON repository 테스트 10개, GlueSQL repository 테스트 19개, main 보조 테스트 1개로 총 65개 테스트가 있다. Step 18은 문서 분석 단계라 테스트 수는 Step 15와 같다.
+Step 18 당시에는 총 65개 테스트였다. Step 28 현재는 기존 동작과 관계형 기능 및 Seed idempotency를 합쳐 총 80개 테스트가 있다. 정확한 목록은 `cargo test -- --list`로 확인한다.

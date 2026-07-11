@@ -1,8 +1,10 @@
 # 에러 처리 흐름
 
+Step 28은 `AppError::Domain`을 추가했다. `project has tasks`, `tag name already exists`, `priority must be between 1 and 5`처럼 GlueSQL 오류가 아닌 정책 실패에 사용한다.
+
 ## 에러 처리 큰 그림
 
-Step 18 현재도 custom error 타입 `AppError`가 있다. 실패 가능성은 `src/error.rs`의 `AppError` enum으로 모인다. REPL의 표준 입력/출력 실패도 `AppError::Io`로 표현한다. Step 15의 GlueSQL transaction 관찰 테스트도 `database is locked`, `nested transaction is not supported` 같은 storage 실패를 `AppError::GlueSql`로 확인한다. SQL을 지원하지 않는 `JsonTaskRepository`는 `AppError::Unsupported`를 반환한다.
+Step 28 현재도 custom error 타입 `AppError`가 있다. 실패 가능성은 `src/error.rs`의 `AppError` enum으로 모인다. REPL의 표준 입력/출력 실패도 `AppError::Io`로 표현한다. Step 15의 GlueSQL transaction 관찰 테스트도 `database is locked`, `nested transaction is not supported` 같은 storage 실패를 `AppError::GlueSql`로 확인한다. SQL을 지원하지 않는 `JsonTaskRepository`는 `AppError::Unsupported`를 반환한다.
 
 ```text
 CLI parsing 실패

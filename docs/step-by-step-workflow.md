@@ -47,7 +47,7 @@ src/cli.rs
 src/main.rs
 src/repl.rs
 src/error.rs
-src/service.rs
+src/service/mod.rs
 src/task.rs
 src/repository/mod.rs
 src/repository/gluesql_repository.rs
@@ -113,7 +113,7 @@ src/cli.rs
 
 추가된 것:
 
-- `src/service.rs`
+- `src/service/mod.rs`
 - `TaskService<R: TaskRepository>`
 - service 단위 테스트
 

@@ -1,5 +1,12 @@
 # 초심자가 자주 하는 실수
 
+## Step 28 주의점
+
+- priority는 1~5다.
+- Tag 중복은 대소문자를 구분하지 않는다.
+- Task가 있는 Project는 삭제할 수 없다.
+- `MAX(id) + 1`은 동시 writer에 안전한 sequence가 아니다.
+
 ## 언어 문법 관련 실수
 
 ## 실수 이름: `mut` 없이 Vec를 수정하려 함
@@ -55,7 +62,7 @@ src/controller.rs를 만들거나 HTTP server crate를 추가하려고 함
 ### 올바른 코드
 
 ```text
-Step 7에서는 `src/command.rs`, `src/cli.rs`, `src/error.rs`, `src/main.rs`, `src/service.rs`, `src/task.rs`, `src/repository/mod.rs`, `tasks.json`을 본다.
+Step 7에서는 `src/command.rs`, `src/cli.rs`, `src/error.rs`, `src/main.rs`, `src/service/mod.rs`, `src/task.rs`, `src/repository/mod.rs`, `tasks.json`을 본다.
 ```
 
 ### 관련 파일
@@ -169,7 +176,7 @@ futures = "0.3"
 
 ### 예방 방법
 
-Step 18 현재는 `serde`, `serde_json`, `gluesql`, `futures`만 둔다. Storage별 기능 비교표를 추가했지만 새 crate는 추가하지 않는다. `clap`은 현재 로드맵에서 사용하지 않는다.
+Step 28 현재는 `serde`, `serde_json`, `gluesql`, `futures`만 둔다. Storage별 기능 비교표를 추가했지만 새 crate는 추가하지 않는다. `clap`은 현재 로드맵에서 사용하지 않는다.
 
 ## 실수 이름: 같은 SledStorage 경로를 동시에 두 번 열려고 함
 

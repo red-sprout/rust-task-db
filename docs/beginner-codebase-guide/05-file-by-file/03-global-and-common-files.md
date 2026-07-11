@@ -1,20 +1,22 @@
 # 공통 파일
 
+Step 28의 `AppError::Domain(String)`은 빈 이름, 잘못된 priority, Tag 중복, Project 삭제 제한 같은 사용자 도메인 실패를 표현한다.
+
 ## 포함된 파일 목록
 
-Step 18 현재도 공통 에러 파일 `src/error.rs`가 있다. 유틸, 설정 모듈 파일은 없다.
+Step 28 현재도 공통 에러 파일 `src/error.rs`가 있다. 유틸, 설정 모듈 파일은 없다.
 
 [src/error.rs](../../../src/error.rs)는 여러 계층에서 함께 쓰는 공통 에러 파일이다. repository 설명은 [02-domain-or-feature-files.md](02-domain-or-feature-files.md)에서 다룬다.
 
 ## 이 파일 묶음의 역할
 
-`src/error.rs`가 `AppError`를 제공하고, `src/cli.rs`, `src/service.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs`가 이 타입을 사용한다.
+`src/error.rs`가 `AppError`를 제공하고, `src/cli.rs`, `src/service/mod.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs`가 이 타입을 사용한다.
 
 ## 전체 연결 관계
 
 ```text
 src/cli.rs
-src/service.rs
+src/service/mod.rs
 src/repository/mod.rs
 src/repository/gluesql_repository.rs
 -> AppError
@@ -37,7 +39,7 @@ src/repository/gluesql_repository.rs
 
 ### 이 파일과 연결된 다른 파일
 
-`src/cli.rs`, `src/service.rs`, `src/repository/mod.rs`, `src/main.rs`
+`src/cli.rs`, `src/service/mod.rs`, `src/repository/mod.rs`, `src/main.rs`
 
 ### 핵심 코드 블록
 

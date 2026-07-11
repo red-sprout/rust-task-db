@@ -4,12 +4,12 @@
 
 ## 현재 단계
 
-- 현재 단계: Step 18. Storage별 기능 비교표 고도화
+- 현재 단계: Step 28. 관계형 Task Management 테스트와 문서 정리
 - 현재 저장 방식: `GlueSqlTaskRepository`가 관리하는 GlueSQL `SledStorage`
-- 현재 지원 명령: `add`, `list`, `done`, `delete`, `search`, `stats`, `sql`, `repl`
+- 현재 지원 명령: 기존 `add`, `list`, `done`, `delete`, `search`, `stats`, `sql`, `repl`과 `project`, 확장 `task`, `tag`, `seed`
 - 현재 CLI 구조: `std::env::args()`를 `src/cli.rs`의 `parse_args`가 `Command` enum으로 변환하고, `src/main.rs`가 `TaskService<GlueSqlTaskRepository>`를 통해 명령을 실행하며 실패는 `AppError`로 표현한다.
 - 보존된 이전 저장소: `JsonTaskRepository`, `tasks.json`, MemoryStorage 기반 테스트 흐름은 삭제하지 않고 남긴다.
-- 아직 도입하지 않는 것: 새 기능 명령, 새 외부 crate, 웹 서버, async 앱 구조, 사용자-facing 동시성 제어 명령, GlueSQL upstream 수정
+- 아직 도입하지 않는 것: 새 외부 crate, 웹 서버, async 앱 구조, 사용자-facing 동시성 제어 명령, GlueSQL upstream 수정
 
 ## 핵심 원칙
 
@@ -34,6 +34,11 @@
 - Step 16에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, 실제 custom storage를 production code에 도입하지 않는다. 대신 최소 custom storage를 만들 때 필요한 GlueSQL Store trait 책임, 읽기 전용 storage와 쓰기 가능 storage의 차이, 현재 repository 구조와 연결되는 지점을 문서화한다.
 - Step 17에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, Todo 명령별 SQL 생성 흐름과 GlueSQL `Payload`가 `Task`, `TaskStats`, `SqlResult`로 변환되는 경로를 문서화한다.
 - Step 18에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, 현재 프로젝트의 `JsonTaskRepository`, `MemoryStorage`, `SledStorage`와 문서 비교 대상 storage의 기능 차이를 표로 고도화한다.
+- Step 19~28에서는 Project 1:N Task, Task N:M Tag를 실제 기능으로 구현하고 Project/Task/Tag CLI, JOIN/aggregate, 삭제 정책, Seed와 문서를 완성한다.
+- GlueSQL 0.19가 `task_tags` 복합 PK를 지원하지 않으므로 연결 중복은 `TaskManagementRepository` 구현에서 검사한다.
+- ID는 `id_sequences` table로 할당하고 SledStorage에서는 sequence 갱신과 INSERT를 같은 transaction에 둔다.
+- SledStorage 다중 변경은 repository `transaction` helper로 원자화하고, transaction 미지원 MemoryStorage는 같은 closure를 비transaction 방식으로 실행한다.
+- Seed 완료 상태는 `app_metadata`의 `seed_version`으로 관리하고 부분 Seed 예약 데이터를 정리한 뒤 재생성한다.
 - 구현을 변경할 때마다 `docs/beginner-codebase-guide/`의 초심자 가이드를 함께 업데이트한다.
 - 초심자 가이드는 실제 코드 경로, 함수명, 타입명, 실행 흐름, 수정 포인트를 코드와 연결해서 설명해야 한다.
 - Markdown view 모드에서 줄이 붙지 않도록 `파일 경로: ...`, `역할: ...` 같은 key-value 설명은 표 또는 bullet list로 작성한다.
@@ -46,7 +51,7 @@
 - `src/main.rs`: `Command` 실행 분기, `TaskService<GlueSqlTaskRepository>` 메서드 호출, 출력
 - `src/repl.rs`: REPL 입력 루프, `.schema`, `.exit`, `.quit`, REPL SQL 결과 출력
 - `src/error.rs`: `AppError`, `Display`, `Error`, `From` 구현
-- `src/service.rs`: `TaskService<R: TaskRepository>`, service 테스트
+- `src/service/mod.rs`: `TaskService<R: TaskRepository>`, service 테스트
 - `src/repository/mod.rs`: `TaskRepository` trait, `SqlResult`, `JsonTaskRepository`, `tasks.json` 읽기/쓰기, search/stats, SQL unsupported 처리, repository 테스트
 - `src/repository/gluesql_repository.rs`: `GlueSqlTaskRepository<S>`, GlueSQL `MemoryStorage` 테스트 흐름, GlueSQL `SledStorage` 영속 저장소, `tasks` table 생성, SQL 기반 CRUD/search/stats/sql, rollback/snapshot/write lock, explicit commit, nested transaction 관찰 테스트
 - `src/command.rs`: CLI 명령을 표현하는 `Command` enum. `Search`, `Stats`, `Sql`, `Repl` 포함

@@ -1,5 +1,7 @@
 # 설정 파일 해설
 
+Step 28의 데이터 경로는 계속 `data/rust-task-db`다. 시작 시 기존 3열 `tasks` table이면 `project_id`, 기본 priority 3을 ALTER로 추가한다.
+
 ## 설정 파일 목록
 
 - `Cargo.toml`
@@ -29,7 +31,7 @@
 
 ## 데이터베이스 설정
 
-별도 데이터베이스 설정 파일은 코드에서 확인되지 않음. Step 18 현재도 `src/main.rs`가 `GlueSqlTaskRepository::persistent("data/rust-task-db")`를 호출한다.
+별도 데이터베이스 설정 파일은 코드에서 확인되지 않음. Step 28 현재도 `src/main.rs`가 `GlueSqlTaskRepository::persistent("data/rust-task-db")`를 호출한다.
 
 ```rust
 let repository = GlueSqlTaskRepository::persistent("data/rust-task-db");
@@ -47,7 +49,7 @@ let repository = GlueSqlTaskRepository::persistent("data/rust-task-db");
 
 ## 테스트 설정
 
-별도 테스트 설정 파일은 없다. `cargo test`가 `src/cli.rs`, `src/error.rs`, `src/service.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs` 안의 테스트를 실행한다.
+별도 테스트 설정 파일은 없다. `cargo test`가 `src/cli.rs`, `src/error.rs`, `src/service/mod.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs` 안의 테스트를 실행한다.
 
 ## CI/CD 설정
 
@@ -59,7 +61,7 @@ let repository = GlueSqlTaskRepository::persistent("data/rust-task-db");
 
 ## 수정하면 위험한 값
 
-Step 18 현재 `[dependencies]`에는 `serde`, `serde_json`, `gluesql`, `futures`를 둔다. `gluesql` feature에는 `gluesql_memory_storage`와 `gluesql_sled_storage`가 포함된다. Storage별 기능 비교표를 추가했지만 새 외부 crate는 추가하지 않았다.
+Step 28 현재 `[dependencies]`에는 `serde`, `serde_json`, `gluesql`, `futures`를 둔다. `gluesql` feature에는 `gluesql_memory_storage`와 `gluesql_sled_storage`가 포함된다. Storage별 기능 비교표를 추가했지만 새 외부 crate는 추가하지 않았다.
 
 ## 설정 오류 해결 가이드
 

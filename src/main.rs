@@ -1,9 +1,11 @@
 mod cli;
 mod command;
 mod error;
+mod project;
 mod repl;
 mod repository;
 mod service;
+mod tag;
 mod task;
 
 use command::Command;
@@ -13,102 +15,153 @@ use task::{Task, TaskStats};
 
 fn main() {
     let command = match cli::parse_args(std::env::args().collect()) {
-        Ok(command) => command,
-        Err(message) => {
-            eprintln!("{message}");
+        Ok(c) => c,
+        Err(e) => {
+            eprintln!("{e}");
             print_help();
             return;
         }
     };
-
     if command == Command::Help {
         print_help();
         return;
     }
-
     let repository = match GlueSqlTaskRepository::persistent("data/rust-task-db") {
-        Ok(repository) => repository,
-        Err(message) => {
-            eprintln!("{message}");
+        Ok(r) => r,
+        Err(e) => {
+            eprintln!("{e}");
             return;
         }
     };
     let mut service = TaskService::new(repository);
+    if let Err(error) = run(command, &mut service) {
+        eprintln!("{error}");
+    }
+}
 
+fn run<R: repository::TaskManagementRepository>(
+    command: Command,
+    service: &mut TaskService<R>,
+) -> Result<(), error::AppError> {
     match command {
-        Command::Add { title } => match service.add(title) {
-            Ok(task) => {
-                println!("Added:");
-                print_task(&task);
-            }
-            Err(message) => eprintln!("{message}"),
-        },
-        Command::List => match service.list() {
-            Ok(tasks) => {
-                println!("List:");
-                print_tasks(&tasks);
-            }
-            Err(message) => eprintln!("{message}"),
-        },
-        Command::Done { id } => match service.done(id) {
-            Ok(()) => {
-                println!("Done:\n{id}");
-            }
-            Err(message) => eprintln!("{message}"),
-        },
-        Command::Delete { id } => match service.delete(id) {
-            Ok(task) => {
-                println!("Deleted:");
-                print_task(&task);
-            }
-            Err(message) => eprintln!("{message}"),
-        },
-        Command::Search { keyword } => match service.search(&keyword) {
-            Ok(tasks) => {
-                println!("Search:");
-                print_tasks(&tasks);
-            }
-            Err(message) => eprintln!("{message}"),
-        },
-        Command::Stats => match service.stats() {
-            Ok(stats) => {
-                println!("Stats:");
-                print_stats(&stats);
-            }
-            Err(message) => eprintln!("{message}"),
-        },
-        Command::Sql { sql } => match service.execute_sql(sql) {
-            Ok(results) => {
-                println!("SQL:");
-                print_sql_results(&results);
-            }
-            Err(message) => eprintln!("{message}"),
-        },
-        Command::Repl => {
-            if let Err(message) = repl::run_repl(&mut service) {
-                eprintln!("{message}");
+        Command::Add { title } => print_task(&service.add(title)?),
+        Command::List => print_tasks(&service.list()?),
+        Command::Done { id } | Command::TaskDone { id } => {
+            service.done(id)?;
+            println!("Done: {id}");
+        }
+        Command::Delete { id } | Command::TaskDelete { id } => print_task(&service.delete(id)?),
+        Command::Search { keyword } | Command::TaskSearch { keyword } => {
+            print_tasks(&service.search(&keyword)?)
+        }
+        Command::Stats => print_stats(&service.stats()?),
+        Command::ProjectAdd { name } => {
+            let p = service.add_project(name)?;
+            println!("{} | {}", p.id, p.name);
+        }
+        Command::ProjectList => {
+            for p in service.list_projects()? {
+                println!("{} | {}", p.id, p.name);
             }
         }
-        Command::Help => unreachable!("help command returns before loading tasks"),
+        Command::ProjectShow { id } => {
+            let p = service.show_project(id)?;
+            println!("{} | {}", p.id, p.name);
+        }
+        Command::ProjectDelete { id } => {
+            let p = service.delete_project(id)?;
+            println!("Deleted: {} | {}", p.id, p.name);
+        }
+        Command::ProjectStats { id } => {
+            let stats = match id {
+                Some(id) => vec![service.project_stats(id)?],
+                None => service.all_project_stats()?,
+            };
+            for s in stats {
+                println!(
+                    "{} | {} | total={} | done={} | todo={} | completion={:.1}%",
+                    s.project.id, s.project.name, s.total, s.done, s.todo, s.completion_rate
+                );
+            }
+        }
+        Command::TaskAdd {
+            project_id,
+            priority,
+            title,
+            tags,
+        } => print_task(&service.add_task_with_tags(project_id, priority, title, tags)?),
+        Command::TaskList { project_id, tag } => {
+            print_tasks(&service.list_tasks(project_id, tag.as_deref())?)
+        }
+        Command::TaskShow { id } => {
+            let d = service.show_task(id)?;
+            print_task(&d.task);
+            println!("project: {}", d.project_name.as_deref().unwrap_or("(none)"));
+            println!(
+                "tags: {}",
+                d.tags
+                    .iter()
+                    .map(|t| t.name.as_str())
+                    .collect::<Vec<_>>()
+                    .join(", ")
+            );
+        }
+        Command::TagAdd { name } => {
+            let t = service.add_tag(name)?;
+            println!("{} | {}", t.id, t.name);
+        }
+        Command::TagList => {
+            for t in service.list_tags()? {
+                println!("{} | {}", t.id, t.name);
+            }
+        }
+        Command::TagDelete { id } => {
+            let t = service.delete_tag(id)?;
+            println!("Deleted: {} | {}", t.id, t.name);
+        }
+        Command::TaskTag { id, tag } => {
+            service.tag_task(id, &tag)?;
+            println!("Tagged: {id} | {tag}");
+        }
+        Command::TaskUntag { id, tag } => {
+            service.untag_task(id, &tag)?;
+            println!("Untagged: {id} | {tag}");
+        }
+        Command::TaskTags { id } => {
+            for t in service.task_tags(id)? {
+                println!("{} | {}", t.id, t.name);
+            }
+        }
+        Command::Seed => {
+            service.seed()?;
+            println!("Seed ready: 10 projects, 1000 tasks, 20 tags");
+        }
+        Command::Sql { sql } => print_sql_results(&service.execute_sql(sql)?),
+        Command::Repl => repl::run_repl(service)?,
+        Command::Help => unreachable!(),
+    }
+    Ok(())
+}
+
+fn print_task(t: &Task) {
+    println!(
+        "{} | project={} | priority={} | {} | {}",
+        t.id,
+        t.project_id
+            .map_or_else(|| "NULL".into(), |id| id.to_string()),
+        t.priority,
+        t.title,
+        t.done
+    );
+}
+fn print_tasks(v: &[Task]) {
+    for t in v {
+        print_task(t)
     }
 }
-
-fn print_task(task: &Task) {
-    println!("{} | {} | {}", task.id, task.title, task.done);
+fn print_stats(s: &TaskStats) {
+    println!("total: {}\ndone: {}\ntodo: {}", s.total, s.done, s.todo)
 }
-
-fn print_tasks(tasks: &[Task]) {
-    for task in tasks {
-        print_task(task);
-    }
-}
-
-fn print_stats(stats: &TaskStats) {
-    println!("total: {}", stats.total);
-    println!("done: {}", stats.done);
-    println!("todo: {}", stats.todo);
-}
-
 fn print_sql_results(results: &[SqlResult]) {
     for result in results {
         match result {
@@ -118,38 +171,11 @@ fn print_sql_results(results: &[SqlResult]) {
                     println!("{}", row.join(" | "));
                 }
             }
-            SqlResult::Affected { kind, count } => {
-                println!("{kind}: {count}");
-            }
-            SqlResult::Message(message) => println!("{message}"),
+            SqlResult::Affected { kind, count } => println!("{kind}: {count}"),
+            SqlResult::Message(m) => println!("{m}"),
         }
     }
 }
-
 fn print_help() {
-    println!("rust-task Step 12: Persistent GlueSQL Todo CLI");
-    println!();
-    println!("Usage:");
-    println!("  rust-task add \"Rust 공부\"");
-    println!("  rust-task list");
-    println!("  rust-task done 1");
-    println!("  rust-task delete 1");
-    println!("  rust-task search rust");
-    println!("  rust-task stats");
-    println!("  rust-task sql \"SELECT * FROM tasks\"");
-    println!("  rust-task repl");
-    println!();
-    println!("Note: Step 12 stores GlueSQL data under data/rust-task-db.");
-}
-
-#[cfg(test)]
-mod tests {
-    use super::*;
-
-    #[test]
-    fn prints_help_before_repository_is_loaded() {
-        let command = Command::Help;
-
-        assert_eq!(command, Command::Help);
-    }
+    println!("rust-task: relational task management CLI\n\nProject: project add|list|show|delete|stats\nTask: task add|list|show|done|delete|search|tag|untag|tags\nTag: tag add|list|delete\nOther: seed, sql, repl\nLegacy: add, list, done, delete, search, stats");
 }

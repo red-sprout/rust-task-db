@@ -22,7 +22,7 @@ Step 6에서는 실패를 단순 `String`으로 표현하던 흐름을 `src/erro
 | --- | --- |
 | `src/error.rs` | `AppError`, `Display`, `Error`, `From` 구현 |
 | `src/cli.rs` | CLI parsing 실패를 `AppError::InvalidCommand`로 반환 |
-| `src/service.rs` | service 메서드가 `Result<_, AppError>` 반환 |
+| `src/service/mod.rs` | service 메서드가 `Result<_, AppError>` 반환 |
 | `src/repository/mod.rs` | 파일/JSON/id 실패를 `AppError`로 반환 |
 | `src/main.rs` | `AppError`를 출력 |
 

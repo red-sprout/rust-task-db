@@ -1,5 +1,7 @@
 # 초심자용 파일 읽기 순서
 
+Step 28에서는 `src/project.rs` -> `src/task.rs` -> `src/tag.rs` -> `src/command.rs` -> `src/cli.rs` -> `src/service/mod.rs` -> repository 순서를 권장한다. 관계형 기능만 빠르게 보려면 [21-relational-task-management.md](21-relational-task-management.md)를 먼저 읽는다.
+
 ## 전체 읽기 전략
 
 먼저 [16-run-guide.md](16-run-guide.md)를 보고 프로젝트가 실행되는지 확인한다. 그 다음 `main()`이 `TaskService`를 만들고, service가 `TaskRepository` trait 메서드를 호출하는 흐름을 따라간다.
@@ -10,11 +12,11 @@
 - 읽는 이유: 코드 읽기 전에 `cargo run`, `cargo test`가 되는지 확인한다.
 - 이 파일에서 봐야 할 코드: `cargo run -- add "Rust 공부"`, `cargo test`
 - 이 파일을 읽고 나면 알아야 하는 것: Step 10은 GlueSQL 저장소 흐름 위에 `repl` 명령을 추가했다.
-- 다음에 읽을 파일: [src/service.rs](../../src/service.rs)
+- 다음에 읽을 파일: [src/service/mod.rs](../../src/service/mod.rs)
 
 ## 1단계: service 구조 이해
 
-- 읽을 파일: [src/service.rs](../../src/service.rs)
+- 읽을 파일: [src/service/mod.rs](../../src/service/mod.rs)
 - 읽는 이유: `TaskService<R: TaskRepository>`가 `main.rs`와 repository 사이에 있다.
 - 이 파일에서 봐야 할 코드: `pub struct TaskService<R: TaskRepository>`, `impl<R: TaskRepository> TaskService<R>`
 - 이 파일을 읽고 나면 알아야 하는 것: service는 저장소 구현체를 직접 고정하지 않고 trait bound에 의존한다.
@@ -31,7 +33,7 @@
 ## 2-1단계: GlueSQL repository 이해
 
 - 읽을 파일: [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs)
-- 읽는 이유: Step 18 현재 활성 저장소 구현체이며 transaction 관찰 테스트와 GlueSQL 실행 경계 테스트도 이 파일에 있다. Storage 비교에서도 이 파일의 `MemoryStorage`/`SledStorage` 생성 흐름을 계속 참조한다.
+- 읽는 이유: Step 28 현재 활성 저장소 구현체이며 transaction 관찰 테스트와 GlueSQL 실행 경계 테스트도 이 파일에 있다. Storage 비교에서도 이 파일의 `MemoryStorage`/`SledStorage` 생성 흐름을 계속 참조한다.
 - 이 파일에서 봐야 할 코드: `GlueSqlTaskRepository::persistent`, `execute`, `execute_sql`, `payload_to_sql_result`, `select_tasks`, `row_to_task`, `select_count`
 - 이 파일을 읽고 나면 알아야 하는 것: GlueSQL `Payload`와 `Value`를 프로젝트 타입인 `Task`, `TaskStats`, `SqlResult`로 바꾼다.
 - 다음에 읽을 파일: [19-query-execution.md](19-query-execution.md)
@@ -94,7 +96,7 @@
 
 ## 7단계: 비즈니스 로직 이해
 
-- 읽을 파일: [src/service.rs](../../src/service.rs), [src/repository/mod.rs](../../src/repository/mod.rs)
+- 읽을 파일: [src/service/mod.rs](../../src/service/mod.rs), [src/repository/mod.rs](../../src/repository/mod.rs)
 - 읽는 이유: Step 10은 service layer가 Todo 명령, SQL 직접 실행, REPL SQL 실행 요청을 받고 GlueSQL repository가 SQL로 저장/검색/집계/직접 실행을 담당한다.
 - 이 파일에서 봐야 할 코드: `TaskService::search`, `TaskService::stats`, `TaskService::execute_sql`, `GlueSqlTaskRepository::search`, `GlueSqlTaskRepository::stats`, `GlueSqlTaskRepository::execute_sql`
 - 이 파일을 읽고 나면 알아야 하는 것: service는 현재 repository에 위임하고, repository가 SQL을 실행한다.
@@ -102,7 +104,7 @@
 
 ## 8단계: 에러 처리 이해
 
-- 읽을 파일: [src/error.rs](../../src/error.rs), [src/cli.rs](../../src/cli.rs), [src/service.rs](../../src/service.rs), [src/repository/mod.rs](../../src/repository/mod.rs), [src/main.rs](../../src/main.rs)
+- 읽을 파일: [src/error.rs](../../src/error.rs), [src/cli.rs](../../src/cli.rs), [src/service/mod.rs](../../src/service/mod.rs), [src/repository/mod.rs](../../src/repository/mod.rs), [src/main.rs](../../src/main.rs)
 - 읽는 이유: CLI parsing 실패, 파일 I/O 실패, JSON parsing 실패, GlueSQL 실패를 `Result`로 표현한다.
 - 이 파일에서 봐야 할 코드: `AppError`, `Result<Command, AppError>`, `Result<Task, AppError>`, `?`
 - 이 파일을 읽고 나면 알아야 하는 것: custom error가 생겨 실패 종류가 enum variant로 나뉜다.
@@ -110,7 +112,7 @@
 
 ## 9단계: 테스트 이해
 
-- 읽을 파일: [src/cli.rs](../../src/cli.rs), [src/error.rs](../../src/error.rs), [src/service.rs](../../src/service.rs), [src/repository/mod.rs](../../src/repository/mod.rs), [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs), [src/main.rs](../../src/main.rs)의 `mod tests`
+- 읽을 파일: [src/cli.rs](../../src/cli.rs), [src/error.rs](../../src/error.rs), [src/service/mod.rs](../../src/service/mod.rs), [src/repository/mod.rs](../../src/repository/mod.rs), [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs), [src/main.rs](../../src/main.rs)의 `mod tests`
 - 읽는 이유: parser 테스트, service 테스트, repository 저장소 테스트가 분리되어 있다.
 - 이 파일에서 봐야 할 코드: `parses_add_command`, `parses_sql_command`, `add_delegates_to_repository`, `executes_select_sql_with_gluesql`
 - 이 파일을 읽고 나면 알아야 하는 것: Step 18에서는 기능 테스트 수가 총 65개로 유지되며 Storage별 기능 비교표 문서가 추가되었다.

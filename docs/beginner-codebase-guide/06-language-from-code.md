@@ -1,8 +1,10 @@
 # 이 프로젝트 코드로 배우는 언어 문법
 
+Step 28에서는 `Option<i64>`로 Project 미지정을 표현하고, `TaskDetail`이 여러 query 결과를 하나의 struct로 조합한다. `TaskManagementRepository: TaskRepository`는 supertrait 문법의 실제 예다.
+
 ## 이 문서의 목적
 
-현재 Step 18 코드에 실제 등장하는 Rust 문법과 외부 crate 사용만 설명한다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 18에서는 Storage별 기능 차이를 문서로 분석한다. 새 Rust 문법이나 production code 변경은 추가하지 않았다.
+현재 Step 28 코드에 실제 등장하는 Rust 문법과 외부 crate 사용만 설명한다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 18에서는 Storage별 기능 차이를 문서로 분석한다. 새 Rust 문법이나 production code 변경은 추가하지 않았다.
 
 ## 이 프로젝트에서 자주 등장하는 문법 목록
 
@@ -13,7 +15,7 @@
 - `src/command.rs`: `enum`, struct-like enum variant, `derive`, `Command::Sql`
 - `src/error.rs`: custom error enum, `Display`, `Error`, `From`, manual `PartialEq`, `AppError::GlueSql`, `AppError::Unsupported`
 - `src/cli.rs`: `Result<Command, AppError>`, `?`, iterator, `let Some(...) else`, `match`
-- `src/service.rs`: generic struct, trait bound, `impl<R: TaskRepository>`, `&self`, `&mut self`
+- `src/service/mod.rs`: generic struct, trait bound, `impl<R: TaskRepository>`, `&self`, `&mut self`
 - `src/repository/mod.rs`: `trait`, `impl Trait for Type`, `&mut self`, `PathBuf`, `SqlResult`, 보존된 JSON 저장소
 - `src/repository/gluesql_repository.rs`: external crate API, `block_on`, `Payload`, `Value`, `MemoryStorage`, `SledStorage`, generic storage 타입, SQL row 변환, `Payload -> SqlResult` 변환
 - `src/repl.rs`: `loop`, `BufRead`, `Write`, `read_line`, `flush`, `Cursor`, mutable borrow
@@ -468,7 +470,7 @@ use task::Task;
 - `mod cli;`: `src/cli.rs` 파일을 `cli` 모듈로 포함한다.
 - `mod command;`: `src/command.rs` 파일을 `command` 모듈로 포함한다.
 - `mod repository;`: `src/repository/mod.rs` 파일을 `repository` 모듈로 포함한다.
-- `mod service;`: `src/service.rs` 파일을 `service` 모듈로 포함한다.
+- `mod service;`: `src/service/mod.rs` 파일을 `service` 모듈로 포함한다.
 - `mod task;`: `src/task.rs` 파일을 `task` 모듈로 포함한다.
 - `use command::Command;`: `Command` 타입을 현재 파일에서 바로 쓰게 한다.
 - `use repository::JsonTaskRepository;`: JSON repository 타입을 현재 파일에서 바로 쓰게 한다.

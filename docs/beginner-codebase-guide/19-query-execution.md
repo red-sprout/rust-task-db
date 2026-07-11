@@ -18,7 +18,7 @@
 -> src/cli.rs parse_args
 -> src/command.rs Command
 -> src/main.rs match command
--> src/service.rs TaskService
+-> src/service/mod.rs TaskService
 -> src/repository/mod.rs TaskRepository
 -> src/repository/gluesql_repository.rs GlueSqlTaskRepository
 -> execute(sql)

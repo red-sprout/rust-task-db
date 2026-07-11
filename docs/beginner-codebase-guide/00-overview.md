@@ -1,5 +1,9 @@
 # 프로젝트 전체 개요
 
+## Step 28 현재 상태
+
+`rust-task`는 Project 1:N Task, Task N:M Tag 관계를 제공하는 Task Management CLI다. Task는 선택적 `project_id`와 priority 1~5를 가지며, Tag filter와 Project 통계는 실제 JOIN/COUNT SQL을 사용한다. 상세 구현은 [21-relational-task-management.md](21-relational-task-management.md)를 본다.
+
 ## 프로젝트 한 줄 요약
 
 `rust-task`는 Rust 문법을 단계별로 배우기 위한 CLI Todo 앱이며, 현재는 Step 18로 Storage별 기능 차이를 현재 코드와 연결해 분석한다. CLI 기능 구현은 Step 12에서 GlueSQL SQL 실행 모드, REPL 모드, 테스트 보강, SledStorage 영속 저장까지 완료되어 있다.
@@ -83,7 +87,7 @@ Step 10에서는 `Command::Repl`, `src/repl.rs`, `BufRead`, `Write`, `.schema`, 
 -> src/cli.rs
 -> src/command.rs
 -> src/main.rs
--> src/service.rs
+-> src/service/mod.rs
 -> TaskRepository
 -> GlueSqlTaskRepository
 -> src/error.rs AppError

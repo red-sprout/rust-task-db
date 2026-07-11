@@ -86,7 +86,7 @@ cargo run -- repl
 -> src/command.rs
 -> src/main.rs
 -> src/error.rs
--> src/service.rs
+-> src/service/mod.rs
 -> src/repository/mod.rs
 -> src/repository/gluesql_repository.rs
 -> GlueSQL SledStorage

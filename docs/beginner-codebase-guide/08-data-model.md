@@ -1,5 +1,16 @@
 # 데이터 모델 해설
 
+## Step 28 관계 모델
+
+| Rust 타입 | GlueSQL table | 핵심 필드 |
+| --- | --- | --- |
+| `Project` | `projects` | `id`, `name` |
+| `Task` | `tasks` | `id`, `project_id`, `title`, `done`, `priority` |
+| `Tag` | `tags` | `id`, `name` |
+| 공개 struct 없음 | `task_tags` | `task_id`, `tag_id` |
+
+`TaskDetail`은 Task, 선택적 Project 이름, Tag 목록을 합친 조회 모델이다.
+
 ## 이 프로젝트의 데이터 흐름 큰 그림
 
 ```text
@@ -30,7 +41,7 @@ CLI 문자열
 | 각 필드의 의미 | id는 식별자, title은 제목, done은 완료 여부 |
 | 어디서 생성되는가 | `Task::new` |
 | 어디서 사용되는가 | `src/repository/mod.rs`의 `add`, `mark_done`, `delete`, `src/main.rs`의 `print_task` |
-| DB에 저장되는가 | Step 18 현재는 GlueSQL `tasks` table에 저장됨 |
+| DB에 저장되는가 | Step 28 현재는 GlueSQL `tasks` table에 저장됨 |
 | 실제 저장 위치 | `data/rust-task-db` |
 | 외부 응답으로 노출되는가 | CLI 출력으로 노출 |
 | 수정 시 영향받는 파일 | `src/task.rs`, `src/main.rs`, 테스트, 이 문서 세트 |
@@ -61,7 +72,7 @@ CLI 문자열
 | 역할 | 애플리케이션 실패 종류 표현 |
 | variant 목록 | `Io`, `Json`, `GlueSql`, `NotFound`, `InvalidCommand`, `Unsupported` |
 | 어디서 생성되는가 | `src/cli.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs` |
-| 어디서 사용되는가 | `src/main.rs`, `src/service.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, 테스트 |
+| 어디서 사용되는가 | `src/main.rs`, `src/service/mod.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, 테스트 |
 | 수정 시 영향받는 파일 | `src/error.rs`, 실패를 반환하는 코드, 테스트, 이 문서 세트 |
 
 ## Service 모델
@@ -69,12 +80,12 @@ CLI 문자열
 | 항목 | 내용 |
 | --- | --- |
 | 이름 | `TaskService<R: TaskRepository>` |
-| 파일 경로 | `src/service.rs` |
+| 파일 경로 | `src/service/mod.rs` |
 | 역할 | CLI 실행 계층과 repository 계층 사이의 service layer |
 | 메서드 목록 | `new`, `add`, `list`, `done`, `delete`, `search`, `stats`, `execute_sql` |
 | 어디서 생성되는가 | `src/main.rs`의 `TaskService::new(repository)` |
 | 어디서 사용되는가 | `src/main.rs`의 `service.add`, `service.list`, `service.done`, `service.delete`, `service.search`, `service.stats`, `service.execute_sql` |
-| 수정 시 영향받는 파일 | `src/service.rs`, `src/main.rs`, 테스트, 이 문서 세트 |
+| 수정 시 영향받는 파일 | `src/service/mod.rs`, `src/main.rs`, 테스트, 이 문서 세트 |
 
 ## Repository 모델
 
@@ -85,7 +96,7 @@ CLI 문자열
 | 역할 | Todo 저장소가 제공해야 하는 동작 약속 |
 | 메서드 목록 | `add`, `find_all`, `mark_done`, `delete`, `search`, `stats`, `execute_sql` |
 | 구현체 | `GlueSqlTaskRepository`, `JsonTaskRepository` |
-| 수정 시 영향받는 파일 | `src/repository/mod.rs`, `src/service.rs`, 테스트, 이 문서 세트 |
+| 수정 시 영향받는 파일 | `src/repository/mod.rs`, `src/service/mod.rs`, 테스트, 이 문서 세트 |
 
 | 항목 | 내용 |
 | --- | --- |
@@ -142,7 +153,7 @@ CLI 문자열
 
 ## Schema/Table/Collection 목록
 
-Step 18 현재도 GlueSQL table schema가 있다.
+Step 28 현재도 GlueSQL table schema가 있다.
 
 Step 12 저장 흐름:
 
@@ -288,7 +299,7 @@ Vec<String>
 - [src/task.rs](../../src/task.rs): struct와 `Task::new`
 - [src/repository/mod.rs](../../src/repository/mod.rs): 저장/로드 테스트 기대값
 - [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs): `CREATE TABLE`, `row_to_task`, SQL projection
-- [src/service.rs](../../src/service.rs): service 테스트 기대값
+- [src/service/mod.rs](../../src/service/mod.rs): service 테스트 기대값
 - [src/main.rs](../../src/main.rs): `print_task`
 - [docs/beginner-codebase-guide/08-data-model.md](08-data-model.md)
 - [docs/beginner-codebase-guide/04-feature-flows.md](04-feature-flows.md)
@@ -299,7 +310,7 @@ Vec<String>
 - `src/cli.rs`: 문자열 parsing
 - `src/main.rs`: 실행 분기
 - `src/repl.rs`: REPL에서 처리할 입력이면 분기 추가
-- `src/service.rs`: 필요한 service 메서드
+- `src/service/mod.rs`: 필요한 service 메서드
 - `src/repository/mod.rs`: 필요한 저장소 메서드
 - `src/repository/gluesql_repository.rs`: 필요한 SQL 구현
 - `src/cli.rs` 테스트

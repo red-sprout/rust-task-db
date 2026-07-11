@@ -1,5 +1,7 @@
 # 설정 파일
 
+Step 28에서도 새 crate를 추가하지 않았다. 기존 `gluesql` 0.19 feature인 MemoryStorage/SledStorage만 사용한다.
+
 ## 포함된 파일 목록
 
 - `Cargo.toml`
@@ -88,7 +90,7 @@ version = "0.1.1"
 
 ### 이 파일을 이해한 뒤 알아야 하는 것
 
-Step 18 현재는 `serde`, `serde_json`, `gluesql`, `futures`를 dependency로 사용한다. Step 12에서 새 crate 이름을 직접 추가하지는 않았지만, `gluesql` feature에 `gluesql_sled_storage`를 추가해 SledStorage를 사용한다. Step 18에서도 새 외부 crate는 추가하지 않았다.
+Step 28 현재는 `serde`, `serde_json`, `gluesql`, `futures`를 dependency로 사용한다. Step 12에서 새 crate 이름을 직접 추가하지는 않았지만, `gluesql` feature에 `gluesql_sled_storage`를 추가해 SledStorage를 사용한다. Step 18에서도 새 외부 crate는 추가하지 않았다.
 
 현재 `Cargo.toml` 핵심:
 

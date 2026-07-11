@@ -4,7 +4,7 @@
 
 현재 코드는 `docs/prompt.md`의 `Step 5. Service layer 도입`까지 구현되어 있다.
 
-Step 5에서는 `src/main.rs`가 repository를 직접 호출하지 않고 `src/service.rs`의 `TaskService<R: TaskRepository>`를 호출하도록 바꿨다.
+Step 5에서는 `src/main.rs`가 repository를 직접 호출하지 않고 `src/service/mod.rs`의 `TaskService<R: TaskRepository>`를 호출하도록 바꿨다.
 
 ## 현재 지원 명령
 
@@ -20,7 +20,7 @@ cargo run -- delete 1
 | 파일 | 역할 |
 | --- | --- |
 | `src/main.rs` | CLI 명령을 실행하고 service 메서드를 호출한다. |
-| `src/service.rs` | `TaskService<R: TaskRepository>`와 service 테스트 |
+| `src/service/mod.rs` | `TaskService<R: TaskRepository>`와 service 테스트 |
 | `src/repository/mod.rs` | `TaskRepository` trait, `JsonTaskRepository`, JSON 파일 저장/로드 |
 | `src/task.rs` | `Task` struct와 serde derive |
 | `src/command.rs` | CLI 명령을 표현하는 `Command` enum |
@@ -31,12 +31,12 @@ cargo run -- delete 1
 
 | 이름 | 위치 | 역할 |
 | --- | --- | --- |
-| `TaskService<R: TaskRepository>` | `src/service.rs` | repository에 의존하는 service layer |
-| `TaskService::new` | `src/service.rs` | repository를 받아 service 생성 |
-| `TaskService::add` | `src/service.rs` | Todo 추가 요청을 repository에 위임 |
-| `TaskService::list` | `src/service.rs` | Todo 목록 조회를 repository에 위임 |
-| `TaskService::done` | `src/service.rs` | Todo 완료 처리를 repository에 위임 |
-| `TaskService::delete` | `src/service.rs` | Todo 삭제를 repository에 위임 |
+| `TaskService<R: TaskRepository>` | `src/service/mod.rs` | repository에 의존하는 service layer |
+| `TaskService::new` | `src/service/mod.rs` | repository를 받아 service 생성 |
+| `TaskService::add` | `src/service/mod.rs` | Todo 추가 요청을 repository에 위임 |
+| `TaskService::list` | `src/service/mod.rs` | Todo 목록 조회를 repository에 위임 |
+| `TaskService::done` | `src/service/mod.rs` | Todo 완료 처리를 repository에 위임 |
+| `TaskService::delete` | `src/service/mod.rs` | Todo 삭제를 repository에 위임 |
 
 ## Step 5에서 배우는 Rust 개념
 

@@ -24,7 +24,7 @@ Step 10에서는 `cargo run -- repl`로 작은 SQL 콘솔을 실행한다. REPL 
 | `src/cli.rs` | `repl` 명령 parsing |
 | `src/main.rs` | `Command::Repl`에서 `repl::run_repl` 호출 |
 | `src/repl.rs` | REPL 입력 루프, `.schema`, `.exit`, `.quit`, SQL 실행 결과 출력 |
-| `src/service.rs` | 기존 `TaskService::execute_sql`을 REPL에서도 사용 |
+| `src/service/mod.rs` | 기존 `TaskService::execute_sql`을 REPL에서도 사용 |
 | `src/repository/gluesql_repository.rs` | 기존 `execute_sql`로 REPL SQL 실행 |
 
 ## 현재 동작

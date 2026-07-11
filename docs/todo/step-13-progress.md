@@ -43,7 +43,7 @@ Step 13은 기능을 늘리는 단계가 아니다. 지금까지 만든 CLI Todo
 -> src/cli.rs parse_args()
 -> src/command.rs Command
 -> src/main.rs
--> src/service.rs TaskService
+-> src/service/mod.rs TaskService
 -> TaskRepository trait
 -> GlueSqlTaskRepository
 -> GlueSQL SledStorage

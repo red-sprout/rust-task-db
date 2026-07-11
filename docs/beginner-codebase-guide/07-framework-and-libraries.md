@@ -1,5 +1,7 @@
 # 프레임워크와 라이브러리 해설
 
+Step 28도 새 외부 crate 없이 GlueSQL 0.19의 JOIN, COUNT, ILIKE, PK/FK를 사용한다. 복합 PK와 task_tags FK 삭제 동작 제한은 application constraint로 보완한다.
+
 ## 이 문서의 목적
 
 현재 코드에서 Rust 언어 기능, 표준 라이브러리, Cargo 기능, 프로젝트 자체 규칙을 구분한다.

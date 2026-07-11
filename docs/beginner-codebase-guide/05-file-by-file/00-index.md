@@ -1,13 +1,15 @@
 # 파일별 상세 해설 인덱스
 
+Step 28에서 추가된 `src/project.rs`, `src/tag.rs`와 이동된 `src/service/mod.rs`는 [21-relational-task-management.md](../21-relational-task-management.md)가 함수명과 수정 지점을 설명한다.
+
 ## 이 디렉터리의 목적
 
-현재 Step 18 코드와 문서 파일을 하나씩 읽을 수 있게 나눈다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 18 문서는 Storage별 기능 비교표를 추가한다.
+현재 Step 28 코드와 문서 파일을 하나씩 읽을 수 있게 나눈다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 18 문서는 Storage별 기능 비교표를 추가한다.
 
 ## 파일별 해설 문서 목록
 
 - [01-entrypoint.md](01-entrypoint.md): `src/main.rs`, `src/repl.rs`
-- [02-domain-or-feature-files.md](02-domain-or-feature-files.md): `src/error.rs`, `src/service.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/command.rs`, `src/cli.rs`, `src/task.rs`, `tasks.json`
+- [02-domain-or-feature-files.md](02-domain-or-feature-files.md): `src/error.rs`, `src/service/mod.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/command.rs`, `src/cli.rs`, `src/task.rs`, `tasks.json`
 - [03-global-and-common-files.md](03-global-and-common-files.md): 현재 공통 파일 없음
 - [04-configuration-files.md](04-configuration-files.md): `Cargo.toml`, `Cargo.lock`
 - [05-test-files.md](05-test-files.md): `src/main.rs`, `src/cli.rs` 내부 테스트
@@ -21,7 +23,7 @@
 - 실행: [src/main.rs](../../../src/main.rs)
 - REPL: [src/repl.rs](../../../src/repl.rs)
 - 에러: [src/error.rs](../../../src/error.rs)
-- 서비스: [src/service.rs](../../../src/service.rs)
+- 서비스: [src/service/mod.rs](../../../src/service/mod.rs)
 - 저장소 trait와 JSON 보존 구현체: [src/repository/mod.rs](../../../src/repository/mod.rs)
 - 현재 활성 SledStorage 저장소, MemoryStorage 테스트 흐름, SQL 실행: [src/repository/gluesql_repository.rs](../../../src/repository/gluesql_repository.rs)
 - 명령 모델: [src/command.rs](../../../src/command.rs)
@@ -32,13 +34,13 @@
 - GitHub 첫 화면 소개: [README.md](../../../README.md)
 - 단계 진행 문서: [docs/todo/step-18-progress.md](../../todo/step-18-progress.md), [docs/todo/step-17-progress.md](../../todo/step-17-progress.md), [docs/todo/step-16-progress.md](../../todo/step-16-progress.md), [docs/todo/step-15-progress.md](../../todo/step-15-progress.md), [docs/todo/roadmap.md](../../todo/roadmap.md)
 - 설정: [Cargo.toml](../../../Cargo.toml)
-- 테스트: `src/main.rs`, `src/task.rs`, `src/error.rs`, `src/cli.rs`, `src/service.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`의 `#[cfg(test)] mod tests`
+- 테스트: `src/main.rs`, `src/task.rs`, `src/error.rs`, `src/cli.rs`, `src/service/mod.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`의 `#[cfg(test)] mod tests`
 
 ## 초심자가 먼저 읽을 파일
 
 1. [src/main.rs](../../../src/main.rs)
 2. [src/error.rs](../../../src/error.rs)
-3. [src/service.rs](../../../src/service.rs)
+3. [src/service/mod.rs](../../../src/service/mod.rs)
 4. [src/repository/mod.rs](../../../src/repository/mod.rs)
 5. [src/repository/gluesql_repository.rs](../../../src/repository/gluesql_repository.rs)
 

@@ -1,6 +1,9 @@
 mod gluesql_repository;
 
 use crate::error::AppError;
+use crate::project::{Project, ProjectStats};
+use crate::tag::Tag;
+use crate::task::TaskDetail;
 use crate::task::{Task, TaskStats};
 use std::fs;
 use std::io::ErrorKind;
@@ -16,6 +19,41 @@ pub trait TaskRepository {
     fn search(&mut self, keyword: &str) -> Result<Vec<Task>, AppError>;
     fn stats(&mut self) -> Result<TaskStats, AppError>;
     fn execute_sql(&mut self, sql: String) -> Result<Vec<SqlResult>, AppError>;
+}
+
+pub trait TaskManagementRepository: TaskRepository {
+    fn add_project(&mut self, name: String) -> Result<Project, AppError>;
+    fn list_projects(&mut self) -> Result<Vec<Project>, AppError>;
+    fn show_project(&mut self, id: i64) -> Result<Project, AppError>;
+    fn delete_project(&mut self, id: i64) -> Result<Project, AppError>;
+    fn project_stats(&mut self, id: i64) -> Result<ProjectStats, AppError>;
+    fn all_project_stats(&mut self) -> Result<Vec<ProjectStats>, AppError>;
+    fn add_task(
+        &mut self,
+        project_id: Option<i64>,
+        priority: i64,
+        title: String,
+    ) -> Result<Task, AppError>;
+    fn add_task_with_tags(
+        &mut self,
+        project_id: Option<i64>,
+        priority: i64,
+        title: String,
+        tags: Vec<String>,
+    ) -> Result<Task, AppError>;
+    fn list_tasks(
+        &mut self,
+        project_id: Option<i64>,
+        tag: Option<&str>,
+    ) -> Result<Vec<Task>, AppError>;
+    fn show_task(&mut self, id: i64) -> Result<TaskDetail, AppError>;
+    fn add_tag(&mut self, name: String) -> Result<Tag, AppError>;
+    fn list_tags(&mut self) -> Result<Vec<Tag>, AppError>;
+    fn delete_tag(&mut self, id: i64) -> Result<Tag, AppError>;
+    fn tag_task(&mut self, task_id: i64, tag_name: &str) -> Result<(), AppError>;
+    fn untag_task(&mut self, task_id: i64, tag_name: &str) -> Result<(), AppError>;
+    fn task_tags(&mut self, task_id: i64) -> Result<Vec<Tag>, AppError>;
+    fn seed(&mut self) -> Result<(), AppError>;
 }
 
 #[derive(Clone, Debug, PartialEq, Eq)]

@@ -1,8 +1,12 @@
 # 테스트 코드 해설
 
+## Step 28 기준
+
+`cargo test` 기준 80개가 통과한다. Project CRUD/검증, Project filter/priority/stats, Tag 중복, tag/untag/filter/detail, Task/Tag 삭제 정리, Seed idempotency를 직접 검증한다.
+
 ## 테스트 구조
 
-테스트는 `src/task.rs`, `src/cli.rs`, `src/error.rs`, `src/service.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs` 하단의 `#[cfg(test)] mod tests` 안에 있다. Step 15에서는 SQL 미지원 repository 경계와 SledStorage explicit commit/nested transaction 테스트가 추가되었다.
+테스트는 `src/task.rs`, `src/cli.rs`, `src/error.rs`, `src/service/mod.rs`, `src/repl.rs`, `src/repository/mod.rs`, `src/repository/gluesql_repository.rs`, `src/main.rs` 하단의 `#[cfg(test)] mod tests` 안에 있다. Step 15에서는 SQL 미지원 repository 경계와 SledStorage explicit commit/nested transaction 테스트가 추가되었다.
 
 ```rust
 #[cfg(test)]
@@ -24,7 +28,7 @@ cargo test
 - `src/cli.rs`
 - `src/task.rs`
 - `src/error.rs`
-- `src/service.rs`
+- `src/service/mod.rs`
 - `src/repl.rs`
 - `src/repository/mod.rs`
 - `src/repository/gluesql_repository.rs`
@@ -133,7 +137,7 @@ then: Ok(Command::Add { title: "Rust" })
 
 | 항목 | 내용 |
 | --- | --- |
-| 테스트 파일 | `src/service.rs` |
+| 테스트 파일 | `src/service/mod.rs` |
 | 테스트 대상 | `TaskService::add`, `TaskService::list`, `TaskService::done`, `TaskService::delete`, `TaskService::search`, `TaskService::stats`, `TaskService::execute_sql` |
 | 테스트가 검증하는 것 | service가 repository trait 메서드에 요청을 위임하는지 |
 | 실패하면 의심해야 할 코드 | `TaskService`, `FakeTaskRepository`, `TaskRepository` |
@@ -304,12 +308,12 @@ fn missing_add_title_returns_error() {
 
 ## 현재 테스트 개수
 
-현재 Step 18의 기능 테스트 수는 총 65개다. Step 18은 새 CLI 명령이나 새 테스트를 추가하지 않고 Storage별 기능 비교표를 문서로 고도화한다. Step 15에서 추가한 GlueSQL engine/storage adapter 분석과 storage 지원 경계 테스트는 그대로 유지한다.
+Step 18 당시 테스트는 65개였다. Step 28 현재는 기존 storage 경계 테스트와 관계형 기능, Seed idempotency를 합쳐 총 80개다.
 
 - `src/task.rs`: domain 테스트 2개
 - `src/cli.rs`: CLI parser 테스트 16개
 - `src/error.rs`: error 테스트 5개
-- `src/service.rs`: service 테스트 7개
+- `src/service/mod.rs`: service 테스트 7개
 - `src/repl.rs`: REPL 테스트 5개
 - `src/repository/mod.rs`: repository 테스트 10개
 - `src/repository/gluesql_repository.rs`: GlueSQL repository 테스트 19개

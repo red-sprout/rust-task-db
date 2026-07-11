@@ -1,5 +1,9 @@
 # Rust 문법 학습용 사이드 프로젝트 구현 프롬프트
 
+## Step 19~28 관계형 Task Management 확장
+
+Step 19 Project table, Step 20 Task 관계/priority, Step 21 Project CLI, Step 22 Tag/task_tags, Step 23 Task-Tag CLI, Step 24 JOIN, Step 25 aggregate, Step 26 삭제/transaction, Step 27 Seed, Step 28 테스트/문서를 순서대로 진행한다. 완료 상태는 `docs/todo/step-19-progress.md`부터 `step-28-progress.md`와 `docs/beginner-codebase-guide/21-relational-task-management.md`를 따른다.
+
 너는 Rust 멘토이자 시니어 백엔드 개발자다.
 
 목표는 Rust 초보자가 **Rust 핵심 문법을 한 번에 학습할 수 있는 작은 CLI 프로젝트**를 구현하도록 돕는 것이다.

@@ -27,7 +27,7 @@ Step 8에서는 기존 JSON 저장소를 지우지 않고, 같은 `TaskRepositor
 | `src/error.rs` | `AppError::GlueSql(String)` 추가 |
 | `src/repository/mod.rs` | `TaskRepository` trait, 기존 `JsonTaskRepository` 보존, `GlueSqlTaskRepository` re-export |
 | `src/repository/gluesql_repository.rs` | GlueSQL `MemoryStorage`, `tasks` table, SQL 기반 Todo 기능 |
-| `src/service.rs` | 조회 메서드도 `&mut self` 흐름으로 조정 |
+| `src/service/mod.rs` | 조회 메서드도 `&mut self` 흐름으로 조정 |
 
 ## 현재 동작
 

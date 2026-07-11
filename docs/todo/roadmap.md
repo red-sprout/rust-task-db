@@ -65,7 +65,7 @@
 
 완료된 일:
 
-- `src/service.rs`
+- `src/service/mod.rs`
 - `TaskService<R: TaskRepository>`
 - `main.rs`에서 service 메서드 호출
 - service 단위 테스트 추가
@@ -278,6 +278,48 @@
 현재 총 65개 테스트가 유지된다.
 
 ## Step 18. Storage별 기능 비교표 고도화
+
+상태: 완료
+
+## Step 19. Project 도메인과 테이블 추가
+
+상태: 완료 — `Project`, `projects` table, CRUD/validation
+
+## Step 20. Task에 project_id와 priority 추가
+
+상태: 완료 — 기존 JSON/Sled migration 호환 포함
+
+## Step 21. Project CLI와 Service 추가
+
+상태: 완료 — add/list/show/delete/stats
+
+## Step 22. Tag와 task_tags 추가
+
+상태: 완료 — 대소문자 무관 중복 정책
+
+## Step 23. Task-Tag CLI 추가
+
+상태: 완료 — tag/untag/tags/list --tag
+
+## Step 24. JOIN 기반 조회 기능 추가
+
+상태: 완료 — Tag filter와 Task 상세
+
+## Step 25. Aggregate 기반 통계 추가
+
+상태: 완료 — Project COUNT와 완료율
+
+## Step 26. 삭제 및 transaction 정책 구현
+
+상태: 완료 — Project restrict, join row 선행 정리, storage 차이 문서화
+
+## Step 27. Seed 기능 추가
+
+상태: 완료 — 10 Project, 1,000 Task, 20 Tag
+
+## Step 28. 테스트와 문서 정리
+
+상태: 완료 — 80개 테스트와 관계형 가이드
 
 상태: 완료
 

@@ -23,7 +23,7 @@ Step 7에서는 CLI 명령에 `search`, `stats`가 추가되었다.
 | `src/command.rs` | `Command::Search`, `Command::Stats` 추가 |
 | `src/cli.rs` | `search`, `stats` parsing |
 | `src/task.rs` | `TaskStats` 추가 |
-| `src/service.rs` | `search`, `stats` service 메서드 |
+| `src/service/mod.rs` | `search`, `stats` service 메서드 |
 | `src/repository/mod.rs` | 제목 검색과 통계 계산 |
 | `src/main.rs` | search/stats 출력 |
 

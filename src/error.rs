@@ -9,6 +9,7 @@ pub enum AppError {
     NotFound(i64),
     InvalidCommand(String),
     Unsupported(String),
+    Domain(String),
 }
 
 impl fmt::Display for AppError {
@@ -20,6 +21,7 @@ impl fmt::Display for AppError {
             Self::NotFound(id) => write!(formatter, "Task not found: {id}"),
             Self::InvalidCommand(message) => write!(formatter, "{message}"),
             Self::Unsupported(message) => write!(formatter, "{message}"),
+            Self::Domain(message) => write!(formatter, "{message}"),
         }
     }
 }
@@ -45,6 +47,7 @@ impl PartialEq for AppError {
             (Self::InvalidCommand(left), Self::InvalidCommand(right)) => left == right,
             (Self::GlueSql(left), Self::GlueSql(right)) => left == right,
             (Self::Unsupported(left), Self::Unsupported(right)) => left == right,
+            (Self::Domain(left), Self::Domain(right)) => left == right,
             (Self::Io(left), Self::Io(right)) => left.to_string() == right.to_string(),
             (Self::Json(left), Self::Json(right)) => left.to_string() == right.to_string(),
             _ => false,
@@ -92,5 +95,13 @@ mod tests {
         let error = AppError::Unsupported("SQL is not supported here".to_string());
 
         assert_eq!(error.to_string(), "SQL is not supported here");
+    }
+
+    #[test]
+    fn displays_domain_message_without_prefix() {
+        assert_eq!(
+            AppError::Domain("project has tasks".into()).to_string(),
+            "project has tasks"
+        );
     }
 }

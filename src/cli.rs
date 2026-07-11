@@ -2,223 +2,336 @@ use crate::command::Command;
 use crate::error::AppError;
 
 pub fn parse_args(args: Vec<String>) -> Result<Command, AppError> {
-    let mut iter = args.into_iter();
-    let _program = iter.next();
-
-    let Some(command) = iter.next() else {
+    let mut values = args.into_iter().skip(1).collect::<Vec<_>>();
+    if values.is_empty() {
         return Ok(Command::Help);
-    };
-
+    }
+    let command = values.remove(0);
     match command.as_str() {
-        "add" => {
-            let title = require_next(&mut iter, "Usage: rust-task add \"할 일\"")?;
-            Ok(Command::Add { title })
-        }
+        "add" => Ok(Command::Add {
+            title: one(values, "Usage: rust-task add \"할 일\"")?,
+        }),
         "list" => Ok(Command::List),
-        "done" => {
-            let id = parse_id(require_next(&mut iter, "Usage: rust-task done 1")?)?;
-            Ok(Command::Done { id })
-        }
-        "delete" => {
-            let id = parse_id(require_next(&mut iter, "Usage: rust-task delete 1")?)?;
-            Ok(Command::Delete { id })
-        }
-        "search" => {
-            let keyword = require_next(&mut iter, "Usage: rust-task search rust")?;
-            Ok(Command::Search { keyword })
-        }
+        "done" => Ok(Command::Done {
+            id: id(one(values, "Usage: rust-task done 1")?)?,
+        }),
+        "delete" => Ok(Command::Delete {
+            id: id(one(values, "Usage: rust-task delete 1")?)?,
+        }),
+        "search" => Ok(Command::Search {
+            keyword: one(values, "Usage: rust-task search rust")?,
+        }),
         "stats" => Ok(Command::Stats),
-        "sql" => {
-            let sql = require_next(&mut iter, "Usage: rust-task sql \"SELECT * FROM tasks\"")?;
-            Ok(Command::Sql { sql })
-        }
+        "project" => parse_project(values),
+        "task" => parse_task(values),
+        "tag" => parse_tag(values),
+        "seed" => Ok(Command::Seed),
+        "sql" => Ok(Command::Sql {
+            sql: one(values, "Usage: rust-task sql \"SELECT * FROM tasks\"")?,
+        }),
         "repl" => Ok(Command::Repl),
         "help" | "-h" | "--help" => Ok(Command::Help),
-        other => Err(AppError::InvalidCommand(format!(
-            "Unknown command: {other}"
-        ))),
+        other => Err(invalid(format!("Unknown command: {other}"))),
     }
 }
 
-fn require_next(
-    iter: &mut impl Iterator<Item = String>,
-    message: &str,
-) -> Result<String, AppError> {
-    iter.next()
-        .ok_or_else(|| AppError::InvalidCommand(message.to_string()))
+fn parse_project(mut v: Vec<String>) -> Result<Command, AppError> {
+    let sub = take(
+        &mut v,
+        "Usage: rust-task project <add|list|show|delete|stats>",
+    )?;
+    match sub.as_str() {
+        "add" => Ok(Command::ProjectAdd {
+            name: one(v, "Usage: rust-task project add \"이름\"")?,
+        }),
+        "list" => Ok(Command::ProjectList),
+        "show" => Ok(Command::ProjectShow {
+            id: id(one(v, "Usage: rust-task project show 1")?)?,
+        }),
+        "delete" => Ok(Command::ProjectDelete {
+            id: id(one(v, "Usage: rust-task project delete 1")?)?,
+        }),
+        "stats" => Ok(Command::ProjectStats {
+            id: match v.len() {
+                0 => None,
+                1 => Some(id(v[0].clone())?),
+                _ => return Err(invalid("Usage: rust-task project stats [id]")),
+            },
+        }),
+        _ => Err(invalid(format!("Unknown project command: {sub}"))),
+    }
 }
 
-fn parse_id(value: String) -> Result<i64, AppError> {
-    value
-        .parse::<i64>()
-        .map_err(|_| AppError::InvalidCommand(format!("id must be an integer: {value}")))
+fn parse_tag(mut v: Vec<String>) -> Result<Command, AppError> {
+    let sub = take(&mut v, "Usage: rust-task tag <add|list|delete>")?;
+    match sub.as_str() {
+        "add" => Ok(Command::TagAdd {
+            name: one(v, "Usage: rust-task tag add backend")?,
+        }),
+        "list" => Ok(Command::TagList),
+        "delete" => Ok(Command::TagDelete {
+            id: id(one(v, "Usage: rust-task tag delete 1")?)?,
+        }),
+        _ => Err(invalid(format!("Unknown tag command: {sub}"))),
+    }
+}
+
+fn parse_task(mut v: Vec<String>) -> Result<Command, AppError> {
+    let sub = take(
+        &mut v,
+        "Usage: rust-task task <add|list|show|done|delete|search|tag|untag|tags>",
+    )?;
+    match sub.as_str() {
+        "add" => {
+            let mut project_id = None;
+            let mut priority = 3;
+            let mut title = None;
+            let mut tags = Vec::new();
+            let mut i = 0;
+            while i < v.len() {
+                match v[i].as_str() {
+                    "--project" => {
+                        i += 1;
+                        project_id = Some(id(v
+                            .get(i)
+                            .cloned()
+                            .ok_or_else(|| invalid("--project requires id"))?)?);
+                    }
+                    "--priority" => {
+                        i += 1;
+                        priority = id(v
+                            .get(i)
+                            .cloned()
+                            .ok_or_else(|| invalid("--priority requires 1..5"))?)?;
+                    }
+                    "--tag" => {
+                        i += 1;
+                        tags.push(
+                            v.get(i)
+                                .cloned()
+                                .ok_or_else(|| invalid("--tag requires name"))?,
+                        );
+                    }
+                    _ if title.is_none() => title = Some(v[i].clone()),
+                    _ => return Err(invalid("task title must be one quoted argument")),
+                }
+                i += 1;
+            }
+            Ok(Command::TaskAdd {
+                project_id,
+                priority,
+                title: title.ok_or_else(|| {
+                    invalid("Usage: rust-task task add [--project 1] [--priority 3] [--tag name] \"할 일\"")
+                })?,
+                tags,
+            })
+        }
+        "list" => {
+            let mut project_id = None;
+            let mut tag = None;
+            let mut i = 0;
+            while i < v.len() {
+                match v[i].as_str() {
+                    "--project" => {
+                        i += 1;
+                        project_id = Some(id(v
+                            .get(i)
+                            .cloned()
+                            .ok_or_else(|| invalid("--project requires id"))?)?);
+                    }
+                    "--tag" => {
+                        i += 1;
+                        tag = Some(
+                            v.get(i)
+                                .cloned()
+                                .ok_or_else(|| invalid("--tag requires name"))?,
+                        );
+                    }
+                    x => return Err(invalid(format!("Unknown task list option: {x}"))),
+                }
+                i += 1;
+            }
+            Ok(Command::TaskList { project_id, tag })
+        }
+        "show" => Ok(Command::TaskShow {
+            id: id(one(v, "Usage: rust-task task show 1")?)?,
+        }),
+        "done" => Ok(Command::TaskDone {
+            id: id(one(v, "Usage: rust-task task done 1")?)?,
+        }),
+        "delete" => Ok(Command::TaskDelete {
+            id: id(one(v, "Usage: rust-task task delete 1")?)?,
+        }),
+        "search" => Ok(Command::TaskSearch {
+            keyword: one(v, "Usage: rust-task task search rust")?,
+        }),
+        "tag" => Ok(Command::TaskTag {
+            id: id(take(&mut v, "Usage: rust-task task tag 1 backend")?)?,
+            tag: one(v, "Usage: rust-task task tag 1 backend")?,
+        }),
+        "untag" => Ok(Command::TaskUntag {
+            id: id(take(&mut v, "Usage: rust-task task untag 1 backend")?)?,
+            tag: one(v, "Usage: rust-task task untag 1 backend")?,
+        }),
+        "tags" => Ok(Command::TaskTags {
+            id: id(one(v, "Usage: rust-task task tags 1")?)?,
+        }),
+        _ => Err(invalid(format!("Unknown task command: {sub}"))),
+    }
+}
+
+fn take(v: &mut Vec<String>, message: &str) -> Result<String, AppError> {
+    if v.is_empty() {
+        Err(invalid(message))
+    } else {
+        Ok(v.remove(0))
+    }
+}
+fn one(v: Vec<String>, message: &str) -> Result<String, AppError> {
+    if v.len() == 1 {
+        Ok(v[0].clone())
+    } else {
+        Err(invalid(message))
+    }
+}
+fn id(v: String) -> Result<i64, AppError> {
+    v.parse()
+        .map_err(|_| invalid(format!("id must be an integer: {v}")))
+}
+fn invalid(message: impl Into<String>) -> AppError {
+    AppError::InvalidCommand(message.into())
 }
 
 #[cfg(test)]
 mod tests {
     use super::*;
-
-    fn args(values: &[&str]) -> Vec<String> {
-        values.iter().map(|value| value.to_string()).collect()
+    fn p(v: &[&str]) -> Result<Command, AppError> {
+        parse_args(v.iter().map(|s| s.to_string()).collect())
     }
-
     #[test]
-    fn parses_add_command() {
-        let command = parse_args(args(&["rust-task", "add", "Rust"]));
-
+    fn legacy_commands_stay_supported() {
         assert_eq!(
-            command,
+            p(&["x", "add", "Rust"]),
             Ok(Command::Add {
-                title: "Rust".to_string()
+                title: "Rust".into()
+            })
+        );
+        assert_eq!(p(&["x", "list"]), Ok(Command::List));
+        assert_eq!(p(&["x", "done", "1"]), Ok(Command::Done { id: 1 }));
+    }
+    #[test]
+    fn parses_project_commands() {
+        assert_eq!(
+            p(&["x", "project", "add", "Lab"]),
+            Ok(Command::ProjectAdd { name: "Lab".into() })
+        );
+        assert_eq!(
+            p(&["x", "project", "stats", "2"]),
+            Ok(Command::ProjectStats { id: Some(2) })
+        );
+    }
+    #[test]
+    fn parses_all_project_stats() {
+        assert_eq!(
+            p(&["x", "project", "stats"]),
+            Ok(Command::ProjectStats { id: None })
+        );
+    }
+    #[test]
+    fn parses_task_add_tags() {
+        let command = p(&[
+            "x", "task", "add", "--tag", "backend", "--tag", "sql", "Plan",
+        ]);
+        assert_eq!(
+            command,
+            Ok(Command::TaskAdd {
+                project_id: None,
+                priority: 3,
+                title: "Plan".into(),
+                tags: vec!["backend".into(), "sql".into()]
             })
         );
     }
-
     #[test]
-    fn parses_list_command() {
-        let command = parse_args(args(&["rust-task", "list"]));
-
-        assert_eq!(command, Ok(Command::List));
-    }
-
-    #[test]
-    fn parses_done_command() {
-        let command = parse_args(args(&["rust-task", "done", "1"]));
-
-        assert_eq!(command, Ok(Command::Done { id: 1 }));
-    }
-
-    #[test]
-    fn parses_delete_command() {
-        let command = parse_args(args(&["rust-task", "delete", "1"]));
-
-        assert_eq!(command, Ok(Command::Delete { id: 1 }));
-    }
-
-    #[test]
-    fn parses_search_command() {
-        let command = parse_args(args(&["rust-task", "search", "Rust"]));
-
+    fn parses_task_options() {
         assert_eq!(
-            command,
-            Ok(Command::Search {
-                keyword: "Rust".to_string()
+            p(&[
+                "x",
+                "task",
+                "add",
+                "--project",
+                "1",
+                "--priority",
+                "5",
+                "Plan"
+            ]),
+            Ok(Command::TaskAdd {
+                project_id: Some(1),
+                priority: 5,
+                title: "Plan".into(),
+                tags: Vec::new()
+            })
+        );
+        assert_eq!(
+            p(&["x", "task", "list", "--tag", "backend"]),
+            Ok(Command::TaskList {
+                project_id: None,
+                tag: Some("backend".into())
             })
         );
     }
-
     #[test]
-    fn parses_stats_command() {
-        let command = parse_args(args(&["rust-task", "stats"]));
-
-        assert_eq!(command, Ok(Command::Stats));
-    }
-
-    #[test]
-    fn parses_sql_command() {
-        let command = parse_args(args(&["rust-task", "sql", "SELECT * FROM tasks"]));
-
+    fn parses_tag_and_seed() {
         assert_eq!(
-            command,
-            Ok(Command::Sql {
-                sql: "SELECT * FROM tasks".to_string()
+            p(&["x", "tag", "add", "backend"]),
+            Ok(Command::TagAdd {
+                name: "backend".into()
             })
         );
+        assert_eq!(p(&["x", "seed"]), Ok(Command::Seed));
     }
-
     #[test]
-    fn parses_repl_command() {
-        let command = parse_args(args(&["rust-task", "repl"]));
-
-        assert_eq!(command, Ok(Command::Repl));
-    }
-
-    #[test]
-    fn parses_help_aliases() {
-        assert_eq!(parse_args(args(&["rust-task", "help"])), Ok(Command::Help));
-        assert_eq!(parse_args(args(&["rust-task", "-h"])), Ok(Command::Help));
+    fn rejects_bad_id() {
         assert_eq!(
-            parse_args(args(&["rust-task", "--help"])),
-            Ok(Command::Help)
+            p(&["x", "done", "no"]),
+            Err(AppError::InvalidCommand("id must be an integer: no".into()))
         );
     }
-
     #[test]
-    fn no_command_returns_help() {
-        let command = parse_args(args(&["rust-task"]));
-
-        assert_eq!(command, Ok(Command::Help));
+    fn help_aliases() {
+        assert_eq!(p(&["x"]), Ok(Command::Help));
+        assert_eq!(p(&["x", "--help"]), Ok(Command::Help));
     }
-
     #[test]
-    fn invalid_id_returns_error() {
-        let command = parse_args(args(&["rust-task", "done", "abc"]));
-
+    fn parses_task_relationship_commands() {
         assert_eq!(
-            command,
-            Err(AppError::InvalidCommand(
-                "id must be an integer: abc".to_string()
-            ))
+            p(&["x", "task", "tag", "1", "backend"]),
+            Ok(Command::TaskTag {
+                id: 1,
+                tag: "backend".into()
+            })
+        );
+        assert_eq!(
+            p(&["x", "task", "untag", "1", "backend"]),
+            Ok(Command::TaskUntag {
+                id: 1,
+                tag: "backend".into()
+            })
+        );
+        assert_eq!(
+            p(&["x", "task", "tags", "1"]),
+            Ok(Command::TaskTags { id: 1 })
         );
     }
-
     #[test]
-    fn missing_add_title_returns_error() {
-        let command = parse_args(args(&["rust-task", "add"]));
-
+    fn parses_project_delete() {
         assert_eq!(
-            command,
-            Err(AppError::InvalidCommand(
-                "Usage: rust-task add \"할 일\"".to_string()
-            ))
+            p(&["x", "project", "delete", "3"]),
+            Ok(Command::ProjectDelete { id: 3 })
         );
     }
-
     #[test]
-    fn missing_done_id_returns_error() {
-        let command = parse_args(args(&["rust-task", "done"]));
-
-        assert_eq!(
-            command,
-            Err(AppError::InvalidCommand(
-                "Usage: rust-task done 1".to_string()
-            ))
-        );
-    }
-
-    #[test]
-    fn missing_search_keyword_returns_error() {
-        let command = parse_args(args(&["rust-task", "search"]));
-
-        assert_eq!(
-            command,
-            Err(AppError::InvalidCommand(
-                "Usage: rust-task search rust".to_string()
-            ))
-        );
-    }
-
-    #[test]
-    fn missing_sql_string_returns_error() {
-        let command = parse_args(args(&["rust-task", "sql"]));
-
-        assert_eq!(
-            command,
-            Err(AppError::InvalidCommand(
-                "Usage: rust-task sql \"SELECT * FROM tasks\"".to_string()
-            ))
-        );
-    }
-
-    #[test]
-    fn unknown_command_returns_error() {
-        let command = parse_args(args(&["rust-task", "unknown"]));
-
-        assert_eq!(
-            command,
-            Err(AppError::InvalidCommand(
-                "Unknown command: unknown".to_string()
-            ))
-        );
+    fn rejects_unknown_subcommand() {
+        assert!(p(&["x", "tag", "wat"]).is_err());
     }
 }

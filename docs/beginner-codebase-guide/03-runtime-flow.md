@@ -1,5 +1,14 @@
 # 프로젝트 실행 흐름
 
+## Step 28 관계형 명령
+
+```text
+터미널 -> parse_args -> Command -> main::run -> TaskService
+-> TaskManagementRepository -> GlueSqlTaskRepository -> GlueSQL SledStorage
+```
+
+`task list --tag backend`는 `tasks`, `task_tags`, `tags`를 JOIN한다.
+
 ## 실행 명령어
 
 ```bash
@@ -194,7 +203,7 @@ Command::Add { title } => match service.add(title) {
 - `Ok(task)`: 추가된 Task를 받는다.
 - `Err(message)`: service나 repository에서 올라온 실패 메시지를 출력한다.
 
-`src/service.rs`의 실제 구현은 아래처럼 repository에 위임한다.
+`src/service/mod.rs`의 실제 구현은 아래처럼 repository에 위임한다.
 
 ```rust
 pub fn add(&mut self, title: String) -> Result<Task, AppError> {
@@ -204,7 +213,7 @@ pub fn add(&mut self, title: String) -> Result<Task, AppError> {
 
 ## GlueSQL 실행 흐름은 어디에 있나?
 
-Step 18 현재 GlueSQL 세부사항과 SQL 결과 변환은 `src/repository/gluesql_repository.rs` 안에 있다. 명령별 SQL과 `Payload` 변환 상세는 [19-query-execution.md](19-query-execution.md)에서 다루고, storage별 기능 차이는 [20-storage-comparison.md](20-storage-comparison.md)에서 다룬다.
+Step 28 현재 GlueSQL 세부사항과 SQL 결과 변환은 `src/repository/gluesql_repository.rs` 안에 있다. 명령별 SQL과 `Payload` 변환 상세는 [19-query-execution.md](19-query-execution.md)에서 다루고, storage별 기능 차이는 [20-storage-comparison.md](20-storage-comparison.md)에서 다룬다.
 
 ```text
 src/main.rs
@@ -217,7 +226,7 @@ src/main.rs
 -> service.search/stats
 -> service.execute_sql
 -> repl::run_repl
--> src/service.rs TaskService
+-> src/service/mod.rs TaskService
 ```
 
 `main.rs`는 이제 GlueSQL API 세부사항을 모른다.

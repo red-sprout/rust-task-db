@@ -1,5 +1,7 @@
 # 실행 진입점
 
+Step 28의 `main::run`은 Project/Task/Tag/Seed variant를 실행한다. 출력 수정 지점은 `print_task`, `print_tasks`, 각 match branch다.
+
 ## 포함된 파일 목록
 
 - `src/main.rs`
@@ -33,7 +35,7 @@ src/main.rs
 
 ### 이 파일의 역할
 
-Step 10의 실행 흐름을 담는다. CLI parsing은 `src/cli.rs`로 분리했고, 명령 실행은 `src/service.rs`의 `TaskService`로 분리했다. 실패 타입은 `src/error.rs`의 `AppError`로 모았다. 현재 활성 저장소와 SQL 실행 세부사항은 `src/repository/gluesql_repository.rs`에 있고, REPL 입력 루프는 `src/repl.rs`에 있다.
+Step 10의 실행 흐름을 담는다. CLI parsing은 `src/cli.rs`로 분리했고, 명령 실행은 `src/service/mod.rs`의 `TaskService`로 분리했다. 실패 타입은 `src/error.rs`의 `AppError`로 모았다. 현재 활성 저장소와 SQL 실행 세부사항은 `src/repository/gluesql_repository.rs`에 있고, REPL 입력 루프는 `src/repl.rs`에 있다.
 
 ### 이 파일이 필요한 이유
 
@@ -44,7 +46,7 @@ Rust CLI 프로그램은 `main()`에서 시작한다. 현재 단계에서는 `ma
 - `src/cli.rs`: `parse_args` 제공
 - `src/command.rs`: `Command` enum 제공
 - `src/error.rs`: `AppError` 제공
-- `src/service.rs`: `TaskService` 제공
+- `src/service/mod.rs`: `TaskService` 제공
 - `src/repl.rs`: `run_repl` 제공
 - `src/repository/mod.rs`: `TaskRepository`, 보존된 `JsonTaskRepository`, `GlueSqlTaskRepository` re-export 제공
 - `src/repository/gluesql_repository.rs`: `GlueSqlTaskRepository` 제공
@@ -170,7 +172,7 @@ if tasks.is_empty() {
 
 ### 수정 시 영향받는 파일
 
-출력만 바꾸면 `src/main.rs`가 중심이다. 새 명령을 추가하면 `src/command.rs`, `src/cli.rs`, `src/service.rs`, `src/repository/mod.rs`, 테스트, 초심자 가이드를 함께 수정해야 한다.
+출력만 바꾸면 `src/main.rs`가 중심이다. 새 명령을 추가하면 `src/command.rs`, `src/cli.rs`, `src/service/mod.rs`, `src/repository/mod.rs`, 테스트, 초심자 가이드를 함께 수정해야 한다.
 
 ### 이 파일을 이해한 뒤 알아야 하는 것
 

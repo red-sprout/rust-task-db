@@ -1,8 +1,10 @@
 # 초심자용 코드베이스 완전 해설서
 
+> Step 28 현재 Project/Task/Tag 관계형 기능이 실제 CLI에 추가되었다. 먼저 [21-relational-task-management.md](21-relational-task-management.md)를 읽고, 아래 Step 18 이전 분석 문서는 배경 자료로 활용한다.
+
 ## 이 문서 세트의 목적
 
-이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 18 코드와 문서만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL SledStorage 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, GlueSQL transaction 관찰 테스트, GlueSQL Engine/Storage Adapter 구조, Minimal Custom Storage 책임, Query Execution 변환 흐름, Storage별 기능 차이, 수정 포인트를 이해하게 만드는 것이다.
+이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 28 코드와 문서만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL SledStorage 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, GlueSQL transaction 관찰 테스트, GlueSQL Engine/Storage Adapter 구조, Minimal Custom Storage 책임, Query Execution 변환 흐름, Storage별 기능 차이, 수정 포인트를 이해하게 만드는 것이다.
 
 현재 구현은 `Step 18. Storage별 기능 비교표 고도화` 단계다. CLI 기능 구현은 Step 12의 GlueSQL `SledStorage` 영속 저장 전환까지 완료되어 있고, Step 18에서는 새 CLI 명령 없이 storage별 기능 차이를 문서로 분석한다.
 
@@ -28,10 +30,11 @@
 17. [18-custom-storage.md](18-custom-storage.md)
 18. [19-query-execution.md](19-query-execution.md)
 19. [20-storage-comparison.md](20-storage-comparison.md)
+20. [21-relational-task-management.md](21-relational-task-management.md)
 
 ## 각 문서의 역할
 
-- [00-overview.md](00-overview.md): 현재 Step 18 프로젝트 큰 그림
+- [00-overview.md](00-overview.md): 현재 Step 28 프로젝트 큰 그림
 - [01-project-map.md](01-project-map.md): 실제 파일 지도
 - [02-reading-order.md](02-reading-order.md): 초심자가 읽을 순서
 - [03-runtime-flow.md](03-runtime-flow.md): `main()`부터 service, GlueSQL repository 호출까지 흐름
@@ -52,19 +55,20 @@
 - [18-custom-storage.md](18-custom-storage.md): Minimal Custom Storage를 만들 때 필요한 trait 책임과 구현 순서
 - [19-query-execution.md](19-query-execution.md): Todo 명령별 SQL 생성과 `Payload` 변환 흐름
 - [20-storage-comparison.md](20-storage-comparison.md): Storage별 기능 차이와 현재 코드 도입 여부 비교
+- [21-relational-task-management.md](21-relational-task-management.md): Step 19~28 관계형 도메인, SQL, 정책, GlueSQL 제약
 - [README.md](../../README.md): GitHub 첫 화면용 요약, 실행 방법, 테스트 방법
 - [docs/todo/step-13-progress.md](../todo/step-13-progress.md): Step 13 최종 검증 및 문서 정합성 점검 기록
 - [docs/todo/step-14-progress.md](../todo/step-14-progress.md): Step 14 GlueSQL transaction/snapshot/write lock 관찰 기록
 - [docs/todo/step-15-progress.md](../todo/step-15-progress.md): Step 15 GlueSQL Engine/Storage Adapter 분석 완료 상태
 - [docs/todo/step-16-progress.md](../todo/step-16-progress.md): Step 16 Minimal Custom Storage 분석 완료 상태
 - [docs/todo/step-17-progress.md](../todo/step-17-progress.md): Step 17 Query Execution 상세 분석 완료 상태
-- [docs/todo/step-18-progress.md](../todo/step-18-progress.md): 현재 Step 18 Storage별 기능 비교표 고도화 상태
+- [docs/todo/step-18-progress.md](../todo/step-18-progress.md): 현재 Step 28 Storage별 기능 비교표 고도화 상태
 
 ## 이 문서만 보고 할 수 있어야 하는 것
 
 - `src/cli.rs`의 `parse_args`가 CLI 문자열을 `Command`로 바꾸는 흐름 설명
 - `search`, `stats`가 CLI에서 service와 repository를 거쳐 실행되는 방식 설명
-- `src/service.rs`의 `TaskService<R: TaskRepository>`가 repository에 의존하는 방식 설명
+- `src/service/mod.rs`의 `TaskService<R: TaskRepository>`가 repository에 의존하는 방식 설명
 - `src/repository/mod.rs`의 `TaskRepository`와 보존된 `JsonTaskRepository` 설명
 - `src/repository/gluesql_repository.rs`의 `GlueSqlTaskRepository` 설명
 - `src/repository/mod.rs`의 `SqlResult` 설명
@@ -95,7 +99,7 @@
 -> src/cli.rs parse_args()
 -> src/command.rs Command
 -> src/main.rs
--> src/service.rs TaskService
+-> src/service/mod.rs TaskService
 -> TaskRepository trait
 -> GlueSqlTaskRepository
 -> GlueSQL SledStorage
@@ -107,11 +111,11 @@
 ## 처음 읽는 사람이 가장 먼저 봐야 할 5개 파일
 
 1. [src/main.rs](../../src/main.rs)
-2. [src/service.rs](../../src/service.rs)
+2. [src/service/mod.rs](../../src/service/mod.rs)
 3. [src/repository/mod.rs](../../src/repository/mod.rs)
 4. [src/task.rs](../../src/task.rs)
 5. [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs)
 
 ## 다음 단계 안내
 
-현재 단계는 Step 18이다. 새 CLI 명령은 추가하지 않고, Step 12까지 구현된 기능 위에서 Storage별 기능 비교표를 문서로 고도화한다.
+현재 단계는 Step 28이다. Project, Task, Tag, Seed 관계형 기능과 기존 명령을 함께 지원한다.

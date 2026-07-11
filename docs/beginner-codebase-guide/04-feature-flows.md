@@ -1,5 +1,14 @@
 # 대표 기능별 실행 흐름
 
+## Step 28 새 기능
+
+- Project: add/list/show/delete/stats
+- Task: project/priority add, filter list, detail, 기존 done/delete/search
+- Tag: add/list/delete, tag/untag/tags
+- Seed: 10 Project, 1,000 Task, 20 Tag
+
+함수와 SQL은 [21-relational-task-management.md](21-relational-task-management.md)에 연결되어 있다.
+
 ## 공통 흐름
 
 모든 명령은 먼저 같은 parser를 지난다.

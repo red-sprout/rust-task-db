@@ -4,7 +4,7 @@ use crate::service::TaskService;
 use std::io::{self, BufRead, Write};
 
 const PROMPT: &str = "rust-task> ";
-const SCHEMA: &str = "CREATE TABLE tasks (\n  id INTEGER,\n  title TEXT,\n  done BOOLEAN\n);";
+const SCHEMA: &str = "projects(id, name)\ntasks(id, project_id, title, done, priority)\ntags(id, name)\ntask_tags(task_id, tag_id)\nid_sequences(entity, next_id)\napp_metadata(key, value)";
 
 pub fn run_repl<R: TaskRepository>(service: &mut TaskService<R>) -> Result<(), AppError> {
     let stdin = io::stdin();
@@ -103,9 +103,8 @@ mod tests {
         run_repl_with_io(&mut service, input, &mut output).unwrap();
 
         let output = String::from_utf8(output).unwrap();
-        assert!(output.contains("CREATE TABLE tasks"));
-        assert!(output.contains("id INTEGER"));
-        assert!(output.contains("done BOOLEAN"));
+        assert!(output.contains("tasks(id, project_id, title, done, priority)"));
+        assert!(output.contains("task_tags(task_id, tag_id)"));
     }
 
     #[test]
@@ -113,7 +112,7 @@ mod tests {
         let repository = GlueSqlTaskRepository::new().unwrap();
         let mut service = TaskService::new(repository);
         let input = Cursor::new(
-            "INSERT INTO tasks VALUES (1, 'Rust', FALSE);\nSELECT id, title, done FROM tasks;\n.quit\n",
+            "INSERT INTO tasks VALUES (1, NULL, 'Rust', FALSE, 3);\nSELECT id, title, done FROM tasks;\n.quit\n",
         );
         let mut output = Vec::new();
 
@@ -143,7 +142,7 @@ mod tests {
         let repository = GlueSqlTaskRepository::new().unwrap();
         let mut service = TaskService::new(repository);
         let input = Cursor::new(
-            "SELECT * FROM missing_table;\nINSERT INTO tasks VALUES (1, 'Rust', FALSE);\nSELECT id, title, done FROM tasks;\n.quit\n",
+            "SELECT * FROM missing_table;\nINSERT INTO tasks VALUES (1, NULL, 'Rust', FALSE, 3);\nSELECT id, title, done FROM tasks;\n.quit\n",
         );
         let mut output = Vec::new();
 
