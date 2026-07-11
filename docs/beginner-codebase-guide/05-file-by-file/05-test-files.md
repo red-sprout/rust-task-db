@@ -1,6 +1,6 @@
 # 테스트 파일
 
-Step 28 테스트는 80개다. 관계형 repository 테스트는 Project CRUD/통계, priority, Tag 연결/중복/해제/filter, 상세 JOIN, 삭제 정리와 Seed idempotency를 검증한다.
+Step 28 테스트는 98개다. 관계형 repository 테스트는 Project CRUD/통계, priority, Tag 연결/중복/해제/filter, 상세 JOIN, 삭제 정리와 Seed idempotency를 검증한다.
 
 ## 포함된 파일 목록
 
@@ -326,14 +326,14 @@ writer와 reader가 같은 SledStorage를 clone해서 나눠 가진다.
 -> reader가 COMMIT한 뒤에는 최신 Todo를 볼 수 있다.
 ```
 
-`sled_repository_pair` helper는 같은 path를 `SledStorage::new(path)`로 두 번 열지 않는다. Sled는 같은 DB 디렉터리에 OS 파일 락을 잡기 때문에 동시에 두 번 열면 실패할 수 있다. 그래서 먼저 만든 `SledStorage`를 `clone()`해서 두 `GlueSqlTaskRepository<SledStorage>`에 넣는다.
+`sled_repository_pair` helper는 같은 path를 `SledStorage::new(path)`로 두 번 열지 않는다. Sled는 같은 DB 디렉터리에 OS 파일 락을 잡기 때문에 동시에 두 번 열면 실패할 수 있다. 그래서 먼저 만든 `SledStorage`를 `clone()`해서 두 `GlueSqlTaskRepository<TracingStorage<SledStorage>>`에 넣는다.
 
 ```rust
 fn sled_repository_pair(
     path: impl AsRef<std::path::Path>,
 ) -> (
-    GlueSqlTaskRepository<SledStorage>,
-    GlueSqlTaskRepository<SledStorage>,
+    GlueSqlTaskRepository<TracingStorage<SledStorage>>,
+    GlueSqlTaskRepository<TracingStorage<SledStorage>>,
 ) {
     let storage = SledStorage::new(path).unwrap();
     let first_storage = storage.clone();
@@ -455,4 +455,4 @@ assert_eq!(command, Ok(Command::Help));
 
 ## 이 파일을 이해한 뒤 알아야 하는 것
 
-Step 18 당시에는 총 65개 테스트였다. Step 28 현재는 기존 동작과 관계형 기능 및 Seed idempotency를 합쳐 총 80개 테스트가 있다. 정확한 목록은 `cargo test -- --list`로 확인한다.
+Step 18 당시에는 총 65개 테스트였다. Step 40 현재는 기존 동작과 관계형 기능 및 Seed idempotency를 합쳐 총 98개 테스트가 있다. 정확한 목록은 `cargo test -- --list`로 확인한다.

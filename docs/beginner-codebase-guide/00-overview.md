@@ -1,6 +1,6 @@
 # 프로젝트 전체 개요
 
-## Step 28 현재 상태
+## Step 40 현재 상태
 
 `rust-task`는 Project 1:N Task, Task N:M Tag 관계를 제공하는 Task Management CLI다. Task는 선택적 `project_id`와 priority 1~5를 가지며, Tag filter와 Project 통계는 실제 JOIN/COUNT SQL을 사용한다. 상세 구현은 [21-relational-task-management.md](21-relational-task-management.md)를 본다.
 
@@ -34,7 +34,7 @@ Rust 초심자가 `struct`, `enum`, `trait`, generic, `impl`, `Vec`, ownership, 
 - Rust 2021 edition
 - Cargo
 - Rust standard library: `std::env`, `std::fs`, `std::path`, `std::io`
-- 외부 crate: `serde`, `serde_json`, `gluesql`, `futures`
+- 외부 crate: `serde`, `serde_json`, `gluesql`, `futures`, `async-trait`
 
 ## 전체 실행 구조
 

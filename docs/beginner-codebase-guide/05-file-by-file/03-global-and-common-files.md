@@ -4,7 +4,7 @@ Step 28의 `AppError::Domain(String)`은 빈 이름, 잘못된 priority, Tag 중
 
 ## 포함된 파일 목록
 
-Step 28 현재도 공통 에러 파일 `src/error.rs`가 있다. 유틸, 설정 모듈 파일은 없다.
+Step 40 현재도 공통 에러 파일 `src/error.rs`가 있다. 유틸, 설정 모듈 파일은 없다.
 
 [src/error.rs](../../../src/error.rs)는 여러 계층에서 함께 쓰는 공통 에러 파일이다. repository 설명은 [02-domain-or-feature-files.md](02-domain-or-feature-files.md)에서 다룬다.
 

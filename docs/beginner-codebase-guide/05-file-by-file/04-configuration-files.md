@@ -90,7 +90,7 @@ version = "0.1.1"
 
 ### 이 파일을 이해한 뒤 알아야 하는 것
 
-Step 28 현재는 `serde`, `serde_json`, `gluesql`, `futures`를 dependency로 사용한다. Step 12에서 새 crate 이름을 직접 추가하지는 않았지만, `gluesql` feature에 `gluesql_sled_storage`를 추가해 SledStorage를 사용한다. Step 18에서도 새 외부 crate는 추가하지 않았다.
+Step 40 현재는 `serde`, `serde_json`, `gluesql`, `futures`, `async-trait`를 dependency로 사용한다. Step 12에서 새 crate 이름을 직접 추가하지는 않았지만, `gluesql` feature에 `gluesql_sled_storage`를 추가해 SledStorage를 사용한다. Step 18에서도 새 외부 crate는 추가하지 않았다.
 
 현재 `Cargo.toml` 핵심:
 
@@ -124,7 +124,7 @@ version = "0.1.0"
 
 ### 코드 블록별 해설
 
-현재는 `serde`, `serde_json`, `gluesql`, `futures`와 그 하위 dependency가 함께 기록된다.
+현재는 `serde`, `serde_json`, `gluesql`, `futures`, `async-trait`와 그 하위 dependency가 함께 기록된다.
 
 ### 이 파일에서 사용된 언어 문법
 

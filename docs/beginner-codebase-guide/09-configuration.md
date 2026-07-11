@@ -31,7 +31,7 @@ Step 28의 데이터 경로는 계속 `data/rust-task-db`다. 시작 시 기존 
 
 ## 데이터베이스 설정
 
-별도 데이터베이스 설정 파일은 코드에서 확인되지 않음. Step 28 현재도 `src/main.rs`가 `GlueSqlTaskRepository::persistent("data/rust-task-db")`를 호출한다.
+별도 데이터베이스 설정 파일은 코드에서 확인되지 않음. Step 40 현재도 `src/main.rs`가 `GlueSqlTaskRepository::persistent("data/rust-task-db")`를 호출한다.
 
 ```rust
 let repository = GlueSqlTaskRepository::persistent("data/rust-task-db");
@@ -61,9 +61,9 @@ let repository = GlueSqlTaskRepository::persistent("data/rust-task-db");
 
 ## 수정하면 위험한 값
 
-Step 28 현재 `[dependencies]`에는 `serde`, `serde_json`, `gluesql`, `futures`를 둔다. `gluesql` feature에는 `gluesql_memory_storage`와 `gluesql_sled_storage`가 포함된다. Storage별 기능 비교표를 추가했지만 새 외부 crate는 추가하지 않았다.
+Step 40 현재 `[dependencies]`에는 `serde`, `serde_json`, `gluesql`, `futures`, `async-trait`를 둔다. `gluesql` feature에는 `gluesql_memory_storage`와 `gluesql_sled_storage`가 포함된다. Storage별 기능 비교표를 추가했지만 새 외부 crate는 추가하지 않았다.
 
 ## 설정 오류 해결 가이드
 
 - `cargo test`가 프로젝트를 못 찾으면 `Cargo.toml` 위치에서 실행했는지 확인한다.
-- dependency 관련 오류가 나면 `serde`, `serde_json`, `gluesql`, `futures` 버전과 `Cargo.lock` 상태를 확인한다.
+- dependency 관련 오류가 나면 `serde`, `serde_json`, `gluesql`, `futures`, `async-trait` 버전과 `Cargo.lock` 상태를 확인한다.

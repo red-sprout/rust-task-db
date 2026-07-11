@@ -100,7 +100,7 @@ where
 GlueSqlTaskRepository<MemoryStorage>
 -> 테스트용 in-memory SQL table
 
-GlueSqlTaskRepository<SledStorage>
+GlueSqlTaskRepository<TracingStorage<SledStorage>>
 -> CLI 기본 영속 SQL table
 ```
 

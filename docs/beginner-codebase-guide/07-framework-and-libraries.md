@@ -11,7 +11,7 @@ Step 28도 새 외부 crate 없이 GlueSQL 0.19의 JOIN, COUNT, ILIKE, PK/FK를 
 - Rust 문법: `struct`, `enum`, `impl`, `match`, `Option`, `Result`, borrow
 - 표준 라이브러리: `std::env::args`, `std::fs`, `std::path`, `std::io`
 - 빌드 도구: Cargo
-- 외부 라이브러리: `serde`, `serde_json`, `gluesql`, `futures`
+- 외부 라이브러리: `serde`, `serde_json`, `gluesql`, `futures`, `async-trait`
 
 ## 프레임워크 기능 목록
 
@@ -19,7 +19,7 @@ Step 28도 새 외부 crate 없이 GlueSQL 0.19의 JOIN, COUNT, ILIKE, PK/FK를 
 
 ## 외부 라이브러리 목록
 
-현재 외부 라이브러리는 `serde`, `serde_json`, `gluesql`, `futures`다.
+현재 외부 라이브러리는 `serde`, `serde_json`, `gluesql`, `futures`, `async-trait`다.
 
 | 이름 | 역할 | 등장 위치 |
 | --- | --- | --- |

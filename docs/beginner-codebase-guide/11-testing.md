@@ -2,7 +2,7 @@
 
 ## Step 28 기준
 
-`cargo test` 기준 80개가 통과한다. Project CRUD/검증, Project filter/priority/stats, Tag 중복, tag/untag/filter/detail, Task/Tag 삭제 정리, Seed idempotency를 직접 검증한다.
+`cargo test` 기준 98개가 통과한다. Project CRUD/검증, Project filter/priority/stats, Tag 중복, tag/untag/filter/detail, Task/Tag 삭제 정리, Seed idempotency를 직접 검증한다.
 
 ## 테스트 구조
 
@@ -308,7 +308,7 @@ fn missing_add_title_returns_error() {
 
 ## 현재 테스트 개수
 
-Step 18 당시 테스트는 65개였다. Step 28 현재는 기존 storage 경계 테스트와 관계형 기능, Seed idempotency를 합쳐 총 80개다.
+Step 18 당시 테스트는 65개였다. Step 40 현재는 기존 storage 경계 테스트와 관계형 기능, Seed idempotency를 합쳐 총 98개다.
 
 - `src/task.rs`: domain 테스트 2개
 - `src/cli.rs`: CLI parser 테스트 16개
@@ -347,7 +347,7 @@ then: 같은 repository 인스턴스 안에서 Task가 조회됨
 | 테스트 파일 | `src/repository/gluesql_repository.rs` |
 | 테스트 대상 | `execute_sql`, `SledStorage::clone`, `BEGIN`, `COMMIT`, `ROLLBACK` |
 | 테스트가 검증하는 것 | storage 구현체별 transaction 차이, repeatable read snapshot, write lock 충돌 |
-| 실패하면 의심해야 할 코드 | `execute`, `execute_sql`, `sled_repository_pair`, `GlueSqlTaskRepository<SledStorage>` 생성 흐름 |
+| 실패하면 의심해야 할 코드 | `execute`, `execute_sql`, `sled_repository_pair`, `GlueSqlTaskRepository<TracingStorage<SledStorage>>` 생성 흐름 |
 
 핵심 코드:
 

@@ -33,7 +33,7 @@ Step 28에서는 `src/project.rs` -> `src/task.rs` -> `src/tag.rs` -> `src/comma
 ## 2-1단계: GlueSQL repository 이해
 
 - 읽을 파일: [src/repository/gluesql_repository.rs](../../src/repository/gluesql_repository.rs)
-- 읽는 이유: Step 28 현재 활성 저장소 구현체이며 transaction 관찰 테스트와 GlueSQL 실행 경계 테스트도 이 파일에 있다. Storage 비교에서도 이 파일의 `MemoryStorage`/`SledStorage` 생성 흐름을 계속 참조한다.
+- 읽는 이유: Step 40 현재 활성 저장소 구현체이며 transaction 관찰 테스트와 GlueSQL 실행 경계 테스트도 이 파일에 있다. Storage 비교에서도 이 파일의 `MemoryStorage`/`SledStorage` 생성 흐름을 계속 참조한다.
 - 이 파일에서 봐야 할 코드: `GlueSqlTaskRepository::persistent`, `execute`, `execute_sql`, `payload_to_sql_result`, `select_tasks`, `row_to_task`, `select_count`
 - 이 파일을 읽고 나면 알아야 하는 것: GlueSQL `Payload`와 `Value`를 프로젝트 타입인 `Task`, `TaskStats`, `SqlResult`로 바꾼다.
 - 다음에 읽을 파일: [19-query-execution.md](19-query-execution.md)

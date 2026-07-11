@@ -8,6 +8,8 @@
 | `src/tag.rs` | `Tag` |
 | `src/service/mod.rs` | `TaskService<R: TaskManagementRepository>` |
 | `docs/beginner-codebase-guide/21-relational-task-management.md` | 관계형 기능 전체 해설 |
+| `src/query_lab/` | plan renderer, runtime trace, scenarios, report |
+| `docs/query-lab/` | Step 29~40 Query Lab 분석 문서 |
 
 ## 전체 디렉터리 트리
 
@@ -64,7 +66,7 @@ rust-task-db/
 | 역할 | GitHub 첫 화면용 프로젝트 소개 문서 |
 | 이 파일이 필요한 이유 | 프로젝트 목적, 실행 방법, 테스트 방법, MemoryStorage 주의점을 빠르게 보여주기 위해 필요하다. |
 | 연결된 파일 | [docs/beginner-codebase-guide/99-index.md](99-index.md), [docs/beginner-codebase-guide/16-run-guide.md](16-run-guide.md), [src/main.rs](../../src/main.rs) |
-| 초심자가 봐야 할 핵심 | 현재 Step 28 상태, 지원 명령, `SledStorage` 저장 위치, Storage별 기능 비교 |
+| 초심자가 봐야 할 핵심 | 현재 Step 40 상태, 지원 명령, `SledStorage` 저장 위치, Storage별 기능 비교 |
 | 설명 깊이 | 짧은 설명으로 충분 |
 
 | 항목 | 내용 |
@@ -73,7 +75,7 @@ rust-task-db/
 | 역할 | Rust package 설정과 dependency 선언 |
 | 이 파일이 필요한 이유 | Cargo가 프로젝트 이름, 버전, edition, 외부 crate를 알기 위해 필요하다. |
 | 연결된 파일 | `src/main.rs`, `src/error.rs`, `src/service/mod.rs`, `src/task.rs` |
-| 초심자가 봐야 할 핵심 | `serde`, `serde_json`, `gluesql`, `futures` dependency |
+| 초심자가 봐야 할 핵심 | `serde`, `serde_json`, `gluesql`, `futures`, `async-trait` dependency |
 | 설명 깊이 | 중간 설명 필요 |
 
 | 항목 | 내용 |

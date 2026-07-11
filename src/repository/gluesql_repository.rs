@@ -4,6 +4,7 @@ use crate::repository::{SqlResult, TaskManagementRepository, TaskRepository};
 use crate::tag::Tag;
 use crate::task::{Task, TaskDetail, TaskStats};
 use futures::executor::block_on;
+use gluesql::core::ast::Statement;
 use gluesql::core::store::{GStore, GStoreMut, Planner};
 use gluesql::prelude::{Glue, MemoryStorage, Payload, SledStorage, Value};
 use std::path::Path;
@@ -35,6 +36,7 @@ impl GlueSqlTaskRepository<MemoryStorage> {
 }
 
 impl GlueSqlTaskRepository<SledStorage> {
+    #[allow(dead_code)]
     pub fn persistent(path: impl AsRef<Path>) -> Result<Self, AppError> {
         let storage =
             SledStorage::new(path).map_err(|error| AppError::GlueSql(error.to_string()))?;
@@ -55,6 +57,100 @@ impl<S> GlueSqlTaskRepository<S>
 where
     S: GStore + GStoreMut + Planner,
 {
+    pub(crate) fn from_storage(storage: S, transactional: bool) -> Result<Self, AppError> {
+        let mut repository = Self {
+            glue: Glue::new(storage),
+            transactional,
+            in_transaction: false,
+        };
+        repository.create_tables()?;
+        Ok(repository)
+    }
+
+    pub(crate) fn storage(&self) -> &S {
+        &self.glue.storage
+    }
+
+    pub(crate) fn seed_lab_profile(&mut self, profile: &str) -> Result<(), AppError> {
+        if profile == "small" {
+            return self.seed();
+        }
+        let (projects, tasks, tags, skewed) = match profile {
+            "medium" => (100usize, 100_000usize, 100usize, false),
+            "large" => (250usize, 250_000usize, 200usize, false),
+            "skewed" => (10usize, 10_000usize, 20usize, true),
+            _ => {
+                return Err(AppError::Domain(format!(
+                    "Unknown lab seed profile: {profile}"
+                )))
+            }
+        };
+        let key = format!("query_lab_seed_{profile}");
+        if metadata_value(self, &key)?.as_deref() == Some("1") {
+            return Ok(());
+        }
+        self.transaction(|repository| {
+            let project_start = reserve_ids(repository, "projects", projects)?;
+            let tag_start = reserve_ids(repository, "tags", tags)?;
+            let task_start = reserve_ids(repository, "tasks", tasks)?;
+            execute_batches(
+                repository,
+                (0..projects).map(|n| {
+                    format!(
+                        "INSERT INTO projects VALUES ({}, 'Lab {profile} Project {:04}');",
+                        project_start + n as i64,
+                        n + 1
+                    )
+                }),
+            )?;
+            execute_batches(
+                repository,
+                (0..tags).map(|n| {
+                    format!(
+                        "INSERT INTO tags VALUES ({}, 'lab-{profile}-tag-{:04}');",
+                        tag_start + n as i64,
+                        n + 1
+                    )
+                }),
+            )?;
+            execute_batches(
+                repository,
+                (0..tasks).map(|n| {
+                    let project_offset = if skewed && n < tasks * 8 / 10 {
+                        0
+                    } else {
+                        n % projects
+                    };
+                    let done = if skewed { n % 10 != 0 } else { n % 3 == 0 };
+                    format!(
+                        "INSERT INTO tasks VALUES ({}, {}, 'Lab {profile} Task {:07}', {}, {});",
+                        task_start + n as i64,
+                        project_start + project_offset as i64,
+                        n + 1,
+                        done,
+                        (n % 5) + 1
+                    )
+                }),
+            )?;
+            execute_batches(
+                repository,
+                (0..tasks).map(|n| {
+                    let tag_offset = if skewed && n < tasks * 8 / 10 {
+                        0
+                    } else {
+                        n % tags
+                    };
+                    format!(
+                        "INSERT INTO task_tags VALUES ({}, {});",
+                        task_start + n as i64,
+                        tag_start + tag_offset as i64
+                    )
+                }),
+            )?;
+            set_metadata(repository, &key, "1")?;
+            Ok(())
+        })
+    }
     fn create_tables(&mut self) -> Result<(), AppError> {
         self.execute(
             "CREATE TABLE IF NOT EXISTS projects (
@@ -98,11 +194,34 @@ where
             )?;
         }
 
+        if self.transactional {
+            for sql in [
+                "CREATE INDEX idx_tasks_project_id ON tasks(project_id);",
+                "CREATE INDEX idx_tasks_done ON tasks(done);",
+                "CREATE INDEX idx_task_tags_tag_id ON task_tags(tag_id);",
+            ] {
+                if let Err(error) = self.execute(sql) {
+                    if !error.to_string().contains("index name already exists") {
+                        return Err(error);
+                    }
+                }
+            }
+        }
+
         Ok(())
     }
 
     fn execute(&mut self, sql: impl AsRef<str>) -> Result<Vec<Payload>, AppError> {
         block_on(self.glue.execute(sql)).map_err(|error| AppError::GlueSql(error.to_string()))
+    }
+
+    pub(crate) fn plan_sql(&mut self, sql: &str) -> Result<Vec<Statement>, AppError> {
+        block_on(self.glue.plan(sql)).map_err(|error| AppError::GlueSql(error.to_string()))
+    }
+
+    pub(crate) fn execute_statement(&mut self, statement: &Statement) -> Result<Payload, AppError> {
+        block_on(self.glue.execute_stmt(statement))
+            .map_err(|error| AppError::GlueSql(error.to_string()))
     }
 
     fn transaction<T>(
@@ -640,6 +759,47 @@ where
         ))?;
     }
     Ok(id)
+}
+
+fn reserve_ids<S>(
+    repository: &mut GlueSqlTaskRepository<S>,
+    table: &str,
+    count: usize,
+) -> Result<i64, AppError>
+where
+    S: GStore + GStoreMut + Planner,
+{
+    let start = allocate_id(repository, table)?;
+    repository.execute(format!(
+        "UPDATE id_sequences SET next_id = {} WHERE entity = {};",
+        start + count as i64,
+        sql_string(table)
+    ))?;
+    Ok(start)
+}
+
+fn execute_batches<S>(
+    repository: &mut GlueSqlTaskRepository<S>,
+    statements: impl IntoIterator<Item = String>,
+) -> Result<(), AppError>
+where
+    S: GStore + GStoreMut + Planner,
+{
+    let mut batch = String::new();
+    let mut count = 0;
+    for statement in statements {
+        batch.push_str(&statement);
+        count += 1;
+        if count == 500 {
+            repository.execute(&batch)?;
+            batch.clear();
+            count = 0;
+        }
+    }
+    if !batch.is_empty() {
+        repository.execute(batch)?;
+    }
+    Ok(())
 }
 
 fn required_name(value: String, field: &str) -> Result<String, AppError> {

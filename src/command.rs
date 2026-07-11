@@ -1,5 +1,19 @@
 #[derive(Debug, PartialEq, Eq)]
 pub enum Command {
+    Analyze {
+        sql: String,
+        plan: bool,
+        runtime: bool,
+        raw_plan: bool,
+        format: AnalyzeFormat,
+    },
+    LabList,
+    LabRun {
+        scenario: String,
+    },
+    LabSeed {
+        profile: String,
+    },
     Add {
         title: String,
     },
@@ -73,4 +87,10 @@ pub enum Command {
     },
     Repl,
     Help,
+}
+
+#[derive(Clone, Debug, PartialEq, Eq)]
+pub enum AnalyzeFormat {
+    Tree,
+    Json,
 }

@@ -1,4 +1,4 @@
-use crate::command::Command;
+use crate::command::{AnalyzeFormat, Command};
 use crate::error::AppError;
 
 pub fn parse_args(args: Vec<String>) -> Result<Command, AppError> {
@@ -22,6 +22,8 @@ pub fn parse_args(args: Vec<String>) -> Result<Command, AppError> {
             keyword: one(values, "Usage: rust-task search rust")?,
         }),
         "stats" => Ok(Command::Stats),
+        "analyze" => parse_analyze(values),
+        "lab" => parse_lab(values),
         "project" => parse_project(values),
         "task" => parse_task(values),
         "tag" => parse_tag(values),
@@ -32,6 +34,53 @@ pub fn parse_args(args: Vec<String>) -> Result<Command, AppError> {
         "repl" => Ok(Command::Repl),
         "help" | "-h" | "--help" => Ok(Command::Help),
         other => Err(invalid(format!("Unknown command: {other}"))),
+    }
+}
+
+fn parse_analyze(v: Vec<String>) -> Result<Command, AppError> {
+    let mut plan = false;
+    let mut runtime = false;
+    let mut raw_plan = false;
+    let mut format = AnalyzeFormat::Tree;
+    let mut sql = None;
+    let mut i = 0;
+    while i < v.len() {
+        match v[i].as_str() {
+            "--plan" => plan = true,
+            "--runtime" => runtime = true,
+            "--raw-plan" => raw_plan = true,
+            "--format" => {
+                i += 1;
+                format = match v.get(i).map(String::as_str) {
+                    Some("tree") => AnalyzeFormat::Tree,
+                    Some("json") => AnalyzeFormat::Json,
+                    _ => return Err(invalid("--format must be tree or json")),
+                };
+            }
+            _ if sql.is_none() => sql = Some(v[i].clone()),
+            value => return Err(invalid(format!("unexpected analyze argument: {value}"))),
+        }
+        i += 1;
+    }
+    Ok(Command::Analyze { sql: sql.ok_or_else(|| invalid("Usage: rust-task analyze [--plan|--runtime|--raw-plan] [--format tree|json] \"SQL\""))?, plan, runtime, raw_plan, format })
+}
+
+fn parse_lab(mut v: Vec<String>) -> Result<Command, AppError> {
+    match take(&mut v, "Usage: rust-task lab <list|run>")?.as_str() {
+        "list" if v.is_empty() => Ok(Command::LabList),
+        "run" => Ok(Command::LabRun {
+            scenario: one(v, "Usage: rust-task lab run <scenario>")?,
+        }),
+        "seed" => {
+            let profile = one(
+                v,
+                "Usage: rust-task lab seed <--small|--medium|--large|--skewed>",
+            )?;
+            Ok(Command::LabSeed {
+                profile: profile.trim_start_matches("--").to_string(),
+            })
+        }
+        value => Err(invalid(format!("Unknown lab command: {value}"))),
     }
 }
 
@@ -249,6 +298,43 @@ mod tests {
                 priority: 3,
                 title: "Plan".into(),
                 tags: vec!["backend".into(), "sql".into()]
+            })
+        );
+    }
+    #[test]
+    fn parses_analyze_options() {
+        assert_eq!(
+            p(&[
+                "x",
+                "analyze",
+                "--runtime",
+                "--raw-plan",
+                "--format",
+                "json",
+                "SELECT 1"
+            ]),
+            Ok(Command::Analyze {
+                sql: "SELECT 1".into(),
+                plan: false,
+                runtime: true,
+                raw_plan: true,
+                format: AnalyzeFormat::Json
+            })
+        );
+    }
+    #[test]
+    fn parses_lab_commands() {
+        assert_eq!(p(&["x", "lab", "list"]), Ok(Command::LabList));
+        assert_eq!(
+            p(&["x", "lab", "run", "join"]),
+            Ok(Command::LabRun {
+                scenario: "join".into()
+            })
+        );
+        assert_eq!(
+            p(&["x", "lab", "seed", "--skewed"]),
+            Ok(Command::LabSeed {
+                profile: "skewed".into()
             })
         );
     }

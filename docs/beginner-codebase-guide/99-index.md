@@ -1,10 +1,12 @@
 # 초심자용 코드베이스 완전 해설서
 
-> Step 28 현재 Project/Task/Tag 관계형 기능이 실제 CLI에 추가되었다. 먼저 [21-relational-task-management.md](21-relational-task-management.md)를 읽고, 아래 Step 18 이전 분석 문서는 배경 자료로 활용한다.
+> Step 40 현재 Project/Task/Tag 관계형 기능이 실제 CLI에 추가되었다. 먼저 [21-relational-task-management.md](21-relational-task-management.md)를 읽고, 아래 Step 18 이전 분석 문서는 배경 자료로 활용한다.
+
+> Step 40 Query Lab은 [docs/query-lab/00-overview.md](../query-lab/00-overview.md)에서 시작한다.
 
 ## 이 문서 세트의 목적
 
-이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 28 코드와 문서만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL SledStorage 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, GlueSQL transaction 관찰 테스트, GlueSQL Engine/Storage Adapter 구조, Minimal Custom Storage 책임, Query Execution 변환 흐름, Storage별 기능 차이, 수정 포인트를 이해하게 만드는 것이다.
+이 문서 세트는 Rust를 처음 보는 사람이 현재 Step 40 코드와 문서만 보고도 `rust-task`의 구조, 실행 흐름, GlueSQL SledStorage 저장소, SQL 실행 모드, REPL 모드, search/stats, custom error, Service layer, Repository trait, GlueSQL transaction 관찰 테스트, GlueSQL Engine/Storage Adapter 구조, Minimal Custom Storage 책임, Query Execution 변환 흐름, Storage별 기능 차이, 수정 포인트를 이해하게 만드는 것이다.
 
 현재 구현은 `Step 18. Storage별 기능 비교표 고도화` 단계다. CLI 기능 구현은 Step 12의 GlueSQL `SledStorage` 영속 저장 전환까지 완료되어 있고, Step 18에서는 새 CLI 명령 없이 storage별 기능 차이를 문서로 분석한다.
 
@@ -34,7 +36,7 @@
 
 ## 각 문서의 역할
 
-- [00-overview.md](00-overview.md): 현재 Step 28 프로젝트 큰 그림
+- [00-overview.md](00-overview.md): 현재 Step 40 프로젝트 큰 그림
 - [01-project-map.md](01-project-map.md): 실제 파일 지도
 - [02-reading-order.md](02-reading-order.md): 초심자가 읽을 순서
 - [03-runtime-flow.md](03-runtime-flow.md): `main()`부터 service, GlueSQL repository 호출까지 흐름
@@ -62,7 +64,7 @@
 - [docs/todo/step-15-progress.md](../todo/step-15-progress.md): Step 15 GlueSQL Engine/Storage Adapter 분석 완료 상태
 - [docs/todo/step-16-progress.md](../todo/step-16-progress.md): Step 16 Minimal Custom Storage 분석 완료 상태
 - [docs/todo/step-17-progress.md](../todo/step-17-progress.md): Step 17 Query Execution 상세 분석 완료 상태
-- [docs/todo/step-18-progress.md](../todo/step-18-progress.md): 현재 Step 28 Storage별 기능 비교표 고도화 상태
+- [docs/todo/step-18-progress.md](../todo/step-18-progress.md): 현재 Step 40 Storage별 기능 비교표 고도화 상태
 
 ## 이 문서만 보고 할 수 있어야 하는 것
 

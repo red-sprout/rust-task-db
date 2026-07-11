@@ -4,9 +4,9 @@
 
 ## 현재 단계
 
-- 현재 단계: Step 28. 관계형 Task Management 테스트와 문서 정리
+- 현재 단계: Step 40. Query Lab 기여 후보 정리
 - 현재 저장 방식: `GlueSqlTaskRepository`가 관리하는 GlueSQL `SledStorage`
-- 현재 지원 명령: 기존 `add`, `list`, `done`, `delete`, `search`, `stats`, `sql`, `repl`과 `project`, 확장 `task`, `tag`, `seed`
+- 현재 지원 명령: 기존 Task Management 명령과 `analyze`, `lab list`, `lab run`, `lab seed`
 - 현재 CLI 구조: `std::env::args()`를 `src/cli.rs`의 `parse_args`가 `Command` enum으로 변환하고, `src/main.rs`가 `TaskService<GlueSqlTaskRepository>`를 통해 명령을 실행하며 실패는 `AppError`로 표현한다.
 - 보존된 이전 저장소: `JsonTaskRepository`, `tasks.json`, MemoryStorage 기반 테스트 흐름은 삭제하지 않고 남긴다.
 - 아직 도입하지 않는 것: 새 외부 crate, 웹 서버, async 앱 구조, 사용자-facing 동시성 제어 명령, GlueSQL upstream 수정
@@ -35,6 +35,9 @@
 - Step 17에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, Todo 명령별 SQL 생성 흐름과 GlueSQL `Payload`가 `Task`, `TaskStats`, `SqlResult`로 변환되는 경로를 문서화한다.
 - Step 18에서는 새 CLI 명령이나 새 외부 crate를 추가하지 않고, 현재 프로젝트의 `JsonTaskRepository`, `MemoryStorage`, `SledStorage`와 문서 비교 대상 storage의 기능 차이를 표로 고도화한다.
 - Step 19~28에서는 Project 1:N Task, Task N:M Tag를 실제 기능으로 구현하고 Project/Task/Tag CLI, JOIN/aggregate, 삭제 정책, Seed와 문서를 완성한다.
+- Step 29~40에서는 기존 관계형 SQL을 대상으로 planned Statement renderer, TracingStorage runtime metrics, scenario/seed, DBMS 비교와 GlueSQL 기여 후보를 제공한다.
+- GlueSQL 0.19의 `glue.plan` 반환형은 `Vec<ast::Statement>`이며 별도 `StatementPlan` 타입이 아님을 문서와 UI에서 구분한다.
+- operator별 actual row는 공개 hook으로 확인할 수 없으므로 Storage row consumption과 혼동하지 않는다.
 - GlueSQL 0.19가 `task_tags` 복합 PK를 지원하지 않으므로 연결 중복은 `TaskManagementRepository` 구현에서 검사한다.
 - ID는 `id_sequences` table로 할당하고 SledStorage에서는 sequence 갱신과 INSERT를 같은 transaction에 둔다.
 - SledStorage 다중 변경은 repository `transaction` helper로 원자화하고, transaction 미지원 MemoryStorage는 같은 closure를 비transaction 방식으로 실행한다.

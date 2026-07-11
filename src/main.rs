@@ -2,6 +2,7 @@ mod cli;
 mod command;
 mod error;
 mod project;
+mod query_lab;
 mod repl;
 mod repository;
 mod service;
@@ -9,7 +10,7 @@ mod tag;
 mod task;
 
 use command::Command;
-use repository::{GlueSqlTaskRepository, SqlResult};
+use repository::SqlResult;
 use service::TaskService;
 use task::{Task, TaskStats};
 
@@ -26,7 +27,7 @@ fn main() {
         print_help();
         return;
     }
-    let repository = match GlueSqlTaskRepository::persistent("data/rust-task-db") {
+    let repository = match query_lab::persistent_traced("data/rust-task-db") {
         Ok(r) => r,
         Err(e) => {
             eprintln!("{e}");
@@ -39,11 +40,51 @@ fn main() {
     }
 }
 
-fn run<R: repository::TaskManagementRepository>(
+fn run<S>(
     command: Command,
-    service: &mut TaskService<R>,
-) -> Result<(), error::AppError> {
+    service: &mut TaskService<repository::GlueSqlTaskRepository<S>>,
+) -> Result<(), error::AppError>
+where
+    S: gluesql::core::store::GStore
+        + gluesql::core::store::GStoreMut
+        + gluesql::core::store::Planner
+        + query_lab::runtime::MetricSource,
+{
     match command {
+        Command::Analyze {
+            sql,
+            plan,
+            runtime,
+            raw_plan,
+            format,
+        } => {
+            let execute_runtime = runtime || (!plan && !raw_plan);
+            let report = query_lab::analyze(service.repository_mut(), &sql, execute_runtime)?;
+            println!(
+                "{}",
+                query_lab::render_report(&report, format, plan, runtime, raw_plan)?
+            );
+        }
+        Command::LabList => println!("{}", query_lab::scenario_names().join("\n")),
+        Command::LabRun { scenario } => {
+            for sql in query_lab::scenario_sql(&scenario)? {
+                let report = query_lab::analyze(service.repository_mut(), sql, true)?;
+                println!(
+                    "{}",
+                    query_lab::render_report(
+                        &report,
+                        command::AnalyzeFormat::Tree,
+                        true,
+                        true,
+                        false
+                    )?
+                );
+            }
+        }
+        Command::LabSeed { profile } => {
+            service.repository_mut().seed_lab_profile(&profile)?;
+            println!("Query Lab seed ready: {profile}");
+        }
         Command::Add { title } => print_task(&service.add(title)?),
         Command::List => print_tasks(&service.list()?),
         Command::Done { id } | Command::TaskDone { id } => {
@@ -177,5 +218,5 @@ fn print_sql_results(results: &[SqlResult]) {
     }
 }
 fn print_help() {
-    println!("rust-task: relational task management CLI\n\nProject: project add|list|show|delete|stats\nTask: task add|list|show|done|delete|search|tag|untag|tags\nTag: tag add|list|delete\nOther: seed, sql, repl\nLegacy: add, list, done, delete, search, stats");
+    println!("rust-task: relational task management CLI\n\nQuery Lab: analyze [options] \"SQL\", lab list, lab run <scenario>\nProject: project add|list|show|delete|stats\nTask: task add|list|show|done|delete|search|tag|untag|tags\nTag: tag add|list|delete\nOther: seed, sql, repl\nLegacy: add, list, done, delete, search, stats");
 }

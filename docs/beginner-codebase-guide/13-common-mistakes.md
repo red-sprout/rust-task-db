@@ -152,7 +152,7 @@ pub priority: i64,
 
 ### 문제가 되는 이유
 
-학습 단계가 꼬인다. Step 10은 `serde`, `serde_json`, `gluesql`, `futures`까지만 사용하면서 GlueSQL 저장소, SQL 실행 모드, REPL 모드를 배우는 단계다.
+학습 단계가 꼬인다. Step 10은 `serde`, `serde_json`, `gluesql`, `futures`, `async-trait`까지만 사용하면서 GlueSQL 저장소, SQL 실행 모드, REPL 모드를 배우는 단계다.
 
 ### 잘못된 코드
 
@@ -176,7 +176,7 @@ futures = "0.3"
 
 ### 예방 방법
 
-Step 28 현재는 `serde`, `serde_json`, `gluesql`, `futures`만 둔다. Storage별 기능 비교표를 추가했지만 새 crate는 추가하지 않는다. `clap`은 현재 로드맵에서 사용하지 않는다.
+Step 40 현재는 `serde`, `serde_json`, `gluesql`, `futures`, `async-trait`만 둔다. Storage별 기능 비교표를 추가했지만 새 crate는 추가하지 않는다. `clap`은 현재 로드맵에서 사용하지 않는다.
 
 ## 실수 이름: 같은 SledStorage 경로를 동시에 두 번 열려고 함
 

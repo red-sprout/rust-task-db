@@ -2,9 +2,11 @@
 
 Step 28에서 추가된 `src/project.rs`, `src/tag.rs`와 이동된 `src/service/mod.rs`는 [21-relational-task-management.md](../21-relational-task-management.md)가 함수명과 수정 지점을 설명한다.
 
+Step 40의 `src/query_lab/` 파일은 [Query Lab 개요](../../query-lab/00-overview.md)와 연결해 읽는다.
+
 ## 이 디렉터리의 목적
 
-현재 Step 28 코드와 문서 파일을 하나씩 읽을 수 있게 나눈다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 18 문서는 Storage별 기능 비교표를 추가한다.
+현재 Step 40 코드와 문서 파일을 하나씩 읽을 수 있게 나눈다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 18 문서는 Storage별 기능 비교표를 추가한다.
 
 ## 파일별 해설 문서 목록
 

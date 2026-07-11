@@ -88,7 +88,7 @@ impl GlueSqlTaskRepository<MemoryStorage> {
 파일 경로: `src/repository/gluesql_repository.rs`
 
 ```rust
-impl GlueSqlTaskRepository<SledStorage> {
+impl GlueSqlTaskRepository<TracingStorage<SledStorage>> {
     pub fn persistent(path: impl AsRef<Path>) -> Result<Self, AppError> {
         let storage =
             SledStorage::new(path).map_err(|error| AppError::GlueSql(error.to_string()))?;

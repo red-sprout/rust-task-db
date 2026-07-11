@@ -4,7 +4,7 @@ Step 28에서는 `Option<i64>`로 Project 미지정을 표현하고, `TaskDetail
 
 ## 이 문서의 목적
 
-현재 Step 28 코드에 실제 등장하는 Rust 문법과 외부 crate 사용만 설명한다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 18에서는 Storage별 기능 차이를 문서로 분석한다. 새 Rust 문법이나 production code 변경은 추가하지 않았다.
+현재 Step 40 코드에 실제 등장하는 Rust 문법과 외부 crate 사용만 설명한다. 기능 코드는 Step 12의 GlueSQL `SledStorage` 상태를 유지하고, Step 18에서는 Storage별 기능 차이를 문서로 분석한다. 새 Rust 문법이나 production code 변경은 추가하지 않았다.
 
 ## 이 프로젝트에서 자주 등장하는 문법 목록
 

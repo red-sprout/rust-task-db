@@ -1,17 +1,17 @@
 # rust-task-db
 
-Rust와 GlueSQL로 만든 관계형 Task Management CLI다. Step 28 현재 Project 1:N Task, Task N:M Tag 관계를 실제 사용자 기능으로 제공하며, 기존 Todo 명령과 JSON repository 학습 코드도 보존한다.
+Rust와 GlueSQL로 만든 관계형 Task Management CLI다. Step 40 현재 Project/Task/Tag 기능과 그 실제 SQL을 분석하는 Query Lab을 함께 제공한다.
 
 ## 현재 상태
 
 | 항목 | 내용 |
 | --- | --- |
-| 현재 단계 | Step 28. 테스트와 문서 정리 |
-| 활성 저장소 | `GlueSqlTaskRepository<SledStorage>` |
+| 현재 단계 | Step 40. Query Lab 기여 후보 정리 |
+| 활성 저장소 | `GlueSqlTaskRepository<TracingStorage<SledStorage>>` |
 | 저장 위치 | `data/rust-task-db` |
 | 테스트 저장소 | GlueSQL `MemoryStorage` |
 | 보존 코드 | `JsonTaskRepository`, `tasks.json`, 기존 `add/list/done/delete/search/stats` |
-| 외부 crate | `serde`, `serde_json`, `gluesql`, `futures` |
+| 외부 crate | `serde`, `serde_json`, `gluesql`, `futures`, `async-trait` |
 
 ## 도메인과 테이블
 
@@ -34,6 +34,25 @@ app_metadata(key PRIMARY KEY, value NOT NULL)
 Step 18의 기존 3열 `tasks` 테이블은 시작 시 `project_id`와 기본 priority 3을 추가하는 migration을 수행한다.
 
 ## CLI
+
+Query Lab:
+
+```bash
+cargo run -- analyze "SELECT * FROM tasks"
+cargo run -- analyze --plan "SELECT * FROM tasks WHERE id = 10"
+cargo run -- analyze --runtime "SELECT * FROM tasks"
+cargo run -- analyze --raw-plan "SELECT ..."
+cargo run -- analyze --format json "SELECT ..."
+cargo run -- lab list
+cargo run -- lab run join
+cargo run -- lab run all
+cargo run -- lab seed --small
+cargo run -- lab seed --medium
+cargo run -- lab seed --large
+cargo run -- lab seed --skewed
+```
+
+`glue.plan`의 planned `ast::Statement`를 tree/JSON/raw plan으로 렌더링한다. `TracingStorage`는 fetch/scan/indexed 호출과 iterator 소비 row를 측정한다. Filter/Join/Aggregate/Sort 내부 actual row는 공개 hook이 없어 limitation으로 구분한다. 상세 문서는 [Query Lab 개요](docs/query-lab/00-overview.md)를 본다.
 
 ```bash
 cargo run -- project add "GlueSQL 분석"
@@ -87,5 +106,7 @@ cargo fmt --check
 cargo check
 cargo test
 ```
+
+현재 전체 테스트는 Query Lab plan/runtime/scenario 검증을 포함해 98개다. 실행 시간은 테스트 assertion으로 사용하지 않는다.
 
 상세 설계와 GlueSQL 조정 사항은 [관계형 Task Management 가이드](docs/beginner-codebase-guide/21-relational-task-management.md), 단계 기록은 [로드맵](docs/todo/roadmap.md)에서 확인할 수 있다.

@@ -255,6 +255,26 @@
 
 현재 총 65개 테스트가 유지된다.
 
+## Step 29~30. Plan Viewer와 Tree Renderer
+
+상태: 완료 — `glue.plan`, planned Statement tree/json/raw plan
+
+## Step 31. Runtime Metrics
+
+상태: 완료 — `TracingStorage`, iterator row consumption, mutation calls
+
+## Step 32~38. Query 실험
+
+상태: 완료 — scan/PK/index/JOIN/aggregate/HAVING/subquery/sort/limit/distinct/mutation/sargability/selectivity
+
+## Step 39. DBMS 비교
+
+상태: 완료 — GlueSQL/PostgreSQL/MySQL/Oracle 비교 문서
+
+## Step 40. 기여 후보
+
+상태: 완료 — Pretty Plan, Explain API, Storage Trace, Operator Hook, Cost/Statistics 우선순위
+
 ## Step 17. Query Execution 상세 분석
 
 상태: 완료

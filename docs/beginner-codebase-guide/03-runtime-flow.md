@@ -213,7 +213,7 @@ pub fn add(&mut self, title: String) -> Result<Task, AppError> {
 
 ## GlueSQL 실행 흐름은 어디에 있나?
 
-Step 28 현재 GlueSQL 세부사항과 SQL 결과 변환은 `src/repository/gluesql_repository.rs` 안에 있다. 명령별 SQL과 `Payload` 변환 상세는 [19-query-execution.md](19-query-execution.md)에서 다루고, storage별 기능 차이는 [20-storage-comparison.md](20-storage-comparison.md)에서 다룬다.
+Step 40 현재 GlueSQL 세부사항과 SQL 결과 변환은 `src/repository/gluesql_repository.rs` 안에 있다. 명령별 SQL과 `Payload` 변환 상세는 [19-query-execution.md](19-query-execution.md)에서 다루고, storage별 기능 차이는 [20-storage-comparison.md](20-storage-comparison.md)에서 다룬다.
 
 ```text
 src/main.rs

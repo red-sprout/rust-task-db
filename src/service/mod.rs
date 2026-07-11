@@ -12,6 +12,9 @@ impl<R> TaskService<R> {
     pub fn new(repository: R) -> Self {
         Self { repository }
     }
+    pub(crate) fn repository_mut(&mut self) -> &mut R {
+        &mut self.repository
+    }
 }
 
 impl<R: TaskRepository> TaskService<R> {
