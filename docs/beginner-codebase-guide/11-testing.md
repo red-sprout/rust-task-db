@@ -2,7 +2,7 @@
 
 ## Step 28 기준
 
-`cargo test` 기준 98개가 통과한다. Project CRUD/검증, Project filter/priority/stats, Tag 중복, tag/untag/filter/detail, Task/Tag 삭제 정리, Seed idempotency를 직접 검증한다.
+`cargo test` 기준 100개가 통과한다. Project CRUD/검증, Project filter/priority/stats, Tag 중복, tag/untag/filter/detail, Task/Tag 삭제 정리, Seed idempotency, Sled secondary-index Planner 위임과 migration column-order INSERT를 직접 검증한다.
 
 ## 테스트 구조
 
@@ -308,7 +308,7 @@ fn missing_add_title_returns_error() {
 
 ## 현재 테스트 개수
 
-Step 18 당시 테스트는 65개였다. Step 40 현재는 기존 storage 경계 테스트와 관계형 기능, Seed idempotency를 합쳐 총 98개다.
+Step 18 당시 테스트는 65개였다. Step 40 현재는 기존 storage 경계 테스트와 관계형 기능, Seed idempotency, Sled Planner 위임, migration 회귀 검증을 합쳐 총 100개다.
 
 - `src/task.rs`: domain 테스트 2개
 - `src/cli.rs`: CLI parser 테스트 16개

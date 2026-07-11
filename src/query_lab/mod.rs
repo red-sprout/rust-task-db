@@ -64,8 +64,18 @@ where
 pub fn persistent_traced(
     path: impl AsRef<Path>,
 ) -> Result<GlueSqlTaskRepository<TracingStorage<SledStorage>>, AppError> {
-    let storage = SledStorage::new(path).map_err(|error| AppError::GlueSql(error.to_string()))?;
-    GlueSqlTaskRepository::from_storage(TracingStorage::new(storage), true)
+    let mut storage =
+        SledStorage::new(path).map_err(|error| AppError::GlueSql(error.to_string()))?;
+    // GlueSQL SledStorage의 기본 stale-lock timeout은 1시간이다. CLI가 transaction
+    // 도중 비정상 종료됐다면 다음 실행에서 오래 기다리지 않고 복구하도록 시작 시에만
+    // 60초 timeout을 사용하고, 초기화 뒤 기본 1시간 정책으로 되돌린다.
+    storage.set_transaction_timeout(Some(60_000));
+    let mut repository = GlueSqlTaskRepository::from_storage(TracingStorage::new(storage), true)?;
+    repository
+        .storage_mut()
+        .inner_mut()
+        .set_transaction_timeout(Some(3_600_000));
+    Ok(repository)
 }
 
 pub fn render_report(
@@ -114,6 +124,32 @@ mod tests {
         );
         assert_eq!(report.metrics.fetch_data_calls, 1);
         assert_eq!(report.metrics.rows_consumed, 1);
+    }
+
+    #[test]
+    fn tracing_storage_delegates_sled_secondary_index_planning() {
+        let path = std::env::temp_dir().join(format!(
+            "rust-task-query-lab-index-{}-{}",
+            std::process::id(),
+            std::time::SystemTime::now()
+                .duration_since(std::time::UNIX_EPOCH)
+                .unwrap()
+                .as_nanos()
+        ));
+        let storage = SledStorage::new(path).unwrap();
+        let mut repository =
+            GlueSqlTaskRepository::from_storage(TracingStorage::new(storage), true).unwrap();
+
+        let report = analyze(
+            &mut repository,
+            "SELECT * FROM tasks WHERE project_id = 1;",
+            true,
+        )
+        .unwrap();
+
+        assert!(contains_label(&report.plans[0], "Index Scan [tasks"));
+        assert_eq!(report.metrics.scan_indexed_data_calls, 1);
+        assert_eq!(report.metrics.scan_data_calls, 0);
     }
 
     #[test]

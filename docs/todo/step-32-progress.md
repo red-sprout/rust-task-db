@@ -21,7 +21,7 @@ Step 32 완료. Full scan, primary key, secondary-index 후보를 같은 report 
 
 ## 구현과 해석
 
-새 schema의 PK equality는 `IndexItem::PrimaryKey`/`fetch_data`로 관찰된다. Sled secondary index는 생성되지만 GlueSQL 0.19 default planner가 일반 predicate를 자동 NonClustered plan으로 선택하지 않는다.
+새 schema의 PK equality는 `IndexItem::PrimaryKey`/`fetch_data`로 관찰된다. SledStorage 전용 Planner는 `plan_index`를 호출하므로 `TracingStorage`가 inner Planner를 위임할 때 `project_id`와 `done` equality가 `IndexItem::NonClustered`/`scan_indexed_data`로 관찰된다.
 
 ```bash
 cargo run -- analyze --plan "SELECT * FROM tasks WHERE id = 1"
@@ -32,7 +32,7 @@ cargo run -- analyze --runtime "SELECT * FROM tasks"
 
 ## 테스트 근거
 
-- `runtime_counts_scan_and_iterator_rows`, `primary_key_plan_uses_fetch_data`
+- `runtime_counts_scan_and_iterator_rows`, `primary_key_plan_uses_fetch_data`, `tracing_storage_delegates_sled_secondary_index_planning`
 - 실행 시간은 assertion으로 사용하지 않는다.
 - plan 종류, Storage 호출, consumed/returned/affected row와 결과값을 검증 대상으로 사용한다.
 

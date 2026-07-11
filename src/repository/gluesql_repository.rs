@@ -71,6 +71,10 @@ where
         &self.glue.storage
     }
 
+    pub(crate) fn storage_mut(&mut self) -> &mut S {
+        &mut self.glue.storage
+    }
+
     pub(crate) fn seed_lab_profile(&mut self, profile: &str) -> Result<(), AppError> {
         if profile == "small" {
             return self.seed();
@@ -90,9 +94,12 @@ where
             return Ok(());
         }
         self.transaction(|repository| {
-            let project_start = reserve_ids(repository, "projects", projects)?;
-            let tag_start = reserve_ids(repository, "tags", tags)?;
-            let task_start = reserve_ids(repository, "tasks", tasks)?;
+            let project_start = reserve_ids(repository, "projects", projects)
+                .map_err(|error| seed_profile_error(profile, "reserve project IDs", error))?;
+            let tag_start = reserve_ids(repository, "tags", tags)
+                .map_err(|error| seed_profile_error(profile, "reserve tag IDs", error))?;
+            let task_start = reserve_ids(repository, "tasks", tasks)
+                .map_err(|error| seed_profile_error(profile, "reserve task IDs", error))?;
             execute_batches(
                 repository,
                 (0..projects).map(|n| {
@@ -102,7 +109,8 @@ where
                         n + 1
                     )
                 }),
-            )?;
+            )
+            .map_err(|error| seed_profile_error(profile, "insert projects", error))?;
             execute_batches(
                 repository,
                 (0..tags).map(|n| {
@@ -112,7 +120,8 @@ where
                         n + 1
                     )
                 }),
-            )?;
+            )
+            .map_err(|error| seed_profile_error(profile, "insert tags", error))?;
             execute_batches(
                 repository,
                 (0..tasks).map(|n| {
@@ -123,7 +132,7 @@ where
                     };
                     let done = if skewed { n % 10 != 0 } else { n % 3 == 0 };
                     format!(
-                        "INSERT INTO tasks VALUES ({}, {}, 'Lab {profile} Task {:07}', {}, {});",
+                        "INSERT INTO tasks (id, project_id, title, done, priority) VALUES ({}, {}, 'Lab {profile} Task {:07}', {}, {});",
                         task_start + n as i64,
                         project_start + project_offset as i64,
                         n + 1,
@@ -131,7 +140,8 @@ where
                         (n % 5) + 1
                     )
                 }),
-            )?;
+            )
+            .map_err(|error| seed_profile_error(profile, "insert tasks", error))?;
             execute_batches(
                 repository,
                 (0..tasks).map(|n| {
@@ -146,8 +156,10 @@ where
                         tag_start + tag_offset as i64
                     )
                 }),
-            )?;
-            set_metadata(repository, &key, "1")?;
+            )
+            .map_err(|error| seed_profile_error(profile, "insert task-tag links", error))?;
+            set_metadata(repository, &key, "1")
+                .map_err(|error| seed_profile_error(profile, "write completion metadata", error))?;
             Ok(())
         })
     }
@@ -420,7 +432,7 @@ where
             let task = Task::with_project(id, project_id, title, priority);
             let project = project_id.map_or_else(|| "NULL".to_string(), |id| id.to_string());
             repository.execute(format!(
-                "INSERT INTO tasks VALUES ({id}, {project}, {}, FALSE, {priority});",
+                "INSERT INTO tasks (id, project_id, title, done, priority) VALUES ({id}, {project}, {}, FALSE, {priority});",
                 sql_string(&task.title)
             ))?;
             for tag in resolved {
@@ -574,6 +586,10 @@ where
             Ok(())
         })
     }
+}
+
+fn seed_profile_error(profile: &str, stage: &str, error: AppError) -> AppError {
+    AppError::GlueSql(format!("lab seed {profile} failed during {stage}: {error}"))
 }
 
 fn metadata_value<S>(
@@ -965,6 +981,39 @@ mod tests {
 
         assert_eq!(task, Task::new(1, "Rust".to_string()));
         assert_eq!(repository.find_all(), Ok(vec![task]));
+    }
+
+    #[test]
+    fn inserts_task_after_migrating_step_18_column_order() {
+        let mut legacy = Glue::new(MemoryStorage::default());
+        block_on(legacy.execute(
+            "CREATE TABLE tasks (
+                id INTEGER PRIMARY KEY,
+                title TEXT NOT NULL,
+                done BOOLEAN NOT NULL
+            );
+            ALTER TABLE tasks ADD COLUMN project_id INTEGER;
+            ALTER TABLE tasks ADD COLUMN priority INTEGER DEFAULT 3;
+            CREATE TABLE projects (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
+            CREATE TABLE tags (id INTEGER PRIMARY KEY, name TEXT NOT NULL);
+            CREATE TABLE task_tags (task_id INTEGER, tag_id INTEGER);
+            CREATE TABLE id_sequences (entity TEXT PRIMARY KEY, next_id INTEGER NOT NULL);
+            CREATE TABLE app_metadata (key TEXT PRIMARY KEY, value TEXT NOT NULL);",
+        ))
+        .unwrap();
+        let mut repository = GlueSqlTaskRepository {
+            glue: legacy,
+            transactional: false,
+            in_transaction: false,
+        };
+        let project = repository.add_project("Migrated".into()).unwrap();
+        let task = repository
+            .add_task(Some(project.id), 4, "column-safe insert".into())
+            .unwrap();
+
+        assert_eq!(task.project_id, Some(project.id));
+        assert_eq!(task.title, "column-safe insert");
+        assert_eq!(task.priority, 4);
     }
 
     #[test]

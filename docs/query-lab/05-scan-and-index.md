@@ -12,7 +12,9 @@ CREATE INDEX idx_tasks_done ON tasks(done);
 CREATE INDEX idx_task_tags_tag_id ON task_tags(tag_id);
 ```
 
-그러나 GlueSQL 0.19 기본 `Planner::plan`은 `plan_primary_key`, `plan_join`만 호출한다(`store/planner.rs`). 일반 SQL predicate가 `NonClustered`로 자동 계획되지 않아 현재 실험에서는 `scan_indexed_data = 0`이 관찰된다. 인덱스 존재를 인덱스 선택으로 해석하면 안 된다.
+GlueSQL 0.19 core의 `Planner` 기본 구현은 `plan_primary_key`, `plan_join`만 호출하지만, `gluesql_sled_storage/src/planner.rs`의 `SledStorage` 전용 구현은 그 사이에 `plan_index`를 호출한다. `TracingStorage<S>`는 반드시 `self.inner.plan(statement)`를 위임해야 이 전용 구현이 보존된다. 초기 구현은 빈 `Planner` impl로 core 기본 구현을 선택해 secondary index를 가렸으며, 현재는 위임하도록 수정했다.
+
+수정 후 `project_id = 1`은 `idx_tasks_project_id`, `done = TRUE`는 `idx_tasks_done`을 `IndexItem::NonClustered`로 계획하고 runtime에서 `scan_indexed_data = 1`이 확인된다. 다만 Sled planner에 cardinality/cost 비교는 확인되지 않으므로 높은 선택도의 `done = TRUE`도 인덱스를 선택한다.
 
 ## 판정 표
 
@@ -20,7 +22,7 @@ CREATE INDEX idx_task_tags_tag_id ON task_tags(tag_id);
 | --- | --- | --- | --- |
 | 조건 없음 | `index: None` | `scan_data` | Full scan 확인 가능 |
 | `id = literal` | `PrimaryKey` | `fetch_data` | 새 schema에서 직접 확인 |
-| `project_id = 1` | `NonClustered` 여부 | indexed 또는 scan | 기본 planner는 자동 선택하지 않음 |
-| `done = TRUE` | 동일 | 동일 | index 생성만으로 사용을 보장하지 않음 |
+| `project_id = 1` | `NonClustered` | `scan_indexed_data` | Sled `plan_index`가 인덱스 선택 |
+| `done = TRUE` | `NonClustered` | `scan_indexed_data` | 선택도 비용 비교 없이 인덱스 선택 |
 
-테스트 `runtime_counts_scan_and_iterator_rows`는 2개 task에 대해 scan 1회, consumed 2, returned 2를 정확히 검증한다. `primary_key_plan_uses_fetch_data`는 새 Memory schema에서 PK plan과 fetch 1회를 검증한다. `renders_non_clustered_index_access_path`는 planner 선택 테스트가 아니라 AST variant renderer 단위 테스트라는 점을 구분해야 한다.
+테스트 `runtime_counts_scan_and_iterator_rows`는 2개 task에 대해 scan 1회, consumed 2, returned 2를 정확히 검증한다. `primary_key_plan_uses_fetch_data`는 새 Memory schema에서 PK plan과 fetch 1회를 검증한다. `renders_non_clustered_index_access_path`는 AST renderer 단위 테스트이며, 실제 Sled planner 위임과 index scan은 `tracing_storage_delegates_sled_secondary_index_planning`이 검증한다.

@@ -81,6 +81,10 @@ impl<S> TracingStorage<S> {
             metrics: TraceMetrics::default(),
         }
     }
+
+    pub(crate) fn inner_mut(&mut self) -> &mut S {
+        &mut self.inner
+    }
 }
 
 pub trait MetricSource {
@@ -223,7 +227,14 @@ impl<S: CustomFunctionMut + Send> CustomFunctionMut for TracingStorage<S> {
 #[async_trait]
 impl<S: Store + StoreMut> AlterTable for TracingStorage<S> {}
 #[async_trait]
-impl<S: Store> Planner for TracingStorage<S> {}
+impl<S: Planner + Sync> Planner for TracingStorage<S> {
+    async fn plan(
+        &self,
+        statement: gluesql::core::ast::Statement,
+    ) -> Result<gluesql::core::ast::Statement> {
+        self.inner.plan(statement).await
+    }
+}
 
 #[cfg(test)]
 mod tests {

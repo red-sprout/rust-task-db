@@ -35,6 +35,8 @@ cargo run -- analyze --runtime "SELECT * FROM tasks"
 - Query Lab 전체 단위/통합 테스트와 `cargo fmt --check`, `cargo check`, `cargo test`
 - 실행 시간은 assertion으로 사용하지 않는다.
 - plan 종류, Storage 호출, consumed/returned/affected row와 결과값을 검증 대상으로 사용한다.
+- `inserts_task_after_migrating_step_18_column_order`는 기존 3열 `tasks` migration 후에도 명시적 column INSERT가 올바른 필드에 값을 저장하는지 검증한다.
+- Query Lab Sled 초기화는 비정상 종료 후 60초가 지난 stale transaction lock을 복구한 다음 기본 1시간 timeout으로 복귀한다.
 
 ## 제약과 주의점
 

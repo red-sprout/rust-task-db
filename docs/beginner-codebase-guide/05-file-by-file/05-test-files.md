@@ -1,6 +1,6 @@
 # 테스트 파일
 
-Step 28 테스트는 98개다. 관계형 repository 테스트는 Project CRUD/통계, priority, Tag 연결/중복/해제/filter, 상세 JOIN, 삭제 정리와 Seed idempotency를 검증한다.
+Step 40 현재 테스트는 100개다. 관계형 repository 테스트는 Project CRUD/통계, priority, Tag 연결/중복/해제/filter, 상세 JOIN, 삭제 정리, Seed idempotency, Sled secondary-index Planner 위임과 Step 18 schema migration 후 column-safe INSERT를 검증한다.
 
 ## 포함된 파일 목록
 
@@ -455,4 +455,4 @@ assert_eq!(command, Ok(Command::Help));
 
 ## 이 파일을 이해한 뒤 알아야 하는 것
 
-Step 18 당시에는 총 65개 테스트였다. Step 40 현재는 기존 동작과 관계형 기능 및 Seed idempotency를 합쳐 총 98개 테스트가 있다. 정확한 목록은 `cargo test -- --list`로 확인한다.
+Step 18 당시에는 총 65개 테스트였다. Step 40 현재는 기존 동작과 관계형 기능, Seed idempotency, Sled Planner 위임, migration column-order 회귀 검증을 합쳐 총 100개 테스트가 있다. 정확한 목록은 `cargo test -- --list`로 확인한다.

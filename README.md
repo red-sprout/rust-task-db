@@ -52,6 +52,8 @@ cargo run -- lab seed --large
 cargo run -- lab seed --skewed
 ```
 
+`large`는 250,000개 Task와 250,000개 Task-Tag 연결을 하나의 transaction에서 생성하므로 개발 환경에 따라 오래 걸릴 수 있다. seed 도중 프로세스가 비정상 종료되면 다음 CLI 시작 시 60초가 지난 stale Sled transaction lock을 rollback한 뒤 기본 1시간 timeout 정책으로 복귀한다.
+
 `glue.plan`의 planned `ast::Statement`를 tree/JSON/raw plan으로 렌더링한다. `TracingStorage`는 fetch/scan/indexed 호출과 iterator 소비 row를 측정한다. Filter/Join/Aggregate/Sort 내부 actual row는 공개 hook이 없어 limitation으로 구분한다. 상세 문서는 [Query Lab 개요](docs/query-lab/00-overview.md)를 본다.
 
 ```bash
@@ -107,6 +109,6 @@ cargo check
 cargo test
 ```
 
-현재 전체 테스트는 Query Lab plan/runtime/scenario 검증을 포함해 98개다. 실행 시간은 테스트 assertion으로 사용하지 않는다.
+현재 전체 테스트는 Query Lab plan/runtime/scenario, Sled secondary-index Planner 위임과 Step 18 schema migration 후 column-safe INSERT 회귀 검증을 포함해 100개다. 실행 시간은 테스트 assertion으로 사용하지 않는다.
 
 상세 설계와 GlueSQL 조정 사항은 [관계형 Task Management 가이드](docs/beginner-codebase-guide/21-relational-task-management.md), 단계 기록은 [로드맵](docs/todo/roadmap.md)에서 확인할 수 있다.
